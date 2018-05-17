@@ -1,6 +1,6 @@
 package tiles;
 
-import world.Car;
+import Car.Car;
 
 public class GrassTrap extends TrapTile {
 	public String getTrap() { return "grass"; }

@@ -1,12 +1,14 @@
 package tiles;
 
-import world.Car;
+import Car.Car;
 
 public class LavaTrap extends TrapTile {
 	public static final int HealthDelta = 20;
 	private int key = 0;
 	
-	public String getTrap() { return "lava"; }
+	public String getTrap() {
+		return "lava";
+	}
 
 	public void applyTo(Car car, float delta) {
 		car.reduceHealth(HealthDelta * delta);

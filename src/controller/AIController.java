@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import tiles.MapTile;
 import utilities.Coordinate;
-import world.Car;
+import Car.Car;
 import world.WorldSpatial;
 
 public class AIController extends CarController {

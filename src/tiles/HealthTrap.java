@@ -1,6 +1,6 @@
 package tiles;
 
-import world.Car;
+import Car.Car;
 
 public class HealthTrap extends TrapTile {
 	public static final int HealthDelta = 5;

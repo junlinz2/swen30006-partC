@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.lang.reflect.Constructor;
 
+import Car.Car;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -146,11 +147,11 @@ public class World {
 		car.draw(batch);
 	}
 	
-	protected static Coordinate getCarStart() {
+	public static Coordinate getCarStart() {
 		return carStart;
 	}
 	
-	protected static Coordinate getStart() {
+	public static Coordinate getStart() {
 		return start;
 	}
 	
@@ -162,7 +163,7 @@ public class World {
 		return map;
 	}
 	
-	protected static MapTile lookUp(double futureX, double futureY){
+	public static MapTile lookUp(double futureX, double futureY){
 		int x = (int) Math.round(futureX);
 		int y =  MAP_HEIGHT - (int) Math.round(futureY); // Convert Y coordinate
 		Coordinate coord = new Coordinate(x,y);

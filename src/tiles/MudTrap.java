@@ -2,7 +2,7 @@ package tiles;
 
 import com.badlogic.gdx.math.Vector2;
 
-import world.Car;
+import Car.Car;
 
 public class MudTrap extends TrapTile {
 	

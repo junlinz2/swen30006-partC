@@ -1,4 +1,4 @@
-package world;
+package Car;
 
 import java.util.HashMap;
 
@@ -18,6 +18,8 @@ import tiles.TrapTile;
 import utilities.Coordinate;
 import utilities.PeekTuple;
 
+import world.World;
+import world.WorldSpatial;
 import world.WorldSpatial.Direction;
 
 /**
@@ -54,8 +56,7 @@ public class Car extends Sprite{
 	public static final int VIEW_SQUARE = 4;
 	private static final int WALL_DAMAGE = 5;
 
-
-	private static enum State { FORWARD, REVERSE };
+	private enum State { FORWARD, REVERSE };
 	private static State carDirection = State.FORWARD;
 
 	private static int CAR_WIDTH;
@@ -66,7 +67,7 @@ public class Car extends Sprite{
 	
 	private int key = 1; // If no keys elsewhere, we have the exit key
 
-	Car(Sprite sprite){
+	public Car(Sprite sprite){
 		super(sprite);
 
 		health = MAX_HEALTH;

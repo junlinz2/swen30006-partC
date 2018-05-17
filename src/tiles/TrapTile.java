@@ -1,6 +1,6 @@
 package tiles;
 
-import world.Car;
+import Car.Car;
 
 public abstract class TrapTile extends MapTile{
 
