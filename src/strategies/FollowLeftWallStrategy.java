@@ -13,4 +13,8 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
     }
 
+    @Override
+    public boolean checkFollowingWall(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView) {
+        return false;
+    }
 }

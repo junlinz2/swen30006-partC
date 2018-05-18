@@ -1,4 +1,4 @@
-package Car;
+package mycontroller;
 
 import tiles.MapTile;
 import utilities.Coordinate;
@@ -12,6 +12,9 @@ public class Sensor {
     // How many minimum units the wall is away from the player.
     private int obstacleSensitivity = 3;
 
+    public Sensor() {
+    }
+
     /**
      * Method below just iterates through the list and check in the correct coordinates.
      * i.e. Given your current position is 10,10
@@ -20,9 +23,10 @@ public class Sensor {
      * checkNorth will check up to obstacleSensitivity amount of tiles to the top.
      * checkSouth will check up to obstacleSensitivity amount of tiles below.
      */
-    public boolean checkEast(HashMap<Coordinate, MapTile> currentView) {
+
+    public boolean checkEast(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition,
+                             ArrayList<String> tilesToAvoid) {
         // Check tiles to my right
-        Coordinate currentPosition = new Coordinate(getPosition());
         for (int i = 0; i <= obstacleSensitivity; i++) {
             MapTile tile = currentView.get(new Coordinate(currentPosition.x + i, currentPosition.y));
             if (tile.isType(MapTile.Type.WALL)) {
@@ -32,9 +36,9 @@ public class Sensor {
         return false;
     }
 
-    public boolean checkWest(HashMap<Coordinate, MapTile> currentView) {
+    public boolean checkWest(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition,
+                             ArrayList<String> tilesToAvoid) {
         // Check tiles to my left
-        Coordinate currentPosition = new Coordinate(getPosition());
         for (int i = 0; i <= obstacleSensitivity; i++) {
             MapTile tile = currentView.get(new Coordinate(currentPosition.x - i, currentPosition.y));
             if (tile.isType(MapTile.Type.WALL)) {
@@ -44,10 +48,9 @@ public class Sensor {
         return false;
     }
 
-    public boolean checkNorth(HashMap<Coordinate, MapTile> currentView, ArrayList<String> tilesToAvoid) {
+    public boolean checkNorth(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition,
+                              ArrayList<String> tilesToAvoid) {
         // Check tiles to towards the top
-
-        Coordinate currentPosition = new Coordinate(getPosition());
         for (int i = 0; i <= obstacleSensitivity; i++) {
             MapTile tile = currentView.get(new Coordinate(currentPosition.x, currentPosition.y + i));
             if (tile.isType(MapTile.Type.WALL)) {
@@ -56,7 +59,7 @@ public class Sensor {
 
             for (String s : tilesToAvoid) {
                 System.out.println(tile.getClass().getName());
-                if (tile.getClass().getName().equals(s)) {
+                if (tile.isType()) {
                     return true;
                 }
             }
@@ -64,9 +67,9 @@ public class Sensor {
         return false;
     }
 
-    public boolean checkSouth(HashMap<Coordinate, MapTile> currentView) {
+    public boolean checkSouth(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition,
+                              ArrayList<String> tilesToAvoid) {
         // Check tiles towards the bottom
-        Coordinate currentPosition = new Coordinate(getPosition());
         for (int i = 0; i <= obstacleSensitivity; i++) {
             MapTile tile = currentView.get(new Coordinate(currentPosition.x, currentPosition.y - i));
             if (tile.isType(MapTile.Type.WALL)) {
@@ -105,11 +108,11 @@ public class Sensor {
      * @return
      */
     public boolean checkFollowingWall(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-                                      WorldSpatial.RelativeDirection direction) {
+                                      WorldSpatial.RelativeDirection direction, Coordinate currentPosition) {
         if (direction == WorldSpatial.RelativeDirection.LEFT) {
             switch (orientation) {
                 case EAST:
-                    return checkNorth(currentView);
+                    return checkNorth(currentView, currentPosition, );
                 case NORTH:
                     return checkWest(currentView);
                 case SOUTH:

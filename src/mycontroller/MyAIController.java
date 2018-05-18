@@ -97,7 +97,8 @@ public class MyAIController extends CarController {
 			}
 
 			// Try to determine whether or not the car is next to a wall.
-			else if(sensor.checkFollowingWall(super.getOrientation(), currentView, WorldSpatial.RelativeDirection.LEFT)){
+			else if(sensor.checkFollowingWall(super.getOrientation(), currentView, WorldSpatial.RelativeDirection.LEFT,
+                    new Coordinate(getPosition()))){
 				// Maintain some velocity
 				if(getSpeed() < CAR_SPEED){
 					applyForwardAcceleration();
