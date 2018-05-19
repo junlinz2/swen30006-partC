@@ -2,9 +2,12 @@ package controller;
 
 import java.util.HashMap;
 
+import tiles.HealthTrap;
 import tiles.MapTile;
+import tiles.TrapTile;
 import utilities.Coordinate;
 import world.Car;
+import world.World;
 import world.WorldSpatial;
 
 public class AIController extends CarController {
@@ -18,6 +21,7 @@ public class AIController extends CarController {
 	private boolean isTurningLeft = false;
 	private boolean isTurningRight = false; 
 	private WorldSpatial.Direction previousState = null; // Keeps track of the previous state
+	public HashMap<Coordinate,MapTile> map;
 	
 	// Car Speed to move at
 	private final float CAR_SPEED = 3;
@@ -27,6 +31,7 @@ public class AIController extends CarController {
 	
 	public AIController(Car car) {
 		super(car);
+		map = getMap();
 	}
 	
 	Coordinate initialGuess;
@@ -36,8 +41,8 @@ public class AIController extends CarController {
 		
 		// Gets what the car can see
 		HashMap<Coordinate, MapTile> currentView = getView();
-		
 		checkStateChange();
+		updateMap(currentView);
 
 		// If you are not following a wall initially, find a wall to stick to!
 		if(!isFollowingWall){
@@ -98,9 +103,21 @@ public class AIController extends CarController {
 				isTurningLeft = true;
 			}
 		}
-		
-		
 
+	}
+	
+	public void updateMap(HashMap<Coordinate, MapTile> currentView){
+		for (Coordinate key : currentView.keySet()) {
+			map.put(key, currentView.get(key));
+		}
+		int reverseYAxis = World.MAP_HEIGHT- 12;
+		MapTile tile =  map.get(new Coordinate(5, reverseYAxis));
+
+		if(MapTile.Type.TRAP == tile.getType()){
+			System.out.println("============");
+			System.out.println(((HealthTrap) tile).getTrap());
+			System.out.println(tile.getType());
+		}
 	}
 	
 	/**
