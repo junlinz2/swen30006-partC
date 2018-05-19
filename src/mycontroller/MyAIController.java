@@ -21,7 +21,6 @@ public class MyAIController extends CarController {
 
     private ArrayList<MapTile> tilesToAvoid = new ArrayList<>();
     private CarNavigationStrategy carNavigationStrategy;
-    private Sensor sensor;
 
 	// Car Speed to move at
 	private final float CAR_SPEED = 3;
@@ -34,14 +33,9 @@ public class MyAIController extends CarController {
 		tilesToAvoid.add(new MapTile(MapTile.Type.WALL));
 		tilesToAvoid.add(new LavaTrap());// TODO maybe don't use a magic string here
 
-        sensor = new Sensor(this);
-
         /**default to following left wall when simulation starts**/
-        carNavigationStrategy = new FollowLeftWallStrategy(this.sensor, tilesToAvoid);
+        carNavigationStrategy = new FollowLeftWallStrategy(new Sensor(this), tilesToAvoid);
 	}
-
-	Coordinate initialGuess;
-	boolean notSouth = true;
 
 	@Override
 	public void update(float delta) {
@@ -106,7 +100,7 @@ public class MyAIController extends CarController {
 					applyForwardAcceleration();
 				}
 				// If there is wall ahead, turn right!
-				if(sensor.checkWallAhead(getOrientation(), currentView, getPosition())){
+				if(sensor.checkViewForTile(getOrientation(), currentView, getPosition())){
 					lastTurnDirection = WorldSpatial.RelativeDirection.RIGHT;
 					isTurningRight = true;
 

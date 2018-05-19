@@ -127,4 +127,37 @@ public class Sensor {
         }
         return false;
     }
+
+    public boolean checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
+                                    Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+        HashMap<Coordinate, MapTile> view = null;
+        switch (orientation) {
+            case EAST:
+                view = getEastView(currentView, currentPosition);
+                break;
+            case NORTH:
+                view = getNorthView(currentView, currentPosition);
+                break;
+            case SOUTH:
+                view = getSouthView(currentView, currentPosition);
+                break;
+            case WEST:
+                view = getWestView(currentView, currentPosition);
+                break;
+        }
+        for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
+            for (MapTile tile : tilesToCheck) {
+                if (tile.getType() == MapTile.Type.TRAP &&
+                        tileInView.getValue().getType() == MapTile.Type.TRAP) {
+                    if (((TrapTile) tileInView.getValue()).getTrap().equals(((TrapTile)tile).getTrap())) {
+                        return true;
+                    }
+                }
+                else if (tileInView.getValue().getType() == tile.getType()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
