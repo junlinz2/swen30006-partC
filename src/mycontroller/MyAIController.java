@@ -3,8 +3,9 @@ package mycontroller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import controller.CarController;
-import strategies.CarNavigationStrategy;
-import strategies.FollowLeftWallStrategy;
+import mycontroller.strategies.CarNavigationStrategy;
+import mycontroller.strategies.FollowLeftWallStrategy;
+import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
 import Car.*;
@@ -18,9 +19,9 @@ public class MyAIController extends CarController {
 	private boolean isTurningRight = false;
 	private WorldSpatial.Direction previousState = null; // Keeps track of the previous state
 
-    private ArrayList<String> tilesToAvoid = new ArrayList<>();
+    private ArrayList<MapTile> tilesToAvoid = new ArrayList<>();
     private CarNavigationStrategy carNavigationStrategy;
-
+    private Sensor sensor;
 
 	// Car Speed to move at
 	private final float CAR_SPEED = 3;
@@ -28,17 +29,15 @@ public class MyAIController extends CarController {
 	// Offset used to differentiate between 0 and 360 degrees
 	private int EAST_THRESHOLD = 3;
 
-	private Sensor sensor;
-
 	public MyAIController(Car car) {
 		super(car);
-		tilesToAvoid.add("lava"); // TODO maybe don't use a magic string here
+		tilesToAvoid.add(new MapTile(MapTile.Type.WALL));
+		tilesToAvoid.add(new LavaTrap());// TODO maybe don't use a magic string here
 
-        sensor = new Sensor();
+        sensor = new Sensor(this);
 
         /**default to following left wall when simulation starts**/
-        carNavigationStrategy = new FollowLeftWallStrategy();
-
+        carNavigationStrategy = new FollowLeftWallStrategy(this.sensor);
 	}
 
 	Coordinate initialGuess;
@@ -49,6 +48,7 @@ public class MyAIController extends CarController {
 
 		// Gets what the car can see
 		HashMap<Coordinate, MapTile> currentView = getView();
+		Coordinate currentPosition = new Coordinate(getPosition());
 
 		checkStateChange();
 
@@ -62,7 +62,9 @@ public class MyAIController extends CarController {
 				lastTurnDirection = WorldSpatial.RelativeDirection.LEFT;
 				applyLeftTurn(getOrientation(),delta);
 			}
-			if(sensor.checkNorth(currentView, tilesToAvoid)){
+
+			// TODO: change getNorthView() to check wall logic instead
+			if(sensor.getNorthView(currentView, currentPosition)){
 				// Turn right until we go back to east!
 				if(!getOrientation().equals(WorldSpatial.Direction.EAST)){
 					lastTurnDirection = WorldSpatial.RelativeDirection.RIGHT;
@@ -88,7 +90,7 @@ public class MyAIController extends CarController {
 			// TODO: tweaking strategy for FollowRightWallStrategy.
 			else if(isTurningLeft){
 				// Apply the left turn if you are not currently near a wall.
-				if(!carNavigationStrategy.checkFollowingWall(getOrientation(), currentView)){
+				if(!carNavigationStrategy.checkFollowingObstacle(getOrientation(), currentView)){
 					applyLeftTurn(getOrientation(),delta);
 				}
 				else{
@@ -96,15 +98,15 @@ public class MyAIController extends CarController {
 				}
 			}
 
+
 			// Try to determine whether or not the car is next to a wall.
-			else if(sensor.checkFollowingWall(super.getOrientation(), currentView, WorldSpatial.RelativeDirection.LEFT,
-                    new Coordinate(getPosition()))){
+			else if(carNavigationStrategy.checkFollowingObstacle(super.getOrientation(), currentView, currentPosition)){
 				// Maintain some velocity
 				if(getSpeed() < CAR_SPEED){
 					applyForwardAcceleration();
 				}
 				// If there is wall ahead, turn right!
-				if(sensor.checkWallAhead(getOrientation(),currentView)){
+				if(sensor.checkWallAhead(getOrientation(), currentView, getPosition())){
 					lastTurnDirection = WorldSpatial.RelativeDirection.RIGHT;
 					isTurningRight = true;
 
@@ -118,6 +120,7 @@ public class MyAIController extends CarController {
 			}
 		}
 	}
+
 
 	/**
 	 * Readjust the car to the orientation we are in.
@@ -133,7 +136,6 @@ public class MyAIController extends CarController {
 				adjustLeft(getOrientation(),delta);
 			}
 		}
-
 	}
 
 	/**
@@ -280,22 +282,5 @@ public class MyAIController extends CarController {
 				break;
 
 		}
-
 	}
-
-    /**
-    public boolean checkNorth(HashMap<Coordinate,MapTile> currentView){
-        // Check tiles to towards the top
-
-        Coordinate currentPosition = new Coordinate(getPosition());
-        for(int i = 0; i <= obstacleSensitivity; i++){
-            MapTile tile = currentView.get(new Coordinate(currentPosition.x, currentPosition.y+i));
-            if (tile.isType(MapTile.Type.WALL)){
-                return true;
-            }
-        }
-        return false;
-    }
-     **/
-
 }
