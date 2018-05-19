@@ -5,11 +5,12 @@ import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
-    public FollowLeftWallStrategy(Sensor sensor) {
+    public FollowLeftWallStrategy(Sensor sensor, ArrayList<MapTile> tilesToAvoid) {
         super.sensor = sensor;
     }
 
@@ -19,8 +20,9 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
     @Override
     public boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-                                          Coordinate currentPosition) {
-        return sensor.checkFollowingObstacle(orientation, currentView, WorldSpatial.RelativeDirection.LEFT, currentPosition);
+                                          Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
+        return sensor.checkFollowingObstacle(orientation, currentView, WorldSpatial.RelativeDirection.LEFT,
+                currentPosition, tilesToAvoid);
     }
 
     public boolean checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,

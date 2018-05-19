@@ -37,7 +37,7 @@ public class MyAIController extends CarController {
         sensor = new Sensor(this);
 
         /**default to following left wall when simulation starts**/
-        carNavigationStrategy = new FollowLeftWallStrategy(this.sensor);
+        carNavigationStrategy = new FollowLeftWallStrategy(this.sensor, tilesToAvoid);
 	}
 
 	Coordinate initialGuess;

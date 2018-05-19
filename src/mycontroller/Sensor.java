@@ -15,7 +15,6 @@ public class Sensor {
 
     // How many minimum units obstacles are away from the player.
     private int obstacleSensitivity = 2;
-    private int wallFollowingSensitivity = 2;
 
     //TODO: remove if Sensor does not need info from controller
     private CarController carController;
@@ -115,8 +114,16 @@ public class Sensor {
         }
         for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
             for (MapTile tile : tilesToCheck) {
-                if (tileInView.getValue().getType().equals(MapTile.Type.TRAP)) {
-                    if (((TrapTile)tileInView.getValue()).getTrap().equals("lava")) // don't hardcode this
+                if (tile.getType() == MapTile.Type.TRAP &&
+                    tileInView.getValue().getType() == MapTile.Type.TRAP) {
+                    if (((TrapTile) tileInView.getValue()).getTrap().equals(((TrapTile)tile).getTrap())) {
+                        return true;
+                    }
+                }
+                else if (tileInView.getValue().getType().equals(tile.getType())) {
+                    return true;
+                }
+            }
         }
         return false;
     }
