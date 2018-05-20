@@ -1,5 +1,6 @@
 package mycontroller.strategies;
 
+import controller.CarController;
 import mycontroller.*;
 import tiles.MapTile;
 import utilities.Coordinate;
@@ -10,8 +11,10 @@ import java.util.HashMap;
 
 public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
-    public FollowLeftWallStrategy(Sensor sensor, ArrayList<MapTile> tilesToAvoid) {
-        super.sensor = sensor;
+    public FollowLeftWallStrategy(Sensor s, CarController c, ArrayList<MapTile> tilesToAvoid) {
+        super.sensor = s;
+        super.relay = new StrategyControllerRelay(c);
+        super.tilesToAvoid = tilesToAvoid;
     }
 
     public void doAction(float delta, HashMap<Coordinate, MapTile> currentView, boolean isTurningLeft,
