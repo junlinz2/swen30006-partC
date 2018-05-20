@@ -14,13 +14,17 @@ import world.WorldSpatial;
 public class MyAIController extends CarController {
 
 	private boolean isFollowingWall = false; // This is initialized when the car sticks to a wall.
-	private WorldSpatial.RelativeDirection lastTurnDirection = null; // Shows the last turn direction the car takes.
-	private boolean isTurningLeft = false;
-	private boolean isTurningRight = false;
+
+
+
+    private WorldSpatial.RelativeDirection lastTurnDirection = null; // Shows the last turn direction the car takes.
+    private boolean isTurningLeft = false;
+    private boolean isTurningRight = false;
 	private WorldSpatial.Direction previousState = null; // Keeps track of the previous state
 
     private ArrayList<MapTile> tilesToAvoid = new ArrayList<>();
     private CarNavigationStrategy carNavigationStrategy;
+    private float delta;
 
 	// Car Speed to move at
 	private final float CAR_SPEED = 3;
@@ -34,11 +38,13 @@ public class MyAIController extends CarController {
 		tilesToAvoid.add(new LavaTrap());// TODO maybe don't use a magic string here
 
         /**default to following left wall when simulation starts**/
-        carNavigationStrategy = new FollowLeftWallStrategy(new Sensor(this), tilesToAvoid);
+        carNavigationStrategy = new FollowLeftWallStrategy(new Sensor(this), this, tilesToAvoid);
 	}
+
 
 	@Override
 	public void update(float delta) {
+        this.delta = delta;
 
 		// Gets what the car can see
 		HashMap<Coordinate, MapTile> currentView = getView();
@@ -58,7 +64,8 @@ public class MyAIController extends CarController {
 			}
 
 			// TODO: change getNorthView() to check wall logic instead
-			if(sensor.getNorthView(currentView, currentPosition)){
+			if(carNavigationStrategy.checkViewForTile(WorldSpatial.Direction.NORTH, currentView, currentPosition,
+					tilesToAvoid)){
 				// Turn right until we go back to east!
 				if(!getOrientation().equals(WorldSpatial.Direction.EAST)){
 					lastTurnDirection = WorldSpatial.RelativeDirection.RIGHT;
@@ -74,7 +81,7 @@ public class MyAIController extends CarController {
 		else {
 
 			// Readjust the car if it is misaligned.
-			readjust(lastTurnDirection,delta);
+			readjust(lastTurnDirection, delta);
 
             // TODO: refactor into FollowLeftWallStrategy, do same thing for RightWall.. except reverse direction.
 			if(isTurningRight){
@@ -84,7 +91,8 @@ public class MyAIController extends CarController {
 			// TODO: tweaking strategy for FollowRightWallStrategy.
 			else if(isTurningLeft){
 				// Apply the left turn if you are not currently near a wall.
-				if(!carNavigationStrategy.checkFollowingObstacle(getOrientation(), currentView)){
+				if(!carNavigationStrategy.checkFollowingObstacle(super.getOrientation(), currentView, currentPosition,
+                        tilesToAvoid)){
 					applyLeftTurn(getOrientation(),delta);
 				}
 				else{
@@ -94,13 +102,15 @@ public class MyAIController extends CarController {
 
 
 			// Try to determine whether or not the car is next to a wall.
-			else if(carNavigationStrategy.checkFollowingObstacle(super.getOrientation(), currentView, currentPosition)){
+			else if(carNavigationStrategy.checkFollowingObstacle(super.getOrientation(), currentView, currentPosition,
+                    tilesToAvoid)){
 				// Maintain some velocity
 				if(getSpeed() < CAR_SPEED){
 					applyForwardAcceleration();
 				}
 				// If there is wall ahead, turn right!
-				if(sensor.checkViewForTile(getOrientation(), currentView, getPosition())){
+				if(carNavigationStrategy.checkViewForTile(super.getOrientation(), currentView, currentPosition,
+                        tilesToAvoid)){
 					lastTurnDirection = WorldSpatial.RelativeDirection.RIGHT;
 					isTurningRight = true;
 
@@ -218,7 +228,7 @@ public class MyAIController extends CarController {
 	/**
 	 * Turn the car counter clock wise (think of a compass going counter clock-wise)
 	 */
-	private void applyLeftTurn(WorldSpatial.Direction orientation, float delta) {
+	public void applyLeftTurn(WorldSpatial.Direction orientation, float delta) {
 		switch(orientation){
 			case EAST:
 				if(!getOrientation().equals(WorldSpatial.Direction.NORTH)){
@@ -250,7 +260,7 @@ public class MyAIController extends CarController {
 	/**
 	 * Turn the car clock wise (think of a compass going clock-wise)
 	 */
-	private void applyRightTurn(WorldSpatial.Direction orientation, float delta) {
+	public void applyRightTurn(WorldSpatial.Direction orientation, float delta) {
 		switch(orientation){
 			case EAST:
 				if(!getOrientation().equals(WorldSpatial.Direction.SOUTH)){
@@ -277,4 +287,20 @@ public class MyAIController extends CarController {
 
 		}
 	}
+
+    public float getDelta() {
+        return delta;
+    }
+
+    public void setTurningLeft(boolean turningLeft) {
+        isTurningLeft = turningLeft;
+    }
+
+    public void setTurningRight(boolean turningRight) {
+        isTurningRight = turningRight;
+    }
+
+    public void setLastTurnDirection(WorldSpatial.RelativeDirection lastTurnDirection) {
+        this.lastTurnDirection = lastTurnDirection;
+    }
 }
