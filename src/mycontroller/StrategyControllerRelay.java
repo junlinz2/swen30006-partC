@@ -18,8 +18,7 @@ public class StrategyControllerRelay {
         this.carController = (MyAIController) c;
     }
 
-    public void changeState(CarNavigationStrategy.carControllerActions action) {
-        float delta = carController.getDelta();
+    public void changeState(CarNavigationStrategy.carControllerActions action, float delta) {
         WorldSpatial.Direction orientation = carController.getOrientation();
         switch(action) {
             case TURNRIGHT:

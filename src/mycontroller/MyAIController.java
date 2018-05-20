@@ -14,41 +14,39 @@ import world.WorldSpatial;
 public class MyAIController extends CarController {
 
 	private boolean isFollowingWall = false; // This is initialized when the car sticks to a wall.
-
-
-
     private WorldSpatial.RelativeDirection lastTurnDirection = null; // Shows the last turn direction the car takes.
     private boolean isTurningLeft = false;
     private boolean isTurningRight = false;
-	private WorldSpatial.Direction previousState = null; // Keeps track of the previous state
+
+    private Coordinate currentPosition;
+
+    private WorldSpatial.Direction previousState = null; // Keeps track of the previous state
 
     private ArrayList<MapTile> tilesToAvoid = new ArrayList<>();
     private CarNavigationStrategy carNavigationStrategy;
-    private float delta;
 
 	// Car Speed to move at
-	private final float CAR_SPEED = 3;
+	private final float CAR_SPEED = 1;
 
 	// Offset used to differentiate between 0 and 360 degrees
 	private int EAST_THRESHOLD = 3;
 
-	public MyAIController(Car car) {
+    public MyAIController(Car car) {
 		super(car);
 		tilesToAvoid.add(new MapTile(MapTile.Type.WALL));
 		tilesToAvoid.add(new LavaTrap());// TODO maybe don't use a magic string here
 
         /**default to following left wall when simulation starts**/
-        carNavigationStrategy = new FollowLeftWallStrategy(new Sensor(this), this, tilesToAvoid);
+        carNavigationStrategy = new FollowLeftWallStrategy(this, tilesToAvoid);
 	}
 
 
 	@Override
 	public void update(float delta) {
-        this.delta = delta;
 
 		// Gets what the car can see
 		HashMap<Coordinate, MapTile> currentView = getView();
-		Coordinate currentPosition = new Coordinate(getPosition());
+		currentPosition = updateCoordinate();
 
 		checkStateChange();
 
@@ -83,45 +81,7 @@ public class MyAIController extends CarController {
 			// Readjust the car if it is misaligned.
 			readjust(lastTurnDirection, delta);
 
-            // TODO: refactor into FollowLeftWallStrategy, do same thing for RightWall.. except reverse direction.
-			if(isTurningRight){
-				applyRightTurn(getOrientation(),delta);
-			}
-
-			// TODO: tweaking strategy for FollowRightWallStrategy.
-			else if(isTurningLeft){
-				// Apply the left turn if you are not currently near a wall.
-				if(!carNavigationStrategy.checkFollowingObstacle(super.getOrientation(), currentView, currentPosition,
-                        tilesToAvoid)){
-					applyLeftTurn(getOrientation(),delta);
-				}
-				else{
-					isTurningLeft = false;
-				}
-			}
-
-
-			// Try to determine whether or not the car is next to a wall.
-			else if(carNavigationStrategy.checkFollowingObstacle(super.getOrientation(), currentView, currentPosition,
-                    tilesToAvoid)){
-				// Maintain some velocity
-				if(getSpeed() < CAR_SPEED){
-					applyForwardAcceleration();
-				}
-				// If there is wall ahead, turn right!
-				if(carNavigationStrategy.checkViewForTile(super.getOrientation(), currentView, currentPosition,
-                        tilesToAvoid)){
-					lastTurnDirection = WorldSpatial.RelativeDirection.RIGHT;
-					isTurningRight = true;
-
-				}
-
-			}
-			// This indicates that I can do a left turn if I am not turning right
-			else{
-				lastTurnDirection = WorldSpatial.RelativeDirection.LEFT;
-				isTurningLeft = true;
-			}
+            carNavigationStrategy.doAction(delta, currentView, this);
 		}
 	}
 
@@ -288,8 +248,12 @@ public class MyAIController extends CarController {
 		}
 	}
 
-    public float getDelta() {
-        return delta;
+    public boolean getIsTurningLeft() {
+        return isTurningLeft;
+    }
+
+    public boolean getIsTurningRight() {
+        return isTurningRight;
     }
 
     public void setTurningLeft(boolean turningLeft) {
@@ -302,5 +266,21 @@ public class MyAIController extends CarController {
 
     public void setLastTurnDirection(WorldSpatial.RelativeDirection lastTurnDirection) {
         this.lastTurnDirection = lastTurnDirection;
+    }
+
+    public Coordinate getCurrentPosition() {
+        return currentPosition;
+    }
+
+    private Coordinate updateCoordinate() {
+	    return new Coordinate(getPosition());
+    }
+
+    public ArrayList<MapTile> getTilesToAvoid() {
+        return tilesToAvoid;
+    }
+
+    public float getMaxCarSpeed() {
+	    return CAR_SPEED;
     }
 }

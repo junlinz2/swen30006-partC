@@ -1,6 +1,7 @@
-package mycontroller.strategies;
+package mycontroller.strategies.unused;
 
 import mycontroller.MyAIController;
+import mycontroller.strategies.CarNavigationStrategy;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
