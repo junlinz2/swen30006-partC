@@ -1,6 +1,7 @@
 package mycontroller.strategies;
 
 import controller.CarController;
+import mycontroller.MyAIController;
 import mycontroller.Sensor;
 import mycontroller.StrategyControllerRelay;
 import tiles.MapTile;
@@ -18,8 +19,7 @@ public abstract class CarNavigationStrategy {
     StrategyControllerRelay relay;
     ArrayList<MapTile> tilesToAvoid;
 
-    public abstract void doAction(float delta, HashMap<Coordinate, MapTile> currentView,  boolean isTurningLeft,
-                                  boolean isTurningRight);
+    public abstract void doAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController);
 
     public abstract boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
                                                    Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid);
