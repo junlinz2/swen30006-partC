@@ -26,7 +26,7 @@ public class MyAIController extends CarController {
     private CarNavigationStrategy carNavigationStrategy;
 
 	// Car Speed to move at
-	private final float CAR_SPEED = 1;
+	private final float CAR_SPEED = 2;
 
 	// Offset used to differentiate between 0 and 360 degrees
 	private int EAST_THRESHOLD = 3;

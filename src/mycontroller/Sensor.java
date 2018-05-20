@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class Sensor {
 
     // How many minimum units obstacles are away from the player.
-    private int obstacleSensitivity = 2;
+    private int obstacleSensitivity = 1;
 
     //TODO: remove if Sensor does not need info from controller
     private CarController carController;
