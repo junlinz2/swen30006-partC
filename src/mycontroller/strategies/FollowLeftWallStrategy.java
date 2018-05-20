@@ -23,7 +23,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
         CarNavigationStrategy.carControllerActions nextState = null;
 
         if(carController.getIsTurningRight()){
-            nextState = carControllerActions.ISTURNINGRIGHT;
+            nextState = carControllerActions.TURNRIGHT;
         }
 
         // TODO: tweaking strategy for FollowRightWallStrategy.
