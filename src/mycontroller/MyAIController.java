@@ -26,7 +26,12 @@ public class MyAIController extends CarController {
     private CarNavigationStrategy carNavigationStrategy;
 
 	// Car Speed to move at
-	private final float CAR_SPEED = 2;
+	private final float MAX_CAR_SPEED = 2;
+
+
+
+    private final float MAX_TURNING_SPEED = 1.2f;
+    private final float MIN_CAR_SPEED = 1f;
 
 	// Offset used to differentiate between 0 and 360 degrees
 	private int EAST_THRESHOLD = 3;
@@ -52,7 +57,7 @@ public class MyAIController extends CarController {
 
 		// If you are not following a wall initially, find a wall to stick to!
 		if(!isFollowingWall){
-			if(getSpeed() < CAR_SPEED){
+			if(getSpeed() < MAX_CAR_SPEED){
 				applyForwardAcceleration();
 			}
 			// Turn towards the north
@@ -281,6 +286,13 @@ public class MyAIController extends CarController {
     }
 
     public float getMaxCarSpeed() {
-	    return CAR_SPEED;
+	    return MAX_CAR_SPEED;
     }
+
+    public float getMinCarSpeed() { return MIN_CAR_SPEED; }
+
+    public float getMaxTurningSpeed() {
+        return MAX_TURNING_SPEED;
+    }
+
 }
