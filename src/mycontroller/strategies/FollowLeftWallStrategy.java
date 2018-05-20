@@ -41,14 +41,18 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
         // Try to determine whether or not the car is next to a wall.
         else if(checkFollowingObstacle(carController.getOrientation(), currentView, carController.getCurrentPosition(),
                 carController.getTilesToAvoid())){
+
             // Maintain some velocity
-            if(carController.getSpeed() < carController.getMaxCarSpeed()) {
+            if (carController.getSpeed() < carController.getMaxCarSpeed()) {
                 nextState = carControllerActions.ACCELERATE;
             }
             // If there is wall ahead, turn right!
-            if(sensor.checkViewForTile(carController.getOrientation(), currentView, carController.getCurrentPosition(),
-            carController.getTilesToAvoid())){
+            else if (sensor.checkViewForTile(carController.getOrientation(), currentView, carController.getCurrentPosition(),
+                carController.getTilesToAvoid())){
                 nextState = carControllerActions.ISTURNINGRIGHT;
+            }
+            else {
+                nextState = carControllerActions.DONOTHING;
             }
         }
         // This indicates that I can do a left turn if I am not turning right
