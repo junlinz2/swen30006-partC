@@ -20,7 +20,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
     //TODO: Find an alternative to passing carController into the strategy.
     public void doAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController) {
 
-        CarNavigationStrategy.carControllerActions nextState = null;
+        CarNavigationStrategy.carControllerActions nextState;
 
         if(carController.getIsTurningRight()){
             nextState = carControllerActions.TURNRIGHT;
@@ -47,8 +47,9 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
                 nextState = carControllerActions.ACCELERATE;
             }
             // If there is wall ahead, turn right!
-            else if (sensor.checkViewForTile(carController.getOrientation(), currentView, carController.getCurrentPosition(),
-                carController.getTilesToAvoid())){
+            int obstacleDistance = checkViewForTile(carController.getOrientation(), currentView,
+                    carController.getCurrentPosition(), carController.getTilesToAvoid());
+            if (obstacleDistance <= sensor.getObstacleTurningStrategy()){
                 nextState = carControllerActions.ISTURNINGRIGHT;
             }
             else {
@@ -60,6 +61,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
             nextState = carControllerActions.ISTURNINGLEFT;
         }
 
+        //debug
         System.out.println(nextState);
 
         relay.changeState(nextState, delta);

@@ -24,7 +24,7 @@ public abstract class CarNavigationStrategy {
     public abstract boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
                                                    Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid);
 
-    public boolean checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
+    public int checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
                                     Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
         return sensor.checkViewForTile(orientation, currentView, currentPosition, tilesToCheck);
     }
