@@ -35,9 +35,9 @@ public class MyAIController extends CarController {
 	private CarNavigationStrategy carNavigationStrategy;
 
 	// Car Speed to move at
-	private final float MAX_CAR_SPEED = 3;
-	private final float MAX_TURNING_SPEED = 0.8f;
-	private final float MIN_CAR_SPEED = 0.5f;
+	private final float MAX_CAR_SPEED = 2;
+	private final float MAX_TURNING_SPEED = 1f;
+	private final float MIN_CAR_SPEED = 0.7f;
 
 	// Slow down and turning threshold when preparing to turn
 	// private int turnThreshold = 2;
