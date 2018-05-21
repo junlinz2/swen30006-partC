@@ -24,25 +24,23 @@ public class StrategyControllerRelay {
 		switch (action) {
 		case TURNRIGHT:
 			// carController.applyReverseAcceleration();
-			if (carController.getSpeed() <= carController.getMinCarSpeed()) {
-				carController.applyForwardAcceleration();
-				break;
-			} else if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
-
-				carController.applyBrake();
-				break;
-			}
+//			if (carController.getSpeed() <= carController.getMinCarSpeed()) {
+//				carController.applyForwardAcceleration();
+//				break;
+//			} else if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
+//
+//				carController.applyBrake();
+//				break;
+//			}
 			carController.applyRightTurn(orientation, delta);
 			break;
 		case TURNLEFT:
 			// carController.applyReverseAcceleration();
-			if (carController.getSpeed() <= carController.getMinCarSpeed()) {
-				carController.applyForwardAcceleration();
-				break;
-			} else if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
-				carController.applyBrake();
-				break;
-			}
+//			if (carController.getSpeed() <= carController.getMinCarSpeed()) {
+//				carController.applyForwardAcceleration();
+//			} else if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
+//				carController.applyBrake();
+//			}
 			carController.applyLeftTurn(orientation, delta);
 			break;
 		case ACCELERATE:
@@ -53,10 +51,14 @@ public class StrategyControllerRelay {
 			}
 			break;
 		case DECELERATE:
-			if (carController.getSpeed() > carController.getMaxTurningSpeed()
-					&& carController.getSpeed() > carController.getMinCarSpeed()) {
+			if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
 				carController.applyReverseAcceleration();
 			}
+			
+			if (carController.getSpeed() < carController.getMinCarSpeed()) {
+				carController.applyForwardAcceleration();
+			}
+
 			// carController.applyBrake();
 			break;
 		case REVERSE:
