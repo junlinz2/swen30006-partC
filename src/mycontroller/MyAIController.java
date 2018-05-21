@@ -67,9 +67,9 @@ public class MyAIController extends CarController {
 				applyLeftTurn(getOrientation(),delta);
 			}
 
-			//
+			//TODO: magic number here "1"
 			if(carNavigationStrategy.checkViewForTile(WorldSpatial.Direction.NORTH, currentView, currentPosition,
-					tilesToAvoid)){
+					tilesToAvoid) == 1){
 				// Turn right until we go back to east!
 				if(!getOrientation().equals(WorldSpatial.Direction.EAST)){
 					lastTurnDirection = WorldSpatial.RelativeDirection.RIGHT;
