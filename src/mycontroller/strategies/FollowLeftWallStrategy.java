@@ -49,7 +49,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
             // If there is wall ahead, turn right!
             int obstacleDistance = checkViewForTile(carController.getOrientation(), currentView,
                     carController.getCurrentPosition(), carController.getTilesToAvoid());
-            if (obstacleDistance <= sensor.getObstacleTurningStrategy()){
+            if (obstacleDistance <= sensor.getObstacleTurningSensitivity()){
                 nextState = carControllerActions.ISTURNINGRIGHT;
             }
             else {
