@@ -7,7 +7,7 @@ import world.WorldSpatial;
 /**
  * Group 39
  *
- * Example of indirection and pure fabrication. We used a relay class that calls the appropriate methods in
+ * Example of pure fabrication, a form of indirection. We used a relay class that calls the appropriate methods in
  * MyAIController according to how the Strategy decides the Controller should act.
  */
 public class StrategyControllerRelay {
@@ -25,11 +25,12 @@ public class StrategyControllerRelay {
                 // carController.applyReverseAcceleration();
                 if (carController.getSpeed() <= carController.getMinCarSpeed()) {
                     carController.applyForwardAcceleration();
-                    //break;
+                    break;
                 }
-                else if (carController.getSpeed() <= carController.getMaxTurningSpeed()) {
+                else if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
+
                     carController.applyBrake();
-                    //break;
+                    break;
                 }
                 carController.applyRightTurn(orientation, delta);
                 break;
@@ -39,7 +40,7 @@ public class StrategyControllerRelay {
                     carController.applyForwardAcceleration();
                     break;
                 }
-                else if (carController.getSpeed() <= carController.getMaxTurningSpeed()) {
+                else if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
                     carController.applyBrake();
                     break;
                 }

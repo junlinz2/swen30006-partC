@@ -11,10 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
 
+import Car.Car;
+
 public class Sensor {
 
     // How many minimum units obstacles are away from the player.
-    private int obstacleSensitivity = 1;
+    private final int obstacleFollowingSensitivity = 1;
+    private final int obstacleTurningSensitivity = 2;
+    private final int carSightSensitivity = Car.VIEW_SQUARE;
 
     //TODO: remove if Sensor does not need info from controller
     private CarController carController;
@@ -26,16 +30,16 @@ public class Sensor {
     /**
      * Method below just iterates through the list and check in the correct coordinates.
      * i.e. Given your current position is 10,10
-     * getEastView will check up to obstacleSensitivity amount of tiles to the right.
-     * getWestView will check up to obstacleSensitivity amount of tiles to the left.
-     * getNorthView will check up to obstacleSensitivity amount of tiles to the top.
-     * getSouthView will check up to obstacleSensitivity amount of tiles below.
+     * getEastView will check up to obstacleFollowingSensitivity amount of tiles to the right.
+     * getWestView will check up to obstacleFollowingSensitivity amount of tiles to the left.
+     * getNorthView will check up to obstacleFollowingSensitivity amount of tiles to the top.
+     * getSouthView will check up to obstacleFollowingSensitivity amount of tiles below.
      */
 
     public HashMap<Coordinate, MapTile> getEastView(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition) {
         HashMap<Coordinate, MapTile> view = new HashMap<>();
         // Check tiles to my right
-        for (int i = 0; i <= obstacleSensitivity; i++) {
+        for (int i = 0; i <= carSightSensitivity; i++) {
             Coordinate coordinate = new Coordinate(currentPosition.x + i, currentPosition.y);
             MapTile tile = currentView.get(coordinate);
             view.put(coordinate, tile);
@@ -46,7 +50,7 @@ public class Sensor {
     public HashMap<Coordinate, MapTile> getWestView(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition) {
         HashMap<Coordinate, MapTile> view = new HashMap<>();
         // Check tiles to my left
-        for (int i = 0; i <= obstacleSensitivity; i++) {
+        for (int i = 0; i <= carSightSensitivity; i++) {
             Coordinate coordinate = new Coordinate(currentPosition.x - i, currentPosition.y);
             MapTile tile = currentView.get(coordinate);
             view.put(coordinate, tile);
@@ -57,7 +61,7 @@ public class Sensor {
     public HashMap<Coordinate, MapTile> getNorthView(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition) {
         HashMap<Coordinate, MapTile> view = new HashMap<>();
         // Check tiles towards the top
-        for (int i = 0; i <= obstacleSensitivity; i++) {
+        for (int i = 0; i <= carSightSensitivity; i++) {
             Coordinate coordinate = new Coordinate(currentPosition.x, currentPosition.y + i);
             MapTile tile = currentView.get(coordinate);
             view.put(coordinate, tile);
@@ -68,7 +72,7 @@ public class Sensor {
     public HashMap<Coordinate, MapTile> getSouthView(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition) {
         HashMap<Coordinate, MapTile> view = new HashMap<>();
         // Check tiles towards the bottom
-        for (int i = 0; i <= obstacleSensitivity; i++) {
+        for (int i = 0; i <= carSightSensitivity; i++) {
             Coordinate coordinate = new Coordinate(currentPosition.x, currentPosition.y - i);
             MapTile tile = currentView.get(coordinate);
             view.put(coordinate, tile);
@@ -95,8 +99,7 @@ public class Sensor {
                     view = getSouthView(currentView, currentPosition);
                     break;
             }
-        }
-        else {
+        } else {
             switch (orientation) {
                 case EAST:
                     view = getSouthView(currentView, currentPosition);
@@ -112,23 +115,39 @@ public class Sensor {
                     break;
             }
         }
+
+        // Loops through Map to allow some flexibility in how close Car should be to wall.
+        int i = 1;
+
         for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
             for (MapTile tile : tilesToCheck) {
                 if (tile.getType() == MapTile.Type.TRAP &&
-                    tileInView.getValue().getType() == MapTile.Type.TRAP) {
-                    if (((TrapTile) tileInView.getValue()).getTrap().equals(((TrapTile)tile).getTrap())) {
+                        tileInView.getValue().getType() == MapTile.Type.TRAP) {
+                    if (((TrapTile) tileInView.getValue()).getTrap().equals(((TrapTile) tile).getTrap()) &&
+                            i <= obstacleFollowingSensitivity) {
                         return true;
                     }
-                }
-                else if (tileInView.getValue().getType().equals(tile.getType())) {
+                } else if (tileInView.getValue().getType().equals(tile.getType()) && i <= obstacleFollowingSensitivity) {
                     return true;
                 }
+            }
+            i++;
+            if (i > obstacleFollowingSensitivity) {
+                break;
             }
         }
         return false;
     }
 
-    public boolean checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
+    /**
+     * Returns how close the nearest tile in tilesToCheck is to the car.
+     * @param orientation
+     * @param currentView
+     * @param currentPosition
+     * @param tilesToCheck
+     * @return
+     */
+    public int checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
                                     Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
         HashMap<Coordinate, MapTile> view = null;
         switch (orientation) {
@@ -145,19 +164,26 @@ public class Sensor {
                 view = getWestView(currentView, currentPosition);
                 break;
         }
+
+        int i = 1;
+
         for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
             for (MapTile tile : tilesToCheck) {
                 if (tile.getType() == MapTile.Type.TRAP &&
                         tileInView.getValue().getType() == MapTile.Type.TRAP) {
-                    if (((TrapTile) tileInView.getValue()).getTrap().equals(((TrapTile)tile).getTrap())) {
-                        return true;
+                    if (((TrapTile) tileInView.getValue()).getTrap().equals(((TrapTile) tile).getTrap())) {
+                        return i;
                     }
-                }
-                else if (tileInView.getValue().getType() == tile.getType()) {
-                    return true;
+                } else if (tileInView.getValue().getType() == tile.getType()) {
+                    return i;
                 }
             }
+            i++;
         }
-        return false;
+        return 0;
+    }
+
+    public int getObstacleTurningSensitivity() {
+        return obstacleTurningSensitivity;
     }
 }
