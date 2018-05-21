@@ -56,7 +56,7 @@ public class Sensor {
         return view;
     }
 
-    public LinkedHashMap<Coordinate, MapTile> getNorthView(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition) {
+	public LinkedHashMap<Coordinate, MapTile> getNorthView(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition) {
         LinkedHashMap<Coordinate, MapTile> view = new LinkedHashMap<>();
         // Check tiles towards the top
         for (int i = 1; i <= carSightSensitivity; i++) {
@@ -176,7 +176,7 @@ public class Sensor {
             i++;
 
         }
-        return 0;
+        return Integer.MAX_VALUE;
     }
 
     public int getObstacleTurningSensitivity() {
@@ -185,5 +185,9 @@ public class Sensor {
 
     public int getObstacleFollowingSensitivity() {
         return obstacleFollowingSensitivity;
+    }
+    
+    public int getCarSightSensitivity() {
+    	return carSightSensitivity;
     }
 }
