@@ -1,6 +1,5 @@
 package mycontroller.strategies;
 
-import controller.CarController;
 import mycontroller.MyAIController;
 import mycontroller.Sensor;
 import mycontroller.StrategyControllerRelay;
@@ -8,8 +7,7 @@ import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 //TODO document this
 public abstract class CarNavigationStrategy {
@@ -26,6 +24,7 @@ public abstract class CarNavigationStrategy {
 
     public int checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
                                     Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+
         return sensor.checkViewForTile(orientation, currentView, currentPosition, tilesToCheck);
     }
 

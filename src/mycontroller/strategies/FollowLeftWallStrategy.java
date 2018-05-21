@@ -6,8 +6,7 @@ import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
@@ -67,7 +66,6 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
         relay.changeState(nextState, delta);
     }
 
-    @Override
     public boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
                                           Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
         return sensor.checkFollowingObstacle(orientation, currentView, WorldSpatial.RelativeDirection.LEFT,
