@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import tiles.MapTile;
 import utilities.Coordinate;
 import utilities.PeekTuple;
-import Car.Car;
+import world.Car;
 import world.World;
 import world.WorldSpatial;
 

@@ -30,6 +30,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 					carController.getTilesToAvoid())) {
 				nextState = carControllerActions.TURNLEFT;
 			} else {
+
 				nextState = carControllerActions.STOPTURNINGLEFT;
 			}
 		}

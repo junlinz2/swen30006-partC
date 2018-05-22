@@ -8,7 +8,7 @@ import mycontroller.strategies.FollowLeftWallStrategy;
 import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
-import Car.*;
+import world.Car;
 import world.WorldSpatial;
 
 public class MyAIController extends CarController {
@@ -25,12 +25,14 @@ public class MyAIController extends CarController {
 	private CarNavigationStrategy carNavigationStrategy;
 
 	// Car Speed to move at
-	private final float MAX_CAR_SPEED = 2;
+	private final float MAX_CAR_SPEED = 2f;
 	private final float MAX_TURNING_SPEED = 1f;
-	private final float MIN_CAR_SPEED = 0.7f;
+	private final float MIN_CAR_SPEED = 1f;
 
-    private final int obstacleFollowingSensitivity = 1;
-	private final int obstacleTurningSensitivity = 1;
+	//TODO : use a different turning strategy for different corner tile types.
+    private final int obstacleFollowingSensitivity = 2;
+	private final int lavaTurningSensitivity = 1;
+	private final int wallTurningSensitivity = 2;
 
 	// Offset used to differentiate between 0 and 360 degrees
 	private int EAST_THRESHOLD = 3;
@@ -254,7 +256,6 @@ public class MyAIController extends CarController {
 			break;
 		default:
 			break;
-
 		}
 	}
 
@@ -307,7 +308,7 @@ public class MyAIController extends CarController {
         return obstacleFollowingSensitivity;
     }
 
-    public int getObstacleTurningSensitivity() {
-        return obstacleTurningSensitivity;
-    }
+    public int getLavaTurningSensitivity() { return lavaTurningSensitivity; }
+
+    public int getWall
 }

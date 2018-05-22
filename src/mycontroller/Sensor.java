@@ -230,6 +230,42 @@ public class Sensor {
         return false;
     }
 
+    public Coordinate getCornerTileCoordinate(WorldSpatial.Direction orientation, Coordinate currentPosition,
+                                          WorldSpatial.RelativeDirection direction) {
+        if (direction == WorldSpatial.RelativeDirection.LEFT) {
+            switch (orientation) {
+                case EAST:
+                    currentPosition.y = currentPosition.y + 1;
+                    break;
+                case NORTH:
+                    currentPosition.x = currentPosition.x - 1;
+                    break;
+                case SOUTH:
+                    currentPosition.x = currentPosition.x + 1;
+                    break;
+                case WEST:
+                    currentPosition.y = currentPosition.y - 1;
+                    break;
+            }
+        } else {
+            switch (orientation) {
+                case EAST:
+                    currentPosition.y = currentPosition.y - 1;
+                    break;
+                case NORTH:
+                    currentPosition.x = currentPosition.x + 1;
+                    break;
+                case SOUTH:
+                    currentPosition.x = currentPosition.x - 1;
+                    break;
+                case WEST:
+                    currentPosition.y = currentPosition.y + 1;
+                    break;
+            }
+        }
+        return currentPosition;
+    }
+
     public int getObstacleTurningSensitivity() {
         return obstacleTurningSensitivity;
     }

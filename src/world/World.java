@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.lang.reflect.Constructor;
 
-import Car.Car;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
