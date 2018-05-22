@@ -5,57 +5,95 @@ import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
-    public FollowLeftWallStrategy(Sensor sensor, ArrayList<MapTile> tilesToAvoid) {
-        super.sensor = sensor;
-    }
+	public FollowLeftWallStrategy(MyAIController c, ArrayList<MapTile> tilesToAvoid) {
+		sensor = new Sensor(c.getObstacleFollowingSensitivity(), c.getObstacleTurningSensitivity(), c.getViewSquare());
+		this.tilesToAvoid = tilesToAvoid;
+	}
 
-    public void doAction(float delta, HashMap<Coordinate, MapTile> currentView, boolean isTurningLeft,
-                         boolean isTurningRight) {
+	public void doAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController) {
 
-        if(isTurningRight){
-            applyRightTurn(getOrientation(),delta);
-        }
+		CarNavigationStrategy.carControllerActions nextState;
 
-        // TODO: tweaking strategy for FollowRightWallStrategy.
-        else if(isTurningLeft){
-            // Apply the left turn if you are not currently near a wall.
-            if(!checkFollowingObstacle(getOrientation(), currentView)){
-                applyLeftTurn(getOrientation(),delta);
+		if (carController.getIsTurningRight()) {
+            if (checkTileAccuracy(carController.getOrientation(), carController.getCurrentPosition(), carController.getFloatX(), carController.getFloatY())) {
+                nextState = carControllerActions.TURNRIGHT;
             }
-            else{
-                isTurningLeft = false;
+            else {
+                nextState = carControllerActions.DONOTHING;
             }
         }
 
-        // Try to determine whether or not the car is next to a wall.
-        else if(carNavigationStrategy.checkFollowingObstacle(super.getOrientation(), currentView, currentPosition)){
-            // Maintain some velocity
-            if(getSpeed() < CAR_SPEED){
-                applyForwardAcceleration();
-            }
-            // If there is wall ahead, turn right!
-            if(sensor.checkViewForTile(getOrientation(), currentView, getPosition())){
-                lastTurnDirection = WorldSpatial.RelativeDirection.RIGHT;
-                isTurningRight = true;
+		// TODO: tweaking strategy for FollowRightWallStrategy.
+		else if (carController.getIsTurningLeft()) {
 
-            }
-        }
-        // This indicates that I can do a left turn if I am not turning right
-        else{
-            lastTurnDirection = WorldSpatial.RelativeDirection.LEFT;
-            isTurningLeft = true;
-        }
-    }
+			// Apply the left turn if you are not currently near a wall.
+			if (!checkFollowingObstacle(carController.getOrientation(), currentView, carController.getCurrentPosition(), carController.getTilesToAvoid())) {
+			    if (checkTileAccuracy(carController.getOrientation(), carController.getCurrentPosition(), carController.getFloatX(), carController.getFloatY())) {
+                    nextState = carControllerActions.TURNLEFT;
+                }
+                else {
+                    nextState = carControllerActions.DONOTHING;
+                }
+			} else {
+				nextState = carControllerActions.STOPTURNINGLEFT;
+			}
+		}
 
-    @Override
-    public boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-                                          Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
-        return sensor.checkFollowingObstacle(orientation, currentView, WorldSpatial.RelativeDirection.LEFT,
-                currentPosition, tilesToAvoid);
+		// Try to determine whether or not the car is next to a wall.
+		else if (checkFollowingObstacle(carController.getOrientation(), currentView, carController.getCurrentPosition(),
+				carController.getTilesToAvoid())) {
+
+			// If there is wall ahead, turn right!
+			int obstacleDistance = checkViewForTile(carController.getOrientation(), currentView,
+					carController.getCurrentPosition(), carController.getTilesToAvoid());
+
+			if (obstacleDistance <= sensor.getObstacleTurningSensitivity()) {
+				nextState = carControllerActions.ISTURNINGRIGHT;
+
+			} else if (obstacleDistance <= sensor.getCarSightSensitivity() ||
+                       sensor.peekCorner(carController.getOrientation(), currentView, carController.getCurrentPosition(),
+                               WorldSpatial.RelativeDirection.LEFT)) {
+				nextState = carControllerActions.DECELERATE;
+			} else {
+				nextState = carControllerActions.ACCELERATE;
+			}
+//			// Maintain some velocity
+//			if (carController.getSpeed() < carController.getMaxCarSpeed()) {
+//				nextState = carControllerActions.ACCELERATE;
+//			}
+		}
+		// This indicates that I can do a left turn if I am not turning right
+		else {
+			nextState = carControllerActions.ISTURNINGLEFT;
+		}
+
+		// TODO: remove debug statement
+		System.out.println(carController.getCurrentPosition().x + " " + carController.getFloatX() + " " + nextState);
+
+		StrategyControllerRelay.getInstance().changeState(carController, nextState, delta);
+	}
+
+	public boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
+			Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
+		return sensor.checkFollowingObstacle(orientation, currentView, WorldSpatial.RelativeDirection.LEFT,
+				currentPosition, tilesToAvoid);
+	}
+
+    public boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x, float y) {
+	    switch (orientation) {
+            case WEST:
+                return (x - coordinate.x) < 0.4;
+            case EAST:
+                return (x - coordinate.x) > -0.4;
+            case NORTH:
+                return (y - coordinate.y) > -0.4;
+            case SOUTH:
+                return (y - coordinate.y) < 0.4;
+        }
+        return false;
     }
 }

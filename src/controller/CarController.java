@@ -7,14 +7,14 @@ import com.badlogic.gdx.math.Vector2;
 import tiles.MapTile;
 import utilities.Coordinate;
 import utilities.PeekTuple;
-import Car.Car;
+import world.Car;
 import world.World;
 import world.WorldSpatial;
 
 public abstract class CarController {
-	
+
 	private Car car;
-	
+
 	/**
 	 * Instantiates the car
 	 * @param car
@@ -22,28 +22,28 @@ public abstract class CarController {
 	public CarController(Car car){
 		this.car = car;
 	}
-	
+
 	/**
 	 * Slows the car down
 	 */
 	public void applyBrake(){
 		this.car.brake();
 	}
-	
+
 	/**
 	 * Speeds the car up in the forward direction
 	 */
 	public void applyForwardAcceleration(){
 		this.car.applyForwardAcceleration();
 	}
-	
+
 	/**
 	 * Speeds the car up in the backwards direction
 	 */
 	public void applyReverseAcceleration(){
 		this.car.applyReverseAcceleration();
 	}
-	
+
 	/**
 	 * Turns the car left
 	 * @param delta refers to the value passed in by the update call
@@ -51,7 +51,7 @@ public abstract class CarController {
 	public void turnLeft(float delta){
 		this.car.turnLeft(delta);
 	}
-	
+
 	/**
 	 * Turns the car right
 	 * @param delta refers to the value passed in by the update call
@@ -59,45 +59,66 @@ public abstract class CarController {
 	public void turnRight(float delta){
 		this.car.turnRight(delta);
 	}
-	
+
 	/**
 	 * Retrieves the car's current position
 	 */
 	public String getPosition(){
 		return this.car.getPosition();
 	}
-	
+
+	/**
+	 * Retrieves the car's current X position
+	 */
+	public float getX(){
+		return this.car.getX();
+	}
+
+	/**
+	 * Retrieves the car's current Y position
+	 */
+	public float getY(){
+		return this.car.getY();
+	}
+
+	/**
+	 * Retrieves the car's current key
+	 */
+	public int getKey(){
+		return this.car.getKey();
+	}
+
 	/**
 	 * Returns the car's current velocity.
 	 */
 	public float getSpeed(){
 		return this.car.getSpeed();
 	}
-	
+
 	public Vector2 getVelocity(){
 		return this.car.getVelocity();
 	}
-	
+
 	/**
 	 * Returns the car's current angle
 	 */
 	public float getAngle(){
 		return this.car.getAngle();
 	}
-	
+
 	/**
 	 * Returns the car's current health
 	 */
 	public float getHealth(){
 		return this.car.getHealth();
 	}
-	
+
 	/**
 	 * Predict which square you will be on when you turn to a certain degree.
 	 * Prediction gets more accurate as you near the actual point.
 	 * This projection assumes that the car's velocity is constant and the delta value is
 	 * also constant (in reality, the delta value will vary)
-	 * 
+	 *
 	 * @param velocity refers to the car's velocity
 	 * @param targetDegree refers to what degree you want to be in
 	 * @param turnDirection refers to which direction you are turning
@@ -106,32 +127,32 @@ public abstract class CarController {
 	public PeekTuple peek(Vector2 velocity, float targetDegree, WorldSpatial.RelativeDirection turnDirection, float delta){
 		return car.peek(velocity, targetDegree, turnDirection, delta);
 	}
-	
+
 	/**
 	 * Returns the view around your car (this is a VIEW_SQUARExVIEW_SQUARE area)
 	 */
 	public HashMap<Coordinate,MapTile> getView(){
 		return car.getView();
 	}
-	
+
 	/**
 	 * Get the distance the car can see
 	 */
 	public int getViewSquare(){
 		return Car.VIEW_SQUARE;
 	}
-	
+
 	/**
 	 * Get the current car orientation (North, West, East or South)
 	 */
 	public WorldSpatial.Direction getOrientation(){
 		return car.getOrientation();
 	}
-	
+
 	public HashMap<Coordinate,MapTile> getMap(){
 		return World.getMap();
 	}
-	
+
 	/**
 	 * This is the required update step for a controller.
 	 */

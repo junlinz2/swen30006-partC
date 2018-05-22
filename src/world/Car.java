@@ -1,4 +1,4 @@
-package Car;
+package world;
 
 import java.util.HashMap;
 
@@ -18,8 +18,6 @@ import tiles.TrapTile;
 import utilities.Coordinate;
 import utilities.PeekTuple;
 
-import world.World;
-import world.WorldSpatial;
 import world.WorldSpatial.Direction;
 
 /**
