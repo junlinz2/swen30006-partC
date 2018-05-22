@@ -52,11 +52,6 @@ public class FollowRightWallStrategy extends CarNavigationStrategy {
             } else {
                 nextState = carControllerActions.ACCELERATE;
             }
-//			// Maintain some velocity
-//			if (carController.getSpeed() < carController.getMaxCarSpeed()) {
-//				nextState = carControllerActions.ACCELERATE;
-//			}
-
         }
         // This indicates that I can do a left turn if I am not turning right
         else {

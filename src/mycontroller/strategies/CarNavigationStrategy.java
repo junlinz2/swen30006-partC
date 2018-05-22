@@ -2,7 +2,6 @@ package mycontroller.strategies;
 
 import mycontroller.MyAIController;
 import mycontroller.Sensor;
-import mycontroller.StrategyControllerRelay;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;

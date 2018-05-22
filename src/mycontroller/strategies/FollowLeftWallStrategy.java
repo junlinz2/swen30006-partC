@@ -24,6 +24,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
 		// TODO: tweaking strategy for FollowRightWallStrategy.
 		else if (carController.getIsTurningLeft()) {
+
 			// Apply the left turn if you are not currently near a wall.
 			if (!checkFollowingObstacle(carController.getOrientation(), currentView, carController.getCurrentPosition(),
 					carController.getTilesToAvoid())) {
@@ -44,9 +45,10 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 			if (obstacleDistance <= sensor.getObstacleTurningSensitivity()) {
 				nextState = carControllerActions.ISTURNINGRIGHT;
 
-			} else if (obstacleDistance <= sensor.getCarSightSensitivity()) {
+			} else if (obstacleDistance <= sensor.getCarSightSensitivity() ||
+                       sensor.peekCorner(carController.getOrientation(), currentView, carController.getCurrentPosition(),
+                               WorldSpatial.RelativeDirection.LEFT)) {
 				nextState = carControllerActions.DECELERATE;
-
 			} else {
 				nextState = carControllerActions.ACCELERATE;
 			}
@@ -54,7 +56,6 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 //			if (carController.getSpeed() < carController.getMaxCarSpeed()) {
 //				nextState = carControllerActions.ACCELERATE;
 //			}
-
 		}
 		// This indicates that I can do a left turn if I am not turning right
 		else {

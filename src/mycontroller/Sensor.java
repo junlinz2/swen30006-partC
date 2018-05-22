@@ -1,6 +1,5 @@
 package mycontroller;
 
-import controller.CarController;
 import tiles.MapTile;
 
 import tiles.TrapTile;
@@ -137,8 +136,6 @@ public class Sensor {
     /**
      * Returns how close the nearest tile in tilesToCheck is to the car.
      */
-
-    //TODO check the logic for this, especially "i".
     public int checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
                                     Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
         LinkedHashMap<Coordinate, MapTile> view = null;
@@ -173,6 +170,64 @@ public class Sensor {
             i++;
         }
         return Integer.MAX_VALUE;
+    }
+
+    /**
+     * Return true if a peeked is traversable (ie: a road tile) within four tiles away.
+     * @param orientation
+     * @param currentView
+     * @param currentPosition
+     * @param direction
+     * @return
+     */
+    public boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
+                              Coordinate currentPosition, WorldSpatial.RelativeDirection direction) {
+        LinkedHashMap<Coordinate, MapTile> view = null;
+        if (direction == WorldSpatial.RelativeDirection.LEFT) {
+            switch (orientation) {
+                case EAST:
+                    currentPosition.y = currentPosition.y + 1;
+                    view = getEastView(currentView, currentPosition);
+                    break;
+                case NORTH:
+                    currentPosition.x = currentPosition.x - 1;
+                    view = getNorthView(currentView, currentPosition);
+                    break;
+                case SOUTH:
+                    currentPosition.x = currentPosition.x + 1;
+                    view = getSouthView(currentView, currentPosition);
+                    break;
+                case WEST:
+                    currentPosition.y = currentPosition.y - 1;
+                    view = getWestView(currentView, currentPosition);
+                    break;
+            }
+        } else {
+            switch (orientation) {
+                case EAST:
+                    currentPosition.y = currentPosition.y - 1;
+                    view = getEastView(currentView, currentPosition);
+                    break;
+                case NORTH:
+                    currentPosition.x = currentPosition.x + 1;
+                    view = getNorthView(currentView, currentPosition);
+                    break;
+                case SOUTH:
+                    currentPosition.x = currentPosition.x - 1;
+                    view = getSouthView(currentView, currentPosition);
+                    break;
+                case WEST:
+                    currentPosition.y = currentPosition.y + 1;
+                    view = getWestView(currentView, currentPosition);
+                    break;
+            }
+        }
+        for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
+            if (tileInView.getValue() != null && tileInView.getValue().getType() == MapTile.Type.ROAD) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getObstacleTurningSensitivity() {
