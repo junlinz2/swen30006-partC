@@ -1,6 +1,5 @@
 package mycontroller.strategies;
 
-import controller.CarController;
 import mycontroller.*;
 import tiles.MapTile;
 import utilities.Coordinate;
@@ -10,13 +9,11 @@ import java.util.*;
 
 public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
-	public FollowLeftWallStrategy(CarController c, ArrayList<MapTile> tilesToAvoid) {
-		sensor = new Sensor(c);
-		relay = new StrategyControllerRelay(c);
+	public FollowLeftWallStrategy(MyAIController c, ArrayList<MapTile> tilesToAvoid) {
+		sensor = new Sensor(c.getObstacleFollowingSensitivity(), c.getObstacleTurningSensitivity(), c.getViewSquare());
 		this.tilesToAvoid = tilesToAvoid;
 	}
 
-	// TODO: Find an alternative to passing carController into the strategy.
 	public void doAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController) {
 
 		CarNavigationStrategy.carControllerActions nextState;
@@ -67,7 +64,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 		// TODO: remove debug statement
 		System.out.println(nextState);
 
-		relay.changeState(nextState, delta);
+		StrategyControllerRelay.getInstance().changeState(carController, nextState, delta);
 	}
 
 	public boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,

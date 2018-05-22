@@ -29,9 +29,8 @@ public class MyAIController extends CarController {
 	private final float MAX_TURNING_SPEED = 1f;
 	private final float MIN_CAR_SPEED = 0.7f;
 
-	// Slow down and turning threshold when preparing to turn
-	// private int turnThreshold = 2;
-	// private int slowDownThreshold = 4;
+    private final int obstacleFollowingSensitivity = 1;
+	private final int obstacleTurningSensitivity = 1;
 
 	// Offset used to differentiate between 0 and 360 degrees
 	private int EAST_THRESHOLD = 3;
@@ -303,4 +302,12 @@ public class MyAIController extends CarController {
 		return MAX_TURNING_SPEED;
 	}
 
+
+    public int getObstacleFollowingSensitivity() {
+        return obstacleFollowingSensitivity;
+    }
+
+    public int getObstacleTurningSensitivity() {
+        return obstacleTurningSensitivity;
+    }
 }

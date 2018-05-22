@@ -10,9 +10,8 @@ import java.util.*;
 
 public class FollowRightWallStrategy extends CarNavigationStrategy {
 
-    public FollowRightWallStrategy(CarController c, ArrayList<MapTile> tilesToAvoid) {
-        sensor = new Sensor(c);
-        relay = new StrategyControllerRelay(c);
+    public FollowRightWallStrategy(MyAIController c, ArrayList<MapTile> tilesToAvoid) {
+        sensor = new Sensor(c.getObstacleFollowingSensitivity(), c.getObstacleTurningSensitivity(), c.getViewSquare());
         this.tilesToAvoid = tilesToAvoid;
     }
 
@@ -67,7 +66,7 @@ public class FollowRightWallStrategy extends CarNavigationStrategy {
         // TODO: remove debug statement
         System.out.println(nextState);
 
-        relay.changeState(nextState, delta);
+        StrategyControllerRelay.getInstance().changeState(carController, nextState, delta);
     }
 
     public boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,

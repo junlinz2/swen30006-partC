@@ -13,39 +13,25 @@ import world.WorldSpatial;
  */
 public class StrategyControllerRelay {
 
-	private MyAIController carController;
+	private static StrategyControllerRelay instance;
 
-	public StrategyControllerRelay(CarController c) {
-		this.carController = (MyAIController) c;
-	}
+	public static StrategyControllerRelay getInstance() {
+	    if (instance == null) {
+	        instance = new StrategyControllerRelay();
+        }
+        return instance;
+    }
 
-	public void changeState(CarNavigationStrategy.carControllerActions action, float delta) {
+	public void changeState(MyAIController carController, CarNavigationStrategy.carControllerActions action, float delta) {
 		WorldSpatial.Direction orientation = carController.getOrientation();
 		switch (action) {
 		case TURNRIGHT:
-			// carController.applyReverseAcceleration();
-//			if (carController.getSpeed() <= carController.getMinCarSpeed()) {
-//				carController.applyForwardAcceleration();
-//				break;
-//			} else if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
-//
-//				carController.applyBrake();
-//				break;
-//			}
 			carController.applyRightTurn(orientation, delta);
 			break;
 		case TURNLEFT:
-			// carController.applyReverseAcceleration();
-//			if (carController.getSpeed() <= carController.getMinCarSpeed()) {
-//				carController.applyForwardAcceleration();
-//			} else if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
-//				carController.applyBrake();
-//			}
 			carController.applyLeftTurn(orientation, delta);
 			break;
 		case ACCELERATE:
-			// carController.setTurningLeft(false);
-			// carController.setTurningRight(false);
 			if (carController.getSpeed() < carController.getMaxCarSpeed()) {
 				carController.applyForwardAcceleration();				
 			}
@@ -54,7 +40,7 @@ public class StrategyControllerRelay {
 			if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
 				carController.applyReverseAcceleration();
 			}
-			
+
 			if (carController.getSpeed() < carController.getMinCarSpeed()) {
 				carController.applyForwardAcceleration();
 			}

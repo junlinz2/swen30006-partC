@@ -14,7 +14,6 @@ public abstract class CarNavigationStrategy {
 
     // Different strategies manipulate the behaviour of the sensor, so we need a reference to it
     Sensor sensor;
-    StrategyControllerRelay relay;
     ArrayList<MapTile> tilesToAvoid;
 
     public abstract void doAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController);
