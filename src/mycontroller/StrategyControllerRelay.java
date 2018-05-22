@@ -23,23 +23,18 @@ public class StrategyControllerRelay {
 		WorldSpatial.Direction orientation = carController.getOrientation();
 		switch (action) {
 		case TURNRIGHT:
-			// carController.applyReverseAcceleration();
-//			if (carController.getSpeed() <= carController.getMinCarSpeed()) {
+//			if (carController.getSpeed() < carController.getMinCarSpeed()) {
 //				carController.applyForwardAcceleration();
-//				break;
 //			} else if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
-//
-//				carController.applyBrake();
-//				break;
+//				carController.applyReverseAcceleration();
 //			}
 			carController.applyRightTurn(orientation, delta);
 			break;
 		case TURNLEFT:
-			// carController.applyReverseAcceleration();
-//			if (carController.getSpeed() <= carController.getMinCarSpeed()) {
+//			if (carController.getSpeed() < carController.getMinCarSpeed()) {
 //				carController.applyForwardAcceleration();
 //			} else if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
-//				carController.applyBrake();
+//				carController.applyReverseAcceleration();
 //			}
 			carController.applyLeftTurn(orientation, delta);
 			break;
@@ -58,8 +53,7 @@ public class StrategyControllerRelay {
 			if (carController.getSpeed() < carController.getMinCarSpeed()) {
 				carController.applyForwardAcceleration();
 			}
-
-			// carController.applyBrake();
+			
 			break;
 		case REVERSE:
 			carController.applyReverseAcceleration();
@@ -67,12 +61,10 @@ public class StrategyControllerRelay {
 		case ISTURNINGLEFT:
 			carController.setLastTurnDirection(WorldSpatial.RelativeDirection.LEFT);
 			carController.setTurningLeft(true);
-			carController.applyBrake();
 			break;
 		case ISTURNINGRIGHT:
 			carController.setLastTurnDirection(WorldSpatial.RelativeDirection.RIGHT);
 			carController.setTurningRight(true);
-			carController.applyBrake();
 			break;
 		case STOPTURNINGLEFT:
 			carController.setTurningLeft(false);
