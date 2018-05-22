@@ -14,15 +14,18 @@ import Car.Car;
 public class Sensor {
 
     // How many minimum units obstacles are away from the player.
-    private final int obstacleFollowingSensitivity = 1;
-    private final int obstacleTurningSensitivity = 1;
-    private final int carSightSensitivity = Car.VIEW_SQUARE;
+    private int obstacleFollowingSensitivity;
+    private int obstacleTurningSensitivity;
+    private int carSightSensitivity;
 
     //TODO: remove if Sensor does not need info from controller
     private CarController carController;
 
-    public Sensor(CarController c) {
+    public Sensor(CarController c, int obstacleFollowingSensitivity, int obstacleTurningSensitivity) {
         carController = c;
+        this.obstacleFollowingSensitivity = obstacleFollowingSensitivity;
+        this.obstacleTurningSensitivity = obstacleTurningSensitivity;
+        this.carSightSensitivity = c.getViewSquare();
     }
 
     /**
