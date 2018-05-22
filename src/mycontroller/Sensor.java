@@ -174,7 +174,6 @@ public class Sensor {
                 }
             }
             i++;
-
         }
         return Integer.MAX_VALUE;
     }

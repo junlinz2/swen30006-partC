@@ -81,6 +81,7 @@ public class StrategyControllerRelay {
 			carController.setTurningRight(false);
 			break;
 		default:
+		    break;
 		}
 	}
 }

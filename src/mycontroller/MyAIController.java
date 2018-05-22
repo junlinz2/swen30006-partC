@@ -13,23 +13,13 @@ import world.WorldSpatial;
 
 public class MyAIController extends CarController {
 
-	private boolean isFollowingWall = false; // This is initialized when the car
-												// sticks to a wall.
-	private WorldSpatial.RelativeDirection lastTurnDirection = null; // Shows
-																		// the
-																		// last
-																		// turn
-																		// direction
-																		// the
-																		// car
-																		// takes.
+	private boolean isFollowingWall = false; // This is initialized when the car sticks to a wall.
+	private WorldSpatial.RelativeDirection lastTurnDirection = null; // Shows the last turn direction the car takes.
 	private boolean isTurningLeft = false;
 	private boolean isTurningRight = false;
 
 	private Coordinate currentPosition;
-
-	private WorldSpatial.Direction previousState = null; // Keeps track of the
-															// previous state
+	private WorldSpatial.Direction previousState = null; // Keeps track of the previous state
 
 	private ArrayList<MapTile> tilesToAvoid = new ArrayList<>();
 	private CarNavigationStrategy carNavigationStrategy;
@@ -49,8 +39,7 @@ public class MyAIController extends CarController {
 	public MyAIController(Car car) {
 		super(car);
 		tilesToAvoid.add(new MapTile(MapTile.Type.WALL));
-		tilesToAvoid.add(new LavaTrap());// TODO maybe don't use a magic string
-											// here
+		tilesToAvoid.add(new LavaTrap());
 
 		/** default to following left wall when simulation starts **/
 		carNavigationStrategy = new FollowLeftWallStrategy(this, tilesToAvoid);
@@ -75,9 +64,11 @@ public class MyAIController extends CarController {
 				lastTurnDirection = WorldSpatial.RelativeDirection.LEFT;
 				applyLeftTurn(getOrientation(), delta);
 			}
-			
+
+			// TODO: remove magic numbers here
 			if (carNavigationStrategy.checkViewForTile(WorldSpatial.Direction.NORTH, currentView, currentPosition,
-					tilesToAvoid) <= 4 && carNavigationStrategy.checkViewForTile(WorldSpatial.Direction.NORTH, currentView, currentPosition, tilesToAvoid) >1) {
+					tilesToAvoid) <= 4 && carNavigationStrategy.checkViewForTile(WorldSpatial.Direction.NORTH,
+                    currentView, currentPosition, tilesToAvoid) > 1) {
 				if(getSpeed() > MAX_TURNING_SPEED)
 				applyReverseAcceleration();
 			}
