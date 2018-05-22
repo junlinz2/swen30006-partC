@@ -37,7 +37,10 @@ public class MyAIController extends CarController {
 	// Car Speed to move at
 	private final float MAX_CAR_SPEED = 2;
 	private final float MAX_TURNING_SPEED = 1f;
-	private final float MIN_CAR_SPEED = 0.7f;
+	private final float MIN_CAR_SPEED = 0.8f;
+
+	private final int obstacleFollowingSensitivity = 1;
+	private final int obstacleTurningSensitivity = 1;
 
 	// Slow down and turning threshold when preparing to turn
 	// private int turnThreshold = 2;
@@ -53,7 +56,8 @@ public class MyAIController extends CarController {
 											// here
 
 		/** default to following left wall when simulation starts **/
-		carNavigationStrategy = new FollowLeftWallStrategy(this, tilesToAvoid);
+		carNavigationStrategy = new FollowLeftWallStrategy(this, tilesToAvoid, obstacleFollowingSensitivity,
+				obstacleTurningSensitivity);
 	}
 
 	@Override
@@ -75,16 +79,16 @@ public class MyAIController extends CarController {
 				lastTurnDirection = WorldSpatial.RelativeDirection.LEFT;
 				applyLeftTurn(getOrientation(), delta);
 			}
-			
-			if (carNavigationStrategy.checkViewForTile(WorldSpatial.Direction.NORTH, currentView, currentPosition,
-					tilesToAvoid) <= 4 && carNavigationStrategy.checkViewForTile(WorldSpatial.Direction.NORTH, currentView, currentPosition, tilesToAvoid) >1) {
-				if(getSpeed() > MAX_TURNING_SPEED)
-				applyReverseAcceleration();
+
+			int obstacleDistance = carNavigationStrategy.checkViewForTile(WorldSpatial.Direction.NORTH, currentView,
+					currentPosition, tilesToAvoid);
+
+			if (obstacleDistance <= getViewSquare() && obstacleDistance > obstacleTurningSensitivity) {
+				if (getSpeed() > MAX_TURNING_SPEED)
+					applyReverseAcceleration();
 			}
 
-			// TODO: magic number here "1"
-			if (carNavigationStrategy.checkViewForTile(WorldSpatial.Direction.NORTH, currentView, currentPosition,
-					tilesToAvoid) == 1) {
+			else if (obstacleDistance == obstacleTurningSensitivity) {
 				// Turn right until we go back to east!
 				if (!getOrientation().equals(WorldSpatial.Direction.EAST)) {
 					lastTurnDirection = WorldSpatial.RelativeDirection.RIGHT;
@@ -93,7 +97,6 @@ public class MyAIController extends CarController {
 					isFollowingWall = true;
 				}
 			}
-
 		}
 
 		// Once the car is already stuck to a wall, apply the following logic
@@ -205,8 +208,7 @@ public class MyAIController extends CarController {
 	}
 
 	/**
-	 * Turn the car counter clock wise (think of a compass going counter
-	 * clock-wise)
+	 * Turn the car counter clock wise (think of a compass going counter clock-wise)
 	 */
 	public void applyLeftTurn(WorldSpatial.Direction orientation, float delta) {
 		switch (orientation) {
@@ -311,5 +313,6 @@ public class MyAIController extends CarController {
 	public float getMaxTurningSpeed() {
 		return MAX_TURNING_SPEED;
 	}
+	
 
 }
