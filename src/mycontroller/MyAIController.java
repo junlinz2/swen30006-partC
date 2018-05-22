@@ -32,7 +32,7 @@ public class MyAIController extends CarController {
 	private final float MIN_CAR_SPEED = 1f;
 
 	//TODO : use a different turning strategy for different corner tile types.
-    private final int obstacleFollowingSensitivity = 2;
+    private final int obstacleFollowingSensitivity = 1;
 	private final int obstacleTurningSensitivity = 1;
 
 	// Offset used to differentiate between 0 and 360 degrees

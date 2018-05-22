@@ -86,13 +86,13 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
     public boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x, float y) {
 	    switch (orientation) {
             case WEST:
-                return (x - coordinate.x) < 0.5;
+                return (x - coordinate.x) < 0.4;
             case EAST:
-                return (x - coordinate.x) > -0.5;
+                return (x - coordinate.x) > -0.4;
             case NORTH:
-                return (y - coordinate.y) > -0.5;
+                return (y - coordinate.y) > -0.4;
             case SOUTH:
-                return (y - coordinate.y) < 0.5;
+                return (y - coordinate.y) < 0.4;
         }
         return false;
     }
