@@ -310,5 +310,5 @@ public class MyAIController extends CarController {
 
     public int getLavaTurningSensitivity() { return lavaTurningSensitivity; }
 
-    public int getWall
+    public int getWallTurningSensitivity() { return wallTurningSensitivity; }
 }
