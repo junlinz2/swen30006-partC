@@ -19,18 +19,26 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 		CarNavigationStrategy.carControllerActions nextState;
 
 		if (carController.getIsTurningRight()) {
-			nextState = carControllerActions.TURNRIGHT;
-		}
+            if (checkTileAccuracy(carController.getOrientation(), carController.getCurrentPosition(), carController.getFloatX(), carController.getFloatY())) {
+                nextState = carControllerActions.TURNRIGHT;
+            }
+            else {
+                nextState = carControllerActions.DONOTHING;
+            }
+        }
 
 		// TODO: tweaking strategy for FollowRightWallStrategy.
 		else if (carController.getIsTurningLeft()) {
 
 			// Apply the left turn if you are not currently near a wall.
-			if (!checkFollowingObstacle(carController.getOrientation(), currentView, carController.getCurrentPosition(),
-					carController.getTilesToAvoid())) {
-				nextState = carControllerActions.TURNLEFT;
+			if (!checkFollowingObstacle(carController.getOrientation(), currentView, carController.getCurrentPosition(), carController.getTilesToAvoid())) {
+			    if (checkTileAccuracy(carController.getOrientation(), carController.getCurrentPosition(), carController.getFloatX(), carController.getFloatY())) {
+                    nextState = carControllerActions.TURNLEFT;
+                }
+                else {
+                    nextState = carControllerActions.DONOTHING;
+                }
 			} else {
-
 				nextState = carControllerActions.STOPTURNINGLEFT;
 			}
 		}
@@ -64,7 +72,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 		}
 
 		// TODO: remove debug statement
-		System.out.println(nextState);
+		System.out.println(carController.getCurrentPosition().x + " " + carController.getFloatX() + " " + nextState);
 
 		StrategyControllerRelay.getInstance().changeState(carController, nextState, delta);
 	}
@@ -74,4 +82,18 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 		return sensor.checkFollowingObstacle(orientation, currentView, WorldSpatial.RelativeDirection.LEFT,
 				currentPosition, tilesToAvoid);
 	}
+
+    public boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x, float y) {
+	    switch (orientation) {
+            case WEST:
+                return (x - coordinate.x) < 0.5;
+            case EAST:
+                return (x - coordinate.x) > -0.5;
+            case NORTH:
+                return (y - coordinate.y) > -0.5;
+            case SOUTH:
+                return (y - coordinate.y) < 0.5;
+        }
+        return false;
+    }
 }

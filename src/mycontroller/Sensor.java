@@ -231,7 +231,7 @@ public class Sensor {
     }
 
     public Coordinate getCornerTileCoordinate(WorldSpatial.Direction orientation, Coordinate currentPosition,
-                                          WorldSpatial.RelativeDirection direction) {
+                                              WorldSpatial.RelativeDirection direction) {
         if (direction == WorldSpatial.RelativeDirection.LEFT) {
             switch (orientation) {
                 case EAST:

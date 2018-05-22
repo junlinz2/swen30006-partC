@@ -17,6 +17,8 @@ public class MyAIController extends CarController {
 	private WorldSpatial.RelativeDirection lastTurnDirection = null; // Shows the last turn direction the car takes.
 	private boolean isTurningLeft = false;
 	private boolean isTurningRight = false;
+    private float x;
+	private float y;
 
 	private Coordinate currentPosition;
 	private WorldSpatial.Direction previousState = null; // Keeps track of the previous state
@@ -31,8 +33,7 @@ public class MyAIController extends CarController {
 
 	//TODO : use a different turning strategy for different corner tile types.
     private final int obstacleFollowingSensitivity = 2;
-	private final int lavaTurningSensitivity = 1;
-	private final int wallTurningSensitivity = 2;
+	private final int obstacleTurningSensitivity = 1;
 
 	// Offset used to differentiate between 0 and 360 degrees
 	private int EAST_THRESHOLD = 3;
@@ -54,6 +55,8 @@ public class MyAIController extends CarController {
 		currentPosition = updateCoordinate();
 
 		checkStateChange();
+		//x = getX();
+		//y = getY();
 
 		// If you are not following a wall initially, find a wall to stick to!
 		if (!isFollowingWall) {
@@ -85,7 +88,6 @@ public class MyAIController extends CarController {
 					isFollowingWall = true;
 				}
 			}
-
 		}
 
 		// Once the car is already stuck to a wall, apply the following logic
@@ -308,7 +310,15 @@ public class MyAIController extends CarController {
         return obstacleFollowingSensitivity;
     }
 
-    public int getLavaTurningSensitivity() { return lavaTurningSensitivity; }
+    public int getObstacleTurningSensitivity() {
+        return obstacleTurningSensitivity;
+    }
 
-    public int getWallTurningSensitivity() { return wallTurningSensitivity; }
+    public float getFloatX() {
+        return getX();
+    }
+
+    public float getFloatY() {
+        return getY();
+    }
 }

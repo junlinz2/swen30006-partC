@@ -35,4 +35,6 @@ public abstract class CarNavigationStrategy {
         TURNRIGHT, TURNLEFT, ACCELERATE, DECELERATE, STOPTURNINGLEFT, STOPTURNINGRIGHT, ISTURNINGLEFT,
         ISTURNINGRIGHT, REVERSE, DONOTHING
     }
+
+    public abstract boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x, float y);
 }
