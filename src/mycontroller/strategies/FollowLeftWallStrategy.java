@@ -10,12 +10,11 @@ import java.util.*;
 public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
 	public FollowLeftWallStrategy(MyAIController c) {
-		sensor = new Sensor(c.getObstacleFollowingSensitivity(), c.getDistToTurn(), c.getDistToSlowDown());
+		sensor = new Sensor(c.OBSTACLE_FOLLOWING_SENSITIVITY, c.DISTANCE_TO_TURN, c.DISTANCE_TO_SLOW_DOWN);
 		this.tilesToAvoid = c.getTilesToAvoid();
 	}
 
 	public void doAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController) {
-
 		CarNavigationStrategy.carControllerActions nextState;
 
 		if (carController.getIsTurningRight()) {
@@ -35,14 +34,8 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 			// Apply the left turn if you are not currently near a wall.
 			if (!checkFollowingObstacle(carController.getOrientation(), currentView, carController.getCurrentPosition(),
 					carController.getTilesToAvoid())) {
-				// if (checkTileAccuracy(carController.getOrientation(),
-				// carController.getCurrentPosition(),
-				// carController.getFloatX(), carController.getFloatY())) {
-				// nextState = carControllerActions.TURNLEFT;
-				// } else {
-				// nextState = carControllerActions.DONOTHING;
-				// }
 				nextState = carControllerActions.TURNLEFT;
+
 			} else {
 				nextState = carControllerActions.STOPTURNINGLEFT;
 			}
@@ -51,11 +44,11 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 		// Try to determine whether or not the car is next to a wall.
 		else if (checkFollowingObstacle(carController.getOrientation(), currentView, carController.getCurrentPosition(),
 				carController.getTilesToAvoid())) {
-			
+
 			if (carController.isJustChangedState()) {
 				carController.setJustChangedState(false);
 			}
-			
+
 			// If there is wall ahead, turn right!
 			int distToObstacle = checkViewForTile(carController.getOrientation(), currentView,
 					carController.getCurrentPosition(), carController.getTilesToAvoid());
@@ -65,25 +58,32 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
 			} else if (distToObstacle <= sensor.getDistToSlowDown()
 					|| peekCorner(carController.getOrientation(), currentView, carController.getCurrentPosition())) {
-				nextState = carControllerActions.DECELERATE;
+				nextState = carControllerActions.SLOWDOWN;
 			} else {
 				nextState = carControllerActions.ACCELERATE;
 			}
 		}
+		
+		else if (carController.justChangedState()) {
+			nextState = carControllerActions.SLOWDOWN;
+		}
 		// This indicates that I can do a left turn if I am not turning right
 		else {
-			if (carController.justChangedState()) {
-				nextState = carControllerActions.DECELERATE;
-				System.out.println("testing==============================================================================");
-			} else {
-				nextState = carControllerActions.ISTURNINGLEFT;				
+			if (!sensor.isDeadEnd()) {
+				nextState = carControllerActions.ISTURNINGLEFT;
+			} 
+			
+			else {
+				//Keep driving straight
+				//Check tile ahead for turning right
 			}
 		}
 
 		// TODO: remove debug statement
-		//System.out.println(carController.getCurrentPosition().x + " " + carController.getFloatX() + " " + nextState);
+		// System.out.println(carController.getCurrentPosition().x + " " +
+		// carController.getFloatX() + " " + nextState);
 		System.out.println(nextState);
-		
+
 		StrategyControllerRelay.getInstance().changeState(carController, nextState, delta);
 	}
 
@@ -95,20 +95,20 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
 	@Override
 	public boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-            Coordinate currentPosition) {
+			Coordinate currentPosition) {
 		return sensor.peekCorner(orientation, currentView, currentPosition, WorldSpatial.RelativeDirection.LEFT);
 	}
 
 	public boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x, float y) {
 		switch (orientation) {
 		case WEST:
-			return (x - coordinate.x) < 0.4;
+			return (x - coordinate.x) < 0.475;
 		case EAST:
-			return (x - coordinate.x) > -0.4;
+			return (x - coordinate.x) > -0.55;
 		case NORTH:
-			return (y - coordinate.y) > -0.4;
+			return (y - coordinate.y) > -0.475;
 		case SOUTH:
-			return (y - coordinate.y) < 0.4;
+			return (y - coordinate.y) < 0.7;
 		}
 		return false;
 	}

@@ -13,29 +13,36 @@ import world.WorldSpatial;
 
 public class MyAIController extends CarController {
 
-	private boolean isFollowingWall = false; // This is initialized when the car sticks to a wall.
-	private WorldSpatial.RelativeDirection lastTurnDirection = null; // Shows the last turn direction the car takes.
+	private boolean isFollowingWall = false; // This is initialized when the car
+												// sticks to a wall.
+	private WorldSpatial.RelativeDirection lastTurnDirection = null; // Shows
+																		// the
+																		// last
+																		// turn
+																		// direction
+																		// the
+																		// car
+																		// takes.
 	private boolean isTurningLeft = false;
 	private boolean isTurningRight = false;
-	private float x;
-	private float y;
 
 	private Coordinate currentPosition;
-	private WorldSpatial.Direction previousState = null; // Keeps track of the previous state
+	private WorldSpatial.Direction previousState = null; // Keeps track of the
+															// previous state
 	private boolean justChangedState = false;
 
 	private ArrayList<MapTile> tilesToAvoid = new ArrayList<>();
 	private CarNavigationStrategy carNavigationStrategy;
 
 	// Car Speed to move at
-	private final float MAX_CAR_SPEED = 2f;
-	private final float MAX_TURNING_SPEED = 1.3f;
-	private final float MIN_CAR_SPEED = 1f;
+	public final float MAX_CAR_SPEED = 3;
+	public final float MAX_TURNING_SPEED = 1.4f;
+	public final float MIN_CAR_SPEED = 1f;
 
 	// TODO : use a different turning strategy for different corner tile types.
-	private final int obstacleFollowingSensitivity = 1;
-	private final int distToTurn = 1;
-	private final int distToSlowDown = getViewSquare();
+	public final int OBSTACLE_FOLLOWING_SENSITIVITY = 2;
+	public final int DISTANCE_TO_TURN = 1;
+	public final int DISTANCE_TO_SLOW_DOWN = getViewSquare();
 
 	// Offset used to differentiate between 0 and 360 degrees
 	private int EAST_THRESHOLD = 3;
@@ -51,6 +58,7 @@ public class MyAIController extends CarController {
 
 	@Override
 	public void update(float delta) {
+		System.out.println(getFloatX() + " " + getFloatY());
 
 		// Gets what the car can see
 		HashMap<Coordinate, MapTile> currentView = getView();
@@ -74,7 +82,7 @@ public class MyAIController extends CarController {
 			int distToObstacleAhead = carNavigationStrategy.checkViewForTile(WorldSpatial.Direction.NORTH, currentView,
 					currentPosition, tilesToAvoid);
 
-			if (distToObstacleAhead <= getDistToSlowDown() && distToObstacleAhead > distToTurn) {
+			if (distToObstacleAhead <= DISTANCE_TO_SLOW_DOWN && distToObstacleAhead > DISTANCE_TO_TURN) {
 				if (getSpeed() > MAX_TURNING_SPEED)
 					applyReverseAcceleration();
 			}
@@ -94,7 +102,7 @@ public class MyAIController extends CarController {
 		// Once the car is already stuck to a wall, apply the following logic
 		else {
 
-			// Readjust the car if it is misaligned.			
+			// Readjust the car if it is misaligned.
 			readjust(lastTurnDirection, delta);
 
 			carNavigationStrategy.doAction(delta, currentView, this);
@@ -102,8 +110,8 @@ public class MyAIController extends CarController {
 	}
 
 	/**
-	 * Note: Trying implementing moving away from wall if crashed
-	 * Readjust the car to the orientation we are in.
+	 * Note: Trying implementing moving away from wall if crashed Readjust the
+	 * car to the orientation we are in.
 	 * 
 	 * @param lastTurnDirection
 	 * @param delta
@@ -197,12 +205,13 @@ public class MyAIController extends CarController {
 				}
 				previousState = getOrientation();
 				setJustChangedState(true);
-			} 
+			}
 		}
 	}
 
 	/**
-	 * Turn the car counter clock wise (think of a compass going counter clock-wise)
+	 * Turn the car counter clock wise (think of a compass going counter
+	 * clock-wise)
 	 */
 	public void applyLeftTurn(WorldSpatial.Direction orientation, float delta) {
 		switch (orientation) {
@@ -295,38 +304,14 @@ public class MyAIController extends CarController {
 		return tilesToAvoid;
 	}
 
-	public float getMaxCarSpeed() {
-		return MAX_CAR_SPEED;
+	public float getFloatX() {
+		return getX();
 	}
 
-	public float getMinCarSpeed() {
-		return MIN_CAR_SPEED;
+	public float getFloatY() {
+		return getY();
 	}
 
-	public float getMaxTurningSpeed() {
-		return MAX_TURNING_SPEED;
-	}
-
-	public int getObstacleFollowingSensitivity() {
-		return obstacleFollowingSensitivity;
-	}
-
-	public int getDistToTurn() {
-		return distToTurn;
-	}
-
-	public int getDistToSlowDown() {
-		return distToSlowDown;
-	}
-
-	// public float getFloatX() {
-	// return getX();
-	// }
-	//
-	// public float getFloatY() {
-	// return getY();
-	// }
-	
 	public boolean justChangedState() {
 		return (isJustChangedState() == true) ? true : false;
 	}

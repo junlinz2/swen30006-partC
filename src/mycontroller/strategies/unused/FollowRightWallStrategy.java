@@ -11,7 +11,7 @@ import java.util.*;
 public class FollowRightWallStrategy extends CarNavigationStrategy {
 
     public FollowRightWallStrategy(MyAIController c, ArrayList<MapTile> tilesToAvoid) {
-        sensor = new Sensor(c.getObstacleFollowingSensitivity(), c.getDistToTurn(), c.getViewSquare());
+        sensor = new Sensor(c.getOBSTACLE_FOLLOWING_SENSITIVITY(), c.getDISTANCE_TO_TURN(), c.getViewSquare());
         this.tilesToAvoid = tilesToAvoid;
     }
 
@@ -43,10 +43,10 @@ public class FollowRightWallStrategy extends CarNavigationStrategy {
             int obstacleDistance = checkViewForTile(carController.getOrientation(), currentView,
                     carController.getCurrentPosition(), carController.getTilesToAvoid());
 
-            if (obstacleDistance <= sensor.getDistToTurn()) {
+            if (obstacleDistance <= sensor.getDISTANCE_TO_TURN()) {
                 nextState = carControllerActions.ISTURNINGRIGHT;
 
-            } else if (obstacleDistance <= sensor.getDistToSlowDown()) {
+            } else if (obstacleDistance <= sensor.getDISTANCE_TO_SLOW_DOWN()) {
                 nextState = carControllerActions.DECELERATE;
 
             } else {

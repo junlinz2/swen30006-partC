@@ -54,8 +54,7 @@ public class Car extends Sprite{
 	public static final int VIEW_SQUARE = 4;
 	private static final int WALL_DAMAGE = 5;
 
-
-	private static enum State { FORWARD, REVERSE };
+	private enum State { FORWARD, REVERSE };
 	private static State carDirection = State.FORWARD;
 
 	private static int CAR_WIDTH;
@@ -66,7 +65,7 @@ public class Car extends Sprite{
 	
 	private int key = 1; // If no keys elsewhere, we have the exit key
 
-	Car(Sprite sprite){
+	public Car(Sprite sprite){
 		super(sprite);
 
 		health = MAX_HEALTH;
@@ -83,8 +82,8 @@ public class Car extends Sprite{
 			setX(World.getCarStart().x);
 			setY(World.getCarStart().y);
 		}
-		CAR_WIDTH = (int) sprite.getWidth();
-		CAR_HEIGHT = (int) sprite.getHeight();
+		CAR_WIDTH = (int) Math.min(sprite.getWidth(), sprite.getHeight());
+		CAR_HEIGHT = CAR_WIDTH;
 
 		this.currentOrientation = WorldSpatial.Direction.EAST;
 	}

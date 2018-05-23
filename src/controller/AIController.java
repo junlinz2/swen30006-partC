@@ -11,8 +11,7 @@ public class AIController extends CarController {
 	
 	// How many minimum units the wall is away from the player.
 	private int wallSensitivity = 2;
-	
-	
+
 	private boolean isFollowingWall = false; // This is initialized when the car sticks to a wall.
 	private WorldSpatial.RelativeDirection lastTurnDirection = null; // Shows the last turn direction the car takes.
 	private boolean isTurningLeft = false;
@@ -98,9 +97,6 @@ public class AIController extends CarController {
 				isTurningLeft = true;
 			}
 		}
-		
-		
-
 	}
 	
 	/**
@@ -317,10 +313,10 @@ public class AIController extends CarController {
 	/**
 	 * Method below just iterates through the list and check in the correct coordinates.
 	 * i.e. Given your current position is 10,10
-	 * checkEast will check up to wallSensitivity amount of tiles to the right.
-	 * checkWest will check up to wallSensitivity amount of tiles to the left.
-	 * checkNorth will check up to wallSensitivity amount of tiles to the top.
-	 * checkSouth will check up to wallSensitivity amount of tiles below.
+	 * getEastView will check up to wallSensitivity amount of tiles to the right.
+	 * getWestView will check up to wallSensitivity amount of tiles to the left.
+	 * getNorthView will check up to wallSensitivity amount of tiles to the top.
+	 * getSouthView will check up to wallSensitivity amount of tiles below.
 	 */
 	public boolean checkEast(HashMap<Coordinate, MapTile> currentView){
 		// Check tiles to my right

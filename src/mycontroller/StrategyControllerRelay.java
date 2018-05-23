@@ -14,7 +14,9 @@ import world.WorldSpatial;
 public class StrategyControllerRelay {
 	
 	//Temporary
+	//right
 	private final float MIN_ROTATING_SPEED = 0.5f;
+	//left
 	private final float MIN_CORNER_SPEED = 1.15f;
 	
 	private static StrategyControllerRelay instance;
@@ -31,7 +33,7 @@ public class StrategyControllerRelay {
 		switch (action) {
 		case TURNRIGHT:
             carController.applyRightTurn(orientation, delta);
-            if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
+            if (carController.getSpeed() > carController.MAX_TURNING_SPEED) {
 				carController.applyReverseAcceleration();	
 			}
             //else if (carController.getSpeed() < carController.getMinCarSpeed()) { 
@@ -45,18 +47,19 @@ public class StrategyControllerRelay {
 			if (carController.getSpeed() < MIN_CORNER_SPEED) { 
 				carController.applyForwardAcceleration();	
 			}
-			else if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
+			else if (carController.getSpeed() > carController.MAX_TURNING_SPEED) {
 				carController.applyReverseAcceleration();	
 			}
 			break;
 		case ACCELERATE:
-			if (carController.getSpeed() < carController.getMaxCarSpeed()) {
+			if (carController.getSpeed() < carController.MAX_CAR_SPEED) {
 				carController.applyForwardAcceleration();				
 			}
 			break;
-		case DECELERATE:
+			
+		case SLOWDOWN:
 			carController.applyForwardAcceleration();
-			if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
+			if (carController.getSpeed() > carController.MAX_TURNING_SPEED) {
 				carController.applyReverseAcceleration();
 			}
 //			else if (carController.getSpeed() < carController.getMinCarSpeed()) {
