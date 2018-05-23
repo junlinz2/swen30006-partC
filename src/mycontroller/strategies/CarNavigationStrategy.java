@@ -21,7 +21,7 @@ public abstract class CarNavigationStrategy {
                                                    Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid);
 
     public int checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-                                    Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+                                Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
 
         return sensor.checkViewForTile(orientation, currentView, currentPosition, tilesToCheck);
     }
@@ -36,5 +36,9 @@ public abstract class CarNavigationStrategy {
         ISTURNINGRIGHT, REVERSE, DONOTHING
     }
 
+    public abstract boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
+                                       Coordinate currentPosition);
+
     public abstract boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x, float y);
+
 }

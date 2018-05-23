@@ -12,13 +12,13 @@ public class Sensor {
 
     // How many minimum units obstacles are away from the player.
     private int obstacleFollowingSensitivity;
-    private int obstacleTurningSensitivity;
-    private int carSightSensitivity;
+    private int distToTurn;
+    private int distToSlowDown;
 
-    public Sensor(int obstacleFollowingSensitivity, int obstacleTurningSensitivity, int carSightSensitivity) {
+    public Sensor(int obstacleFollowingSensitivity, int distToTurn, int distToSlowDown) {
         this.obstacleFollowingSensitivity = obstacleFollowingSensitivity;
-        this.obstacleTurningSensitivity = obstacleTurningSensitivity;
-        this.carSightSensitivity = carSightSensitivity;
+        this.distToTurn = distToTurn;
+        this.distToSlowDown = distToSlowDown;
     }
 
     /**
@@ -33,7 +33,7 @@ public class Sensor {
     public LinkedHashMap<Coordinate, MapTile> getEastView(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition) {
         LinkedHashMap<Coordinate, MapTile> view = new LinkedHashMap<>();
         // Check tiles to my right
-        for (int i = 1; i <= carSightSensitivity; i++) {
+        for (int i = 1; i <= distToSlowDown; i++) {
             Coordinate coordinate = new Coordinate(currentPosition.x + i, currentPosition.y);
             MapTile tile = currentView.get(coordinate);
             view.put(coordinate, tile);
@@ -44,7 +44,7 @@ public class Sensor {
     public LinkedHashMap<Coordinate, MapTile> getWestView(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition) {
         LinkedHashMap<Coordinate, MapTile> view = new LinkedHashMap<>();
         // Check tiles to my left
-        for (int i = 1; i <= carSightSensitivity; i++) {
+        for (int i = 1; i <= distToSlowDown; i++) {
             Coordinate coordinate = new Coordinate(currentPosition.x - i, currentPosition.y);
             MapTile tile = currentView.get(coordinate);
             view.put(coordinate, tile);
@@ -52,10 +52,10 @@ public class Sensor {
         return view;
     }
 
-	public LinkedHashMap<Coordinate, MapTile> getNorthView(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition) {
+    public LinkedHashMap<Coordinate, MapTile> getNorthView(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition) {
         LinkedHashMap<Coordinate, MapTile> view = new LinkedHashMap<>();
         // Check tiles towards the top
-        for (int i = 1; i <= carSightSensitivity; i++) {
+        for (int i = 1; i <= distToSlowDown; i++) {
             Coordinate coordinate = new Coordinate(currentPosition.x, currentPosition.y + i);
             MapTile tile = currentView.get(coordinate);
             view.put(coordinate, tile);
@@ -66,7 +66,7 @@ public class Sensor {
     public LinkedHashMap<Coordinate, MapTile> getSouthView(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition) {
         LinkedHashMap<Coordinate, MapTile> view = new LinkedHashMap<>();
         // Check tiles towards the bottom
-        for (int i = 1; i <= carSightSensitivity; i++) {
+        for (int i = 1; i <= distToSlowDown; i++) {
             Coordinate coordinate = new Coordinate(currentPosition.x, currentPosition.y - i);
             MapTile tile = currentView.get(coordinate);
             view.put(coordinate, tile);
@@ -137,7 +137,7 @@ public class Sensor {
      * Returns how close the nearest tile in tilesToCheck is to the car.
      */
     public int checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-                                    Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+                                Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
         LinkedHashMap<Coordinate, MapTile> view = null;
         switch (orientation) {
             case EAST:
@@ -266,15 +266,15 @@ public class Sensor {
         return currentPosition;
     }
 
-    public int getObstacleTurningSensitivity() {
-        return obstacleTurningSensitivity;
+    public int getDistToTurn() {
+        return distToTurn;
     }
 
     public int getObstacleFollowingSensitivity() {
         return obstacleFollowingSensitivity;
     }
-    
-    public int getCarSightSensitivity() {
-    	return carSightSensitivity;
+
+    public int getDistToSlowDown() {
+        return distToSlowDown;
     }
 }
