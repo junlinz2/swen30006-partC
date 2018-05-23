@@ -13,8 +13,8 @@ import java.util.HashMap;
 public abstract class CarNavigationStrategy {
 
     // Different strategies manipulate the behaviour of the sensor, so we need a reference to it
-    Sensor sensor;
-    ArrayList<MapTile> tilesToAvoid;
+    private Sensor sensor;
+    private ArrayList<MapTile> tilesToAvoid;
 
     public abstract void doAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController);
 
@@ -23,12 +23,27 @@ public abstract class CarNavigationStrategy {
 
     public int checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
                                 Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
-
-        return sensor.checkViewForTile(orientation, currentView, currentPosition, tilesToCheck);
+        return getSensor().checkViewForTile(orientation, currentView, currentPosition, tilesToCheck);
     }
 
     public String getStrategyName() {
         return this.getClass().getSimpleName();
+    }
+
+    public Sensor getSensor() {
+        return sensor;
+    }
+
+    public void setSensor(Sensor sensor) {
+        this.sensor = sensor;
+    }
+
+    public ArrayList<MapTile> getTilesToAvoid() {
+        return tilesToAvoid;
+    }
+
+    public void setTilesToAvoid(ArrayList<MapTile> tilesToAvoid) {
+        this.tilesToAvoid = tilesToAvoid;
     }
 
 
@@ -40,6 +55,6 @@ public abstract class CarNavigationStrategy {
     public abstract boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
                                        Coordinate currentPosition);
 
-    public abstract boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x, float y);
+    public abstract boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float xPos, float yPos);
 
 }

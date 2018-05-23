@@ -11,8 +11,8 @@ import java.util.HashMap;
 public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
 	public FollowLeftWallStrategy(MyAIController c) {
-		sensor = new Sensor(c.getObstacleFollowingSensitivity(), c.getDistToTurn(), c.getDistToSlowDown());
-		this.tilesToAvoid = c.getTilesToAvoid();
+		setSensor(new Sensor(c.getObstacleFollowingSensitivity(), c.getDistToTurn(), c.getDistToSlowDown()));
+		this.setTilesToAvoid(c.getTilesToAvoid());
 	}
 
 	public void doAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController) {
@@ -61,10 +61,10 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 			int distToObstacle = checkViewForTile(carController.getOrientation(), currentView,
 					carController.getCurrentPosition(), carController.getTilesToAvoid());
 
-			if (distToObstacle <= sensor.getDistToTurn()) {
+			if (distToObstacle <= getSensor().getDistToTurn()) {
 				nextState = carControllerActions.ISTURNINGRIGHT;
 
-			} else if (distToObstacle <= sensor.getDistToSlowDown()
+			} else if (distToObstacle <= getSensor().getDistToSlowDown()
 					|| peekCorner(carController.getOrientation(), currentView, carController.getCurrentPosition())) {
 				nextState = carControllerActions.DECELERATE;
 			} else {
@@ -90,27 +90,27 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
 	public boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 										  Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
-		return sensor.checkFollowingObstacle(orientation, currentView, WorldSpatial.RelativeDirection.LEFT,
+		return getSensor().checkFollowingObstacle(orientation, currentView, WorldSpatial.RelativeDirection.LEFT,
 				currentPosition, tilesToAvoid);
 	}
 
-	@Override
 	public boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 							  Coordinate currentPosition) {
-		return sensor.peekCorner(orientation, currentView, currentPosition, WorldSpatial.RelativeDirection.LEFT);
+		return getSensor().peekCorner(orientation, currentView, currentPosition, WorldSpatial.RelativeDirection.LEFT);
 	}
 
-	public boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x, float y) {
-	    float accuracyThreshold = 0.4f;
+	//TODO: magic values here.
+	public boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float xPos, float yPos) {
+	    //float accuracyThreshold = 0.4f;
 		switch (orientation) {
 			case WEST:
-				return (x - coordinate.x) < (accuracyThreshold);
+				return (xPos - coordinate.x) < (0.475);
 			case EAST:
-				return (x - coordinate.x) > -(accuracyThreshold);
+				return (xPos - coordinate.x) > -(0.55);
 			case NORTH:
-				return (y - coordinate.y) > -(accuracyThreshold);
+				return (yPos - coordinate.y) > -(0.475);
 			case SOUTH:
-				return (y - coordinate.y) < (accuracyThreshold);
+				return (yPos - coordinate.y) < (0.7);
 		}
 		return false;
 	}

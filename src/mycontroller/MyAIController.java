@@ -3,8 +3,9 @@ package mycontroller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import controller.CarController;
+import mycontroller.exceptions.StrategyNotFoundException;
 import mycontroller.strategies.CarNavigationStrategy;
-import mycontroller.strategies.FollowLeftWallStrategy;
+import mycontroller.strategies.StrategyFactory;
 import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
@@ -23,7 +24,6 @@ public class MyAIController extends CarController {
     private Coordinate currentPosition;
     private WorldSpatial.Direction previousState = null; // Keeps track of the previous state
     private boolean justChangedState = false;
-
     private ArrayList<MapTile> tilesToAvoid = new ArrayList<>();
     private CarNavigationStrategy carNavigationStrategy;
 
@@ -38,15 +38,19 @@ public class MyAIController extends CarController {
     private final int distToSlowDown = getViewSquare();
 
     // Offset used to differentiate between 0 and 360 degrees
-    private int EAST_THRESHOLD = 3;
+    private final int EAST_THRESHOLD = 3;
 
-    public MyAIController(Car car) {
+    private StrategyFactory strategyFactory;
+    private String startingStrategy = "FollowLeftWall";
+    private String[] strategies = {"FollowLeftWall", "FollowRightWall", "GoThroughLava"};
+
+    public MyAIController(Car car) throws StrategyNotFoundException {
         super(car);
         tilesToAvoid.add(new MapTile(MapTile.Type.WALL));
         tilesToAvoid.add(new LavaTrap());
 
         /** default to following left wall when simulation starts **/
-        carNavigationStrategy = new FollowLeftWallStrategy(this);
+        strategyFactory = new StrategyFactory(this);
     }
 
     @Override
@@ -262,6 +266,10 @@ public class MyAIController extends CarController {
         }
     }
 
+    public String getControllerStartingStrategy() {
+        return startingStrategy;
+    }
+
     public boolean getIsTurningLeft() {
         return isTurningLeft;
     }
@@ -336,5 +344,9 @@ public class MyAIController extends CarController {
 
     public void setJustChangedState(boolean justChangedState) {
         this.justChangedState = justChangedState;
+    }
+
+    public void setCarNavigationStrategy(CarNavigationStrategy carNavigationStrategy) {
+        this.carNavigationStrategy = carNavigationStrategy;
     }
 }
