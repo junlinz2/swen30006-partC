@@ -93,7 +93,7 @@ public class MyAIController extends CarController {
 		// Once the car is already stuck to a wall, apply the following logic
 		else {
 
-			// Readjust the car if it is misaligned.
+			// Readjust the car if it is misaligned.			
 			readjust(lastTurnDirection, delta);
 
 			carNavigationStrategy.doAction(delta, currentView, this);
@@ -101,6 +101,7 @@ public class MyAIController extends CarController {
 	}
 
 	/**
+	 * Note: Trying implementing moving away from wall if crashed
 	 * Readjust the car to the orientation we are in.
 	 * 
 	 * @param lastTurnDirection
@@ -112,12 +113,7 @@ public class MyAIController extends CarController {
 				adjustRight(getOrientation(), delta);
 			} else if (!isTurningLeft && lastTurnDirection.equals(WorldSpatial.RelativeDirection.LEFT)) {
 				adjustLeft(getOrientation(), delta);
-			} 
-			//Testing driving away from the wall if car crashes
-			else if (isTurningLeft && getSpeed() == 0) {
-				adjustLeft(getOrientation(), delta);
 			}
-			
 		}
 	}
 
@@ -146,8 +142,6 @@ public class MyAIController extends CarController {
 		case WEST:
 			if (getAngle() > WorldSpatial.WEST_DEGREE) {
 				turnRight(delta);
-				System.out.println("=============================================================================");
-
 			}
 			break;
 
