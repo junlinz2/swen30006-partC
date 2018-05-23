@@ -33,9 +33,9 @@ public class MyAIController extends CarController {
     private final float MIN_CAR_SPEED = 1f;
 
     // TODO : use a different turning strategy for different corner tile types.
-    private final int obstacleFollowingSensitivity = 1;
-    private final int distToTurn = 1;
-    private final int distToSlowDown = getViewSquare();
+    public final int obstacleFollowingSensitivity = 1;
+    public final int distToTurn = 1;
+    public final int distToSlowDown = getViewSquare();
 
     // Offset used to differentiate between 0 and 360 degrees
     private final int EAST_THRESHOLD = 3;
@@ -153,7 +153,6 @@ public class MyAIController extends CarController {
             default:
                 break;
         }
-
     }
 
     private void adjustRight(WorldSpatial.Direction orientation, float delta) {
