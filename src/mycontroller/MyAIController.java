@@ -22,6 +22,7 @@ public class MyAIController extends CarController {
 
 	private Coordinate currentPosition;
 	private WorldSpatial.Direction previousState = null; // Keeps track of the previous state
+	private boolean justChangedState = false;
 
 	private ArrayList<MapTile> tilesToAvoid = new ArrayList<>();
 	private CarNavigationStrategy carNavigationStrategy;
@@ -195,7 +196,8 @@ public class MyAIController extends CarController {
 					isTurningRight = false;
 				}
 				previousState = getOrientation();
-			}
+				setJustChangedState(true);
+			} 
 		}
 	}
 
@@ -324,4 +326,16 @@ public class MyAIController extends CarController {
 	// public float getFloatY() {
 	// return getY();
 	// }
+	
+	public boolean justChangedState() {
+		return (isJustChangedState() == true) ? true : false;
+	}
+
+	public boolean isJustChangedState() {
+		return justChangedState;
+	}
+
+	public void setJustChangedState(boolean justChangedState) {
+		this.justChangedState = justChangedState;
+	}
 }
