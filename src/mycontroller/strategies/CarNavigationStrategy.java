@@ -6,7 +6,8 @@ import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 //TODO document this
 public abstract class CarNavigationStrategy {

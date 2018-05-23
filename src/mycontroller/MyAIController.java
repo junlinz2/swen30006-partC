@@ -177,7 +177,6 @@ public class MyAIController extends CarController {
             default:
                 break;
         }
-
     }
 
     /**
@@ -338,6 +337,4 @@ public class MyAIController extends CarController {
     public void setJustChangedState(boolean justChangedState) {
         this.justChangedState = justChangedState;
     }
-
-
 }

@@ -5,7 +5,8 @@ import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
@@ -100,15 +101,16 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 	}
 
 	public boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x, float y) {
+	    float accuracyThreshold = 0.4f;
 		switch (orientation) {
 			case WEST:
-				return (x - coordinate.x) < 0.4;
+				return (x - coordinate.x) < (accuracyThreshold);
 			case EAST:
-				return (x - coordinate.x) > -0.4;
+				return (x - coordinate.x) > -(accuracyThreshold);
 			case NORTH:
-				return (y - coordinate.y) > -0.4;
+				return (y - coordinate.y) > -(accuracyThreshold);
 			case SOUTH:
-				return (y - coordinate.y) < 0.4;
+				return (y - coordinate.y) < (accuracyThreshold);
 		}
 		return false;
 	}
