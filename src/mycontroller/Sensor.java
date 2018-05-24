@@ -24,10 +24,10 @@ public class Sensor {
     /**
      * Method below just iterates through the list and check in the correct coordinates.
      * i.e. Given your current position is 10,10
-     * getEastView will check up to obstacleFollowingSensitivity amount of tiles to the right.
-     * getWestView will check up to obstacleFollowingSensitivity amount of tiles to the left.
-     * getNorthView will check up to obstacleFollowingSensitivity amount of tiles to the top.
-     * getSouthView will check up to obstacleFollowingSensitivity amount of tiles below.
+     * getEastView will check up to OBSTACLE_FOLLOWING_SENSITIVITY amount of tiles to the right.
+     * getWestView will check up to OBSTACLE_FOLLOWING_SENSITIVITY amount of tiles to the left.
+     * getNorthView will check up to OBSTACLE_FOLLOWING_SENSITIVITY amount of tiles to the top.
+     * getSouthView will check up to OBSTACLE_FOLLOWING_SENSITIVITY amount of tiles below.
      */
 
     public LinkedHashMap<Coordinate, MapTile> getEastView(HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition) {

@@ -10,7 +10,6 @@ import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.Car;
-import world.World;
 import world.WorldSpatial;
 
 public class MyAIController extends CarController {
@@ -35,9 +34,9 @@ public class MyAIController extends CarController {
     private final float MIN_CAR_SPEED = 1f;
 
     // TODO : use a different turning strategy for different corner tile types.
-    public final int obstacleFollowingSensitivity = 1;
-    public final int distToTurn = 1;
-    public final int distToSlowDown = getViewSquare();
+    public final int OBSTACLE_FOLLOWING_SENSITIVITY = 1;
+    public final int DIST_TO_TURN = 1;
+    public final int DIST_TO_SLOW_DOWN = getViewSquare();
 
     // Offset used to differentiate between 0 and 360 degrees
     private final int EAST_THRESHOLD = 3;
@@ -80,7 +79,7 @@ public class MyAIController extends CarController {
             int distToObstacleAhead = carNavigationStrategy.checkViewForTile(WorldSpatial.Direction.NORTH, currentView,
                     currentPosition, tilesToAvoid);
 
-            if (distToObstacleAhead <= getDistToSlowDown() && distToObstacleAhead > distToTurn) {
+            if (distToObstacleAhead <= DIST_TO_SLOW_DOWN && distToObstacleAhead > DIST_TO_TURN) {
                 if (getSpeed() > MAX_TURNING_SPEED)
                     applyReverseAcceleration();
             }
@@ -322,15 +321,7 @@ public class MyAIController extends CarController {
     }
 
     public int getObstacleFollowingSensitivity() {
-        return obstacleFollowingSensitivity;
-    }
-
-    public int getDistToTurn() {
-        return distToTurn;
-    }
-
-    public int getDistToSlowDown() {
-        return distToSlowDown;
+        return OBSTACLE_FOLLOWING_SENSITIVITY;
     }
 
     // public float getFloatX() {

@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
 	public FollowLeftWallStrategy(MyAIController c) {
-		setSensor(new Sensor(c.getObstacleFollowingSensitivity(), c.getDistToTurn(), c.getDistToSlowDown()));
+		setSensor(new Sensor(c.getObstacleFollowingSensitivity(), c.DIST_TO_TURN, c.DIST_TO_SLOW_DOWN));
 		this.setTilesToAvoid(c.getTilesToAvoid());
 	}
 
