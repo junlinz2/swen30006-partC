@@ -8,7 +8,7 @@ public class StrategyFactory {
 
         // set the default behaviour of controller to follow left wall
         CarNavigationStrategy initialStrategy = changeCarStrategy(c, MyAIController.strategies.FOLLOWLEFTWALL);
-
+        c.setCarNavigationStrategy(initialStrategy);
     }
 
     // TODO : add the other strategies

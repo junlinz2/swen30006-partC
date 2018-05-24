@@ -299,6 +299,10 @@ public class MyAIController extends CarController {
         }
     }
 
+    public void setCarNavigationStrategy(CarNavigationStrategy strategy) {
+        this.carNavigationStrategy = strategy;
+    }
+
     public boolean getIsTurningLeft() {
         return isTurningLeft;
     }
