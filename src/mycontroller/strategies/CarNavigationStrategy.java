@@ -32,12 +32,12 @@ public abstract class CarNavigationStrategy {
 	}
 
 	public abstract boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-			Coordinate currentPosition);
+			Coordinate currentPosition, ArrayList<MapTile> tilesToCheck);
 
 	// TODO: Remove if not used
 	public abstract boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x,
 			float y);
 
 	public abstract boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-			Coordinate currentPosition);
+			Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid);
 }
