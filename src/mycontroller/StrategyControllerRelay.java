@@ -1,6 +1,5 @@
 package mycontroller;
 
-import controller.CarController;
 import mycontroller.strategies.CarNavigationStrategy;
 import world.WorldSpatial;
 
@@ -13,14 +12,7 @@ import world.WorldSpatial;
  */
 public class StrategyControllerRelay {
 	
-	//Temporary
-	//right
-	private final float MIN_ROTATING_SPEED = 0.5f;
-	//left
-	private final float MIN_CORNER_SPEED = 1.15f;
-	
 	private static StrategyControllerRelay instance;
-
 	public static StrategyControllerRelay getInstance() {
 	    if (instance == null) {
 	        instance = new StrategyControllerRelay();
@@ -37,14 +29,14 @@ public class StrategyControllerRelay {
 				carController.applyReverseAcceleration();	
 			}
             //else if (carController.getSpeed() < carController.getMinCarSpeed()) { 
-            else if (carController.getSpeed() < MIN_ROTATING_SPEED) { 
+            else if (carController.getSpeed() < carController.MIN_ROTATING_SPEED) { 
             	carController.applyForwardAcceleration();	
 			}
 			break;
 		case TURNLEFT:
 			carController.applyLeftTurn(orientation, delta);
 			//if (carController.getSpeed() < carController.getMinCarSpeed()) { 
-			if (carController.getSpeed() < MIN_CORNER_SPEED) { 
+			if (carController.getSpeed() < carController.MIN_CORNER_SPEED) { 
 				carController.applyForwardAcceleration();	
 			}
 			else if (carController.getSpeed() > carController.MAX_TURNING_SPEED) {

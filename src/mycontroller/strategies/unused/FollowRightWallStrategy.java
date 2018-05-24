@@ -43,10 +43,10 @@ public class FollowRightWallStrategy extends CarNavigationStrategy {
             int obstacleDistance = checkViewForTile(carController.getOrientation(), currentView,
                     carController.getCurrentPosition(), carController.getTilesToAvoid());
 
-            if (obstacleDistance <= sensor.getDISTANCE_TO_TURN()) {
+            if (obstacleDistance <= sensor.getDistToTurn()) {
                 nextState = carControllerActions.ISTURNINGRIGHT;
 
-            } else if (obstacleDistance <= sensor.getDISTANCE_TO_SLOW_DOWN()) {
+            } else if (obstacleDistance <= sensor.getDistToSlowDown()) {
                 nextState = carControllerActions.DECELERATE;
 
             } else {

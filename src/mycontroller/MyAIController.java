@@ -12,37 +12,37 @@ import world.Car;
 import world.WorldSpatial;
 
 public class MyAIController extends CarController {
-
-	private boolean isFollowingWall = false; // This is initialized when the car
-												// sticks to a wall.
-	private WorldSpatial.RelativeDirection lastTurnDirection = null; // Shows
-																		// the
-																		// last
-																		// turn
-																		// direction
-																		// the
-																		// car
-																		// takes.
+	
+	// This is initialized when the car sticks to a wall.
+	private boolean isFollowingWall = false; 
+	
+	// Shows the last turning direction
+	private WorldSpatial.RelativeDirection lastTurnDirection = null; 
+	
 	private boolean isTurningLeft = false;
 	private boolean isTurningRight = false;
-
 	private Coordinate currentPosition;
-	private WorldSpatial.Direction previousState = null; // Keeps track of the
-															// previous state
+	
+	// Keeps track of the previous state
+	private WorldSpatial.Direction previousState = null; 
 	private boolean justChangedState = false;
-
 	private ArrayList<MapTile> tilesToAvoid = new ArrayList<>();
 	private CarNavigationStrategy carNavigationStrategy;
+	private GameMap latestGameMap;
 
 	// Car Speed to move at
 	public final float MAX_CAR_SPEED = 3;
 	public final float MAX_TURNING_SPEED = 1.4f;
 	public final float MIN_CAR_SPEED = 1f;
+	public final float MIN_ROTATING_SPEED = 0.5f;
+	public final float MIN_CORNER_SPEED = 1.15f;
+	
 
 	// TODO : use a different turning strategy for different corner tile types.
 	public final int OBSTACLE_FOLLOWING_SENSITIVITY = 2;
 	public final int DISTANCE_TO_TURN = 1;
 	public final int DISTANCE_TO_SLOW_DOWN = getViewSquare();
+	
 
 	// Offset used to differentiate between 0 and 360 degrees
 	private int EAST_THRESHOLD = 3;
@@ -51,20 +51,23 @@ public class MyAIController extends CarController {
 		super(car);
 		tilesToAvoid.add(new MapTile(MapTile.Type.WALL));
 		tilesToAvoid.add(new LavaTrap());
-
+		latestGameMap = new GameMap(getMap());
 		/** default to following left wall when simulation starts **/
 		carNavigationStrategy = new FollowLeftWallStrategy(this);
 	}
 
 	@Override
 	public void update(float delta) {
-		System.out.println(getFloatX() + " " + getFloatY());
+		//TODO print statement here
+		//System.out.println(getFloatX() + " " + getFloatY());
 
 		// Gets what the car can see
 		HashMap<Coordinate, MapTile> currentView = getView();
 		currentPosition = updateCoordinate();
-
+		latestGameMap.updateMap(currentView);
 		checkStateChange();
+		
+		//TODO remove if unused
 		// x = getX();
 		// y = getY();
 
@@ -304,13 +307,14 @@ public class MyAIController extends CarController {
 		return tilesToAvoid;
 	}
 
-	public float getFloatX() {
-		return getX();
-	}
-
-	public float getFloatY() {
-		return getY();
-	}
+	//TODO Remove if unused
+//	public float getFloatX() {
+//		return getX();
+//	}
+//
+//	public float getFloatY() {
+//		return getY();
+//	}
 
 	public boolean justChangedState() {
 		return (isJustChangedState() == true) ? true : false;

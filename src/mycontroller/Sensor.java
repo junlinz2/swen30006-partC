@@ -11,24 +11,21 @@ import java.util.*;
 public class Sensor {
 	// How many minimum units obstacles are away from the player.
 	private int obstacleFollowingSensitivity;
-	// TODO:Remove distToTurn if not used
-	private int distToTurn;
 	private int distToSlowDown;
 
 	public Sensor(int obstacleFollowingSensitivity, int distToTurn, int distToSlowDown) {
 		this.obstacleFollowingSensitivity = obstacleFollowingSensitivity;
-		this.distToTurn = distToTurn;
 		this.distToSlowDown = distToSlowDown;
 	}
 
 	/**
 	 * Method below just iterates through the list and check in the correct
-	 * coordinates. i.e. Given your current position is 10,10 getEastView will check
-	 * up to obstacleFollowingSensitivity amount of tiles to the right. getWestView
-	 * will check up to obstacleFollowingSensitivity amount of tiles to the left.
-	 * getNorthView will check up to obstacleFollowingSensitivity amount of tiles to
-	 * the top. getSouthView will check up to obstacleFollowingSensitivity amount of
-	 * tiles below.
+	 * coordinates. i.e. Given your current position is 10,10 getEastView will
+	 * check up to obstacleFollowingSensitivity amount of tiles to the right.
+	 * getWestView will check up to obstacleFollowingSensitivity amount of tiles
+	 * to the left. getNorthView will check up to obstacleFollowingSensitivity
+	 * amount of tiles to the top. getSouthView will check up to
+	 * obstacleFollowingSensitivity amount of tiles below.
 	 */
 
 	public LinkedHashMap<Coordinate, MapTile> getEastView(HashMap<Coordinate, MapTile> currentView,
@@ -84,15 +81,15 @@ public class Sensor {
 		LinkedHashMap<Coordinate, MapTile> view = getOrientationView(currentView, orientation, direction,
 				currentPosition);
 
-		// Loops through Map to allow some flexibility in how close Car should be to
+		// Loops through Map to allow some flexibility in how close Car should
+		// be to
 		// wall.
 		int i = 1;
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if (areTilesSameType(tile, tileInView.getValue()) && i <= obstacleFollowingSensitivity)
+				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()) && i <= obstacleFollowingSensitivity)
 					return true;
 			}
-
 			i++;
 			if (i > obstacleFollowingSensitivity) {
 				break;
@@ -139,9 +136,8 @@ public class Sensor {
 		int i = 1;
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if (areTilesSameType(tile, tileInView.getValue())) {
-					return i;					
-				}
+				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()))
+					return i;
 			}
 
 			i++;
@@ -150,8 +146,8 @@ public class Sensor {
 	}
 
 	/**
-	 * Return true if a peeked is traversable (ie: a road tile) within four tiles
-	 * away.
+	 * Return true if a peeked is traversable (ie: a road tile) within four
+	 * tiles away.
 	 * 
 	 * @param orientation
 	 * @param currentView
@@ -368,10 +364,6 @@ public class Sensor {
 			}
 		}
 		return currentPosition;
-	}
-
-	public int getDistToTurn() {
-		return distToTurn;
 	}
 
 	public int getObstacleFollowingSensitivity() {

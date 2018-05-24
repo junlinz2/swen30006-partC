@@ -6,15 +6,16 @@ import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 //TODO document this
 public abstract class CarNavigationStrategy {
 
 	// Different strategies manipulate the behaviour of the sensor, so we need a
 	// reference to it
-	Sensor sensor;
-	ArrayList<MapTile> tilesToAvoid;
+	protected Sensor sensor;
+	protected ArrayList<MapTile> tilesToAvoid;
 
 	public abstract void doAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController);
 
@@ -23,12 +24,7 @@ public abstract class CarNavigationStrategy {
 
 	public int checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
-
 		return sensor.checkViewForTile(orientation, currentView, currentPosition, tilesToCheck);
-	}
-
-	public String getStrategyName() {
-		return this.getClass().getSimpleName();
 	}
 
 	public enum carControllerActions {
