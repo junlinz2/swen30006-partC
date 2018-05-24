@@ -299,6 +299,10 @@ public class MyAIController extends CarController {
         }
     }
 
+    public boolean justChangedState() {
+        return justChangedState;
+    }
+
     public void setCarNavigationStrategy(CarNavigationStrategy strategy) {
         this.carNavigationStrategy = strategy;
     }
