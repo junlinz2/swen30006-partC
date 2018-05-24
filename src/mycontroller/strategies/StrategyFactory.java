@@ -7,16 +7,17 @@ public class StrategyFactory {
     public StrategyFactory(MyAIController c) throws StrategyNotFoundException {
 
         // set the default behaviour of controller to follow left wall
-        CarNavigationStrategy initialStrategy = changeCarStrategy(c, MyAIController.strategies.FollowLeftWall);
-        c.setCarNavigationStrategy(initialStrategy);
+        CarNavigationStrategy initialStrategy = changeCarStrategy(c, MyAIController.strategies.FOLLOWLEFTWALL);
+
     }
 
     // TODO : add the other strategies
     public CarNavigationStrategy changeCarStrategy(MyAIController c, MyAIController.strategies strategyName)
             throws StrategyNotFoundException {
         switch (strategyName) {
-            case FollowLeftWall:
+            case FOLLOWLEFTWALL:
                 return new FollowLeftWallStrategy(c);
+
             default:
                 throw new StrategyNotFoundException();
         }
