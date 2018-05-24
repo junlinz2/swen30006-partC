@@ -5,13 +5,13 @@ import tiles.MapTile;
 public class HashMapTile {
 	private MapTile tile;
 	private int isExplored;
-	private boolean toFollow;
+	private boolean followed;
 	private int keyValue;
 
 	public HashMapTile (MapTile tile){
 		this.tile = tile;
 		this.isExplored = 0;
-		this.toFollow = false;
+		this.followed = false;
 		this.keyValue = 0;
 	}
 
@@ -35,12 +35,12 @@ public class HashMapTile {
 		return this.tile.isType(tileType);
 	}
 
-	public boolean isToFollow() {
-		return toFollow;
+	public boolean isFollowed() {
+		return followed;
 	}
 
-	public void setToFollow(boolean toFollow) {
-		this.toFollow = toFollow;
+	public void setFollowed(boolean followed) {
+		this.followed = followed;
 	}
 
 	public int getKeyValue() {

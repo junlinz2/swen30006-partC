@@ -23,6 +23,9 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 				carController.setJustChangedState(false);
 			}
 
+			deregisterFollowedObstacles(carController.getLatestGameMap(), currentView, carController.getOrientation(),
+					carController.getCurrentPosition(), carController.getTilesToAvoid());
+
 			int distToObstacle = checkViewForTile(carController.getOrientation(), currentView,
 					carController.getCurrentPosition(), carController.getTilesToAvoid());
 
@@ -87,22 +90,73 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 	}
 
 	public boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-										  Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
+			Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
 		return sensor.checkFollowingObstacle(orientation, currentView, WorldSpatial.RelativeDirection.LEFT,
 				currentPosition, tilesToAvoid);
 	}
 
 	@Override
 	public boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-				Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+			Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
 		return sensor.peekCorner(orientation, currentView, currentPosition, WorldSpatial.RelativeDirection.LEFT,
 				tilesToCheck);
 	}
 
 	@Override
 	public boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-							 Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
+			Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
 		return sensor.isDeadEnd(orientation, currentView, WorldSpatial.RelativeDirection.LEFT, currentPosition,
 				tilesToAvoid);
+	}
+
+	public void registerObstaclesToFollow(GameMap gameMap, HashMap<Coordinate, MapTile> currentView,
+			WorldSpatial.Direction orientation, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+		int distToObstacle = Integer.MAX_VALUE;
+		Coordinate obstacleCoordinate = null;
+
+		switch (orientation) {
+		case NORTH:
+			distToObstacle = sensor.checkViewForTile(WorldSpatial.Direction.EAST, currentView, currentPosition,
+					tilesToCheck);
+			obstacleCoordinate = new Coordinate(currentPosition.x + distToObstacle, currentPosition.y);
+		case SOUTH:
+			distToObstacle = sensor.checkViewForTile(WorldSpatial.Direction.WEST, currentView, currentPosition,
+					tilesToCheck);
+			obstacleCoordinate = new Coordinate(currentPosition.x - distToObstacle, currentPosition.y);
+		case EAST:
+			distToObstacle = sensor.checkViewForTile(WorldSpatial.Direction.SOUTH, currentView, currentPosition,
+					tilesToCheck);
+			obstacleCoordinate = new Coordinate(currentPosition.x, currentPosition.y - distToObstacle);
+		case WEST:
+			distToObstacle = sensor.checkViewForTile(WorldSpatial.Direction.NORTH, currentView, currentPosition,
+					tilesToCheck);
+			obstacleCoordinate = new Coordinate(currentPosition.x, currentPosition.y + distToObstacle);
+		}
+
+		if (distToObstacle <= sensor.getDistToSlowDown()) {
+			if (!gameMap.getObstaclesToFollow().contains(obstacleCoordinate)
+					&& !gameMap.getUpdatedMap().get(obstacleCoordinate).isFollowed()) {
+				gameMap.getObstaclesToFollow().add(obstacleCoordinate);
+			}
+		}
+	}
+
+	public void deregisterFollowedObstacles(GameMap gameMap, HashMap<Coordinate, MapTile> currentView,
+			WorldSpatial.Direction orientation, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+		LinkedHashMap<Coordinate, MapTile> view = sensor.getOrientationView(currentView, orientation,
+				WorldSpatial.RelativeDirection.LEFT, currentPosition);
+
+		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
+			for (MapTile tile : tilesToCheck) {
+				if (currentPosition.x == 1 && currentPosition.y == 18) {
+					System.out.println("testing]=======================================================");
+				}
+				if (TilesChecker.checkTileTypeSame(tileInView.getValue(), tile)) {
+					gameMap.getObstaclesToFollow().remove(tileInView.getKey());
+					gameMap.getUpdatedMap().get(tileInView.getKey()).setFollowed(true);
+					return;
+				}
+			}
+		}
 	}
 }

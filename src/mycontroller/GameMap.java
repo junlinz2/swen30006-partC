@@ -1,5 +1,6 @@
 package mycontroller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import tiles.MapTile;
@@ -7,6 +8,11 @@ import utilities.Coordinate;
 
 public class GameMap {
 	private HashMap<Coordinate, HashMapTile> updatedMap = new HashMap<>();
+	private ArrayList<Coordinate> obstaclesToFollow = new ArrayList<>();
+	
+	public void setObstaclesToFollow(ArrayList<Coordinate> obstaclesToFollow) {
+		this.obstaclesToFollow = obstaclesToFollow;
+	}
 
 	public GameMap(HashMap<Coordinate, MapTile> map) {
 		createMap(map);
@@ -15,7 +21,7 @@ public class GameMap {
 	private void createMap(HashMap<Coordinate, MapTile> map) {
 		for (Coordinate key : map.keySet()) {
 			System.out.println(map.get(key).getType());
-			updatedMap.put(key, new HashMapTile(map.get(key)));
+			getUpdatedMap().put(key, new HashMapTile(map.get(key)));
 		}
 	}
 
@@ -25,7 +31,7 @@ public class GameMap {
 			if(TilesChecker.checkTileIsEmpty(currentView.get(key))){
 				break;
 			}
-			HashMapTile tileFromMap = updatedMap.get(key);
+			HashMapTile tileFromMap = getUpdatedMap().get(key);
 
 			//get from map the object to check if it has been explored
 			if (tileFromMap.getExplored() == 0) {
@@ -45,8 +51,20 @@ public class GameMap {
 				//set explored and change tile type
 				tileFromMap.setExplored(1);
 				tileFromMap.setTile(tileFromView);
-				updatedMap.put(key, tileFromMap);
+				getUpdatedMap().put(key, tileFromMap);
 			}
 		}
+	}
+
+	public ArrayList<Coordinate> getObstaclesToFollow() {
+		return obstaclesToFollow;
+	}
+
+	public HashMap<Coordinate, HashMapTile> getUpdatedMap() {
+		return updatedMap;
+	}
+
+	public void setUpdatedMap(HashMap<Coordinate, HashMapTile> updatedMap) {
+		this.updatedMap = updatedMap;
 	}
 }
