@@ -3,8 +3,10 @@ package mycontroller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import controller.CarController;
+import mycontroller.exceptions.StrategyNotFoundException;
 import mycontroller.strategies.CarNavigationStrategy;
 import mycontroller.strategies.FollowLeftWallStrategy;
+import mycontroller.strategies.StrategyFactory;
 import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
@@ -13,31 +15,26 @@ import world.WorldSpatial;
 
 public class MyAIController extends CarController {
 
-	private boolean isFollowingWall = false; // This is initialized when the car
-												// sticks to a wall.
-	private WorldSpatial.RelativeDirection lastTurnDirection = null; // Shows
-																		// the
-																		// last
-																		// turn
-																		// direction
-																		// the
-																		// car
-																		// takes.
+	private boolean isFollowingWall = false; // This is initialized when the car sticks to a wall.
+	private WorldSpatial.RelativeDirection lastTurnDirection = null; // Shows the last turn direction the car takes.
+
 	private boolean isTurningLeft = false;
 	private boolean isTurningRight = false;
-
 	private Coordinate currentPosition;
-	private WorldSpatial.Direction previousState = null; // Keeps track of the
-															// previous state
+	
+	// Keeps track of the previous state
+	private WorldSpatial.Direction previousState = null; 
 	private boolean justChangedState = false;
-
 	private ArrayList<MapTile> tilesToAvoid = new ArrayList<>();
-	private CarNavigationStrategy carNavigationStrategy;
+	private GameMap latestGameMap;
 
 	// Car Speed to move at
 	public final float MAX_CAR_SPEED = 3;
 	public final float MAX_TURNING_SPEED = 1.4f;
 	public final float MIN_CAR_SPEED = 1f;
+
+	public final float MIN_ROTATING_SPEED = 0.5f;
+	public final float MIN_CORNER_SPEED = 1.15f;
 
 	// TODO : use a different turning strategy for different corner tile types.
 	public final int OBSTACLE_FOLLOWING_SENSITIVITY = 2;
@@ -46,25 +43,36 @@ public class MyAIController extends CarController {
 
 	// Offset used to differentiate between 0 and 360 degrees
 	private int EAST_THRESHOLD = 3;
+    private CarNavigationStrategy carNavigationStrategy;
+    private StrategyFactory strategyFactory;
 
-	public MyAIController(Car car) {
+    public enum strategies {FOLLOWLEFTWALL, FOLLOWRIGHTWALL, GOTHROUGHLAVA, HEALING}
+
+	public MyAIController(Car car) throws StrategyNotFoundException {
 		super(car);
 		tilesToAvoid.add(new MapTile(MapTile.Type.WALL));
 		tilesToAvoid.add(new LavaTrap());
+		latestGameMap = new GameMap(getMap());
 
+		//TODO (Junlin) - check implementations as I have created a factory here.
 		/** default to following left wall when simulation starts **/
-		carNavigationStrategy = new FollowLeftWallStrategy(this);
+        strategyFactory = new StrategyFactory(this);
+        carNavigationStrategy = strategyFactory.changeCarStrategy(this, strategies.FOLLOWLEFTWALL);
 	}
 
 	@Override
 	public void update(float delta) {
-		System.out.println(getFloatX() + " " + getFloatY());
+
+		//TODO print statement here
+		//System.out.println(getFloatX() + " " + getFloatY());
 
 		// Gets what the car can see
 		HashMap<Coordinate, MapTile> currentView = getView();
 		currentPosition = updateCoordinate();
-
+		latestGameMap.updateMap(currentView);
 		checkStateChange();
+		
+		//TODO remove if unused
 		// x = getX();
 		// y = getY();
 
@@ -108,6 +116,8 @@ public class MyAIController extends CarController {
 			carNavigationStrategy.doAction(delta, currentView, this);
 		}
 	}
+
+
 
 	/**
 	 * Note: Trying implementing moving away from wall if crashed Readjust the
@@ -237,9 +247,14 @@ public class MyAIController extends CarController {
 			break;
 		default:
 			break;
-
 		}
-
+        //if (carController.getSpeed() < carController.getMinCarSpeed()) {
+        if (getSpeed() < MIN_CORNER_SPEED) {
+            applyForwardAcceleration();
+        }
+        else if (getSpeed() > MAX_TURNING_SPEED) {
+            applyReverseAcceleration();
+        }
 	}
 
 	/**
@@ -270,6 +285,13 @@ public class MyAIController extends CarController {
 		default:
 			break;
 		}
+        if (getSpeed() > MAX_TURNING_SPEED) {
+            applyReverseAcceleration();
+        }
+        //else if (carController.getSpeed() < carController.getMinCarSpeed()) {
+        else if (getSpeed() < MIN_ROTATING_SPEED) {
+            applyForwardAcceleration();
+        }
 	}
 
 	public boolean getIsTurningLeft() {
@@ -304,16 +326,17 @@ public class MyAIController extends CarController {
 		return tilesToAvoid;
 	}
 
-	public float getFloatX() {
-		return getX();
-	}
-
-	public float getFloatY() {
-		return getY();
-	}
+	//TODO Remove if unused
+//	public float getFloatX() {
+//		return getX();
+//	}
+//
+//	public float getFloatY() {
+//		return getY();
+//	}
 
 	public boolean justChangedState() {
-		return (isJustChangedState() == true) ? true : false;
+		return isJustChangedState();
 	}
 
 	public boolean isJustChangedState() {
@@ -327,4 +350,6 @@ public class MyAIController extends CarController {
 	public WorldSpatial.RelativeDirection getLastTurnDirection() {
 		return lastTurnDirection;
 	}
+
+
 }

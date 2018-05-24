@@ -9,29 +9,27 @@ import world.WorldSpatial;
 import java.util.*;
 
 public class Sensor {
-	//TODO: Remove this and add tilesToAvoid in those involved methods (Protected Variation)
+	// TODO: Remove this and add tilesToAvoid in those involved methods
+	// (Protected Variation)
 	private final MapTile WALL = new MapTile(MapTile.Type.WALL);
 
 	// How many minimum units obstacles are away from the player.
 	private int obstacleFollowingSensitivity;
-	// TODO:Remove distToTurn if not used
-	private int distToTurn;
 	private int distToSlowDown;
 
 	public Sensor(int obstacleFollowingSensitivity, int distToTurn, int distToSlowDown) {
 		this.obstacleFollowingSensitivity = obstacleFollowingSensitivity;
-		this.distToTurn = distToTurn;
 		this.distToSlowDown = distToSlowDown;
 	}
 
 	/**
 	 * Method below just iterates through the list and check in the correct
-	 * coordinates. i.e. Given your current position is 10,10 getEastView will check
-	 * up to obstacleFollowingSensitivity amount of tiles to the right. getWestView
-	 * will check up to obstacleFollowingSensitivity amount of tiles to the left.
-	 * getNorthView will check up to obstacleFollowingSensitivity amount of tiles to
-	 * the top. getSouthView will check up to obstacleFollowingSensitivity amount of
-	 * tiles below.
+	 * coordinates. i.e. Given your current position is 10,10 getEastView will
+	 * check up to obstacleFollowingSensitivity amount of tiles to the right.
+	 * getWestView will check up to obstacleFollowingSensitivity amount of tiles
+	 * to the left. getNorthView will check up to obstacleFollowingSensitivity
+	 * amount of tiles to the top. getSouthView will check up to
+	 * obstacleFollowingSensitivity amount of tiles below.
 	 */
 
 	public LinkedHashMap<Coordinate, MapTile> getEastView(HashMap<Coordinate, MapTile> currentView,
@@ -117,17 +115,16 @@ public class Sensor {
 			}
 		}
 
-		// Loops through Map to allow some flexibility in how close Car should be to
+		// Loops through Map to allow some flexibility in how close Car should
+		// be to
 		// wall.
 		int i = 1;
 
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-
-				if (areTilesSameType(tile, tileInView.getValue()) && i <= obstacleFollowingSensitivity)
+				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()) && i <= obstacleFollowingSensitivity)
 					return true;
 			}
-
 			i++;
 			if (i > obstacleFollowingSensitivity) {
 				break;
@@ -176,7 +173,7 @@ public class Sensor {
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
 
-				if (areTilesSameType(tile, tileInView.getValue()))
+				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()))
 					return i;
 			}
 
@@ -186,8 +183,8 @@ public class Sensor {
 	}
 
 	/**
-	 * Return true if a peeked is traversable (ie: a road tile) within four tiles
-	 * away.
+	 * Return true if a peeked is traversable (ie: a road tile) within four
+	 * tiles away.
 	 * 
 	 * @param orientation
 	 * @param currentView
@@ -195,7 +192,7 @@ public class Sensor {
 	 * @param direction
 	 * @return
 	 */
-	//TODO: Make use of obstacleFollowingSensitivity
+	// TODO: Make use of obstacleFollowingSensitivity
 	public boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			Coordinate currentPosition, WorldSpatial.RelativeDirection direction) {
 		LinkedHashMap<Coordinate, MapTile> view = null;
@@ -282,10 +279,6 @@ public class Sensor {
 		return currentPosition;
 	}
 
-	public int getDistToTurn() {
-		return distToTurn;
-	}
-
 	public int getObstacleFollowingSensitivity() {
 		return obstacleFollowingSensitivity;
 	}
@@ -332,6 +325,7 @@ public class Sensor {
 		}
 
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
+			//TODO check this
 			if (areTilesSameType(tileInView.getValue(), WALL)) {
 				Coordinate roadBeforeObstacle = null;
 				int obstacleX = tileInView.getKey().x;
@@ -359,9 +353,9 @@ public class Sensor {
 				}
 			}
 		}
-		
-		//No wallTile found in currentView in the interested direction/path
-		//Assume all deadends can be seen in currentView
+
+		// No wallTile found in currentView in the interested direction/path
+		// Assume all deadends can be seen in currentView
 		return false;
 	}
 
@@ -376,26 +370,26 @@ public class Sensor {
 			adjacentTile1 = new Coordinate(roadBeforeObstacle.x, roadBeforeObstacle.y + 1);
 			adjacentTile2 = new Coordinate(roadBeforeObstacle.x, roadBeforeObstacle.y - 1);
 			break;
-			
+
 		case EAST:
 		case WEST:
 			adjacentTile1 = new Coordinate(roadBeforeObstacle.x + 1, roadBeforeObstacle.y);
 			adjacentTile2 = new Coordinate(roadBeforeObstacle.x - 1, roadBeforeObstacle.y);
 			break;
 		}
-		
+
 		if (adjacentTile1 == null && adjacentTile2 == null) {
-			//TODO: Create Exception (Invalid direction)
+			// TODO: Create Exception (Invalid direction)
 			return false;
 		}
-		
-		else if (areTilesSameType(currentView.get(adjacentTile1), WALL) 
+		//TODO check for same type
+		else if (areTilesSameType(currentView.get(adjacentTile1), WALL)
 				&& areTilesSameType(currentView.get(adjacentTile2), WALL)) {
 			return true;
-		} 
-		
+		}
+
 		else {
 			return false;
-		}	
+		}
 	}
 }

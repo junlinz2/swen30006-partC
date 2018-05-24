@@ -4,7 +4,6 @@ import mycontroller.*;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
-
 import java.util.*;
 
 public class FollowLeftWallStrategy extends CarNavigationStrategy {
@@ -36,7 +35,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 					carController.getCurrentPosition(), carController.getTilesToAvoid());
 
 			// If there is wall ahead, turn right!
-			if (distToObstacle <= sensor.getDistToTurn()) {
+			if (distToObstacle <= carController.DISTANCE_TO_TURN) {
 				nextState = carControllerActions.ISTURNINGRIGHT;
 			} 
 			
@@ -70,7 +69,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 				int distToObstacle = checkViewForTile(carController.getOrientation(), currentView,
 						carController.getCurrentPosition(), carController.getTilesToAvoid());
 
-				if (distToObstacle <= sensor.getDistToTurn()) {
+				if (distToObstacle <= carController.DISTANCE_TO_TURN) {
 					nextState = carControllerActions.ISTURNINGRIGHT;
 				}
 
