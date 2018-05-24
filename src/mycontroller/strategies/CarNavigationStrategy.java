@@ -56,5 +56,4 @@ public abstract class CarNavigationStrategy {
                                        Coordinate currentPosition);
 
     public abstract boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float xPos, float yPos);
-
 }

@@ -20,13 +20,6 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 		CarNavigationStrategy.carControllerActions nextState;
 
 		if (carController.getIsTurningRight()) {
-			// if (checkTileAccuracy(carController.getOrientation(),
-			// carController.getCurrentPosition(),
-			// carController.getFloatX(), carController.getFloatY())) {
-			// nextState = carControllerActions.TURNRIGHT;
-			// } else {
-			// nextState = carControllerActions.DONOTHING;
-			// }
 			nextState = carControllerActions.TURNRIGHT;
 		}
 
@@ -36,13 +29,6 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 			// Apply the left turn if you are not currently near a wall.
 			if (!checkFollowingObstacle(carController.getOrientation(), currentView, carController.getCurrentPosition(),
 					carController.getTilesToAvoid())) {
-				// if (checkTileAccuracy(carController.getOrientation(),
-				// carController.getCurrentPosition(),
-				// carController.getFloatX(), carController.getFloatY())) {
-				// nextState = carControllerActions.TURNLEFT;
-				// } else {
-				// nextState = carControllerActions.DONOTHING;
-				// }
 				nextState = carControllerActions.TURNLEFT;
 			} else {
 				nextState = carControllerActions.STOPTURNINGLEFT;
@@ -75,7 +61,6 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 		else {
 			if (carController.justChangedState()) {
 				nextState = carControllerActions.DECELERATE;
-				System.out.println("testing==============================================================================");
 			} else {
 				nextState = carControllerActions.ISTURNINGLEFT;
 			}

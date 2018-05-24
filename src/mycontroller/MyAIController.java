@@ -10,6 +10,7 @@ import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.Car;
+import world.World;
 import world.WorldSpatial;
 
 public class MyAIController extends CarController {
@@ -26,6 +27,7 @@ public class MyAIController extends CarController {
     private boolean justChangedState = false;
     private ArrayList<MapTile> tilesToAvoid = new ArrayList<>();
     private CarNavigationStrategy carNavigationStrategy;
+    private HashMap<Coordinate,MapTile> gameMap = new HashMap<>();
 
     // Car Speed to move at
     private final float MAX_CAR_SPEED = 2f;
@@ -41,8 +43,7 @@ public class MyAIController extends CarController {
     private final int EAST_THRESHOLD = 3;
 
     private StrategyFactory strategyFactory;
-    private String startingStrategy = "FollowLeftWall";
-    private String[] strategies = {"FollowLeftWall", "FollowRightWall", "GoThroughLava"};
+    public enum strategies {FollowLeftWall, FollowRightWall, GoThroughLava};
 
     public MyAIController(Car car) throws StrategyNotFoundException {
         super(car);
@@ -59,6 +60,7 @@ public class MyAIController extends CarController {
         // Gets what the car can see
         HashMap<Coordinate, MapTile> currentView = getView();
         currentPosition = updateCoordinate();
+        updateMap(currentView);
 
         checkStateChange();
         // x = getX();
@@ -102,6 +104,12 @@ public class MyAIController extends CarController {
             readjust(lastTurnDirection, delta);
 
             carNavigationStrategy.doAction(delta, currentView, this);
+        }
+    }
+
+    private void updateMap(HashMap<Coordinate,MapTile> currentView) {
+        for (Coordinate key : currentView.keySet()) {
+            gameMap.put(key, currentView.get(key));
         }
     }
 
@@ -230,9 +238,10 @@ public class MyAIController extends CarController {
                 break;
             default:
                 break;
-
         }
-
+        if (getSpeed() < getMinCarSpeed()) {
+            applyForwardAcceleration();
+        }
     }
 
     /**
@@ -263,10 +272,9 @@ public class MyAIController extends CarController {
             default:
                 break;
         }
-    }
-
-    public String getControllerStartingStrategy() {
-        return startingStrategy;
+        if (getSpeed() < getMinCarSpeed()) {
+            applyForwardAcceleration();
+        }
     }
 
     public boolean getIsTurningLeft() {

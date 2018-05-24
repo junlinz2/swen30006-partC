@@ -26,15 +26,9 @@ public class StrategyControllerRelay {
 		WorldSpatial.Direction orientation = carController.getOrientation();
 		switch (action) {
 		case TURNRIGHT:
-			if (carController.getSpeed() < carController.getMinCarSpeed()) {
-			    carController.applyForwardAcceleration();
-            }
             carController.applyRightTurn(orientation, delta);
 			break;
 		case TURNLEFT:
-            if (carController.getSpeed() < carController.getMinCarSpeed()) {
-                carController.applyForwardAcceleration();
-            }
 			carController.applyLeftTurn(orientation, delta);
 			break;
 		case ACCELERATE:
