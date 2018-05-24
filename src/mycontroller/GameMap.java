@@ -2,10 +2,8 @@ package mycontroller;
 
 import java.util.HashMap;
 
-import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
-import world.World;
 
 public class GameMap {
 	private HashMap<Coordinate, HashMapTile> updatedMap = new HashMap<>();
