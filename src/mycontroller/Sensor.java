@@ -28,6 +28,7 @@ public class Sensor {
 	 * obstacleFollowingSensitivity amount of tiles below.
 	 */
 
+	//TODO: change distToSlowDown to getViewSquare() (Same thing but naming matters)
 	public LinkedHashMap<Coordinate, MapTile> getEastView(HashMap<Coordinate, MapTile> currentView,
 			Coordinate currentPosition) {
 		LinkedHashMap<Coordinate, MapTile> view = new LinkedHashMap<>();
@@ -91,24 +92,11 @@ public class Sensor {
 					return true;
 			}
 			i++;
+			
 			if (i > obstacleFollowingSensitivity) {
 				break;
 			}
 		}
-		return false;
-	}
-
-	private boolean areTilesSameType(MapTile tile1, MapTile tile2) {
-		if (tile1.getType() == MapTile.Type.TRAP && tile2.getType() == MapTile.Type.TRAP) {
-			if (((TrapTile) tile1).getTrap().equals(((TrapTile) tile2).getTrap())) {
-				return true;
-			}
-		}
-
-		else if (tile1.getType().equals(tile2.getType())) {
-			return true;
-		}
-
 		return false;
 	}
 
@@ -201,21 +189,12 @@ public class Sensor {
 
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if (tileInView.getValue() != null && areTilesSameType(tileInView.getValue(), tile) {
+				if (tileInView.getValue() != null && TilesChecker.checkTileTraversable(tileInView.getValue(), tile)) {
 					return true;
 				}
 			}
-			
-			if (tileInView.getValue() != null && tileInView.getValue().getType() == MapTile.Type.ROAD) {
-				return true;
-			}
-			
-			if (tileInView.getValue() != null && ) {
-				return true;
-			}
-			
-			
 		}
+		
 		return false;
 	}
 
@@ -228,7 +207,8 @@ public class Sensor {
 
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if (areTilesSameType(tileInView.getValue(), tile)) {
+				//if (areTilesSameType(tileInView.getValue(), tile)) {
+				if (TilesChecker.checkTileTypeSame(tileInView.getValue(), tile)) {
 					Coordinate roadBeforeObstacle = null;
 					int obstacleX = tileInView.getKey().x;
 					int obstacleY = tileInView.getKey().y;
@@ -286,11 +266,11 @@ public class Sensor {
 			boolean istile2Obstacle = false;
 
 			for (MapTile tile : tilesToCheck) {
-				if (areTilesSameType(currentView.get(adjacentTile1), tile)) {
+				if (TilesChecker.checkTileTypeSame(currentView.get(adjacentTile1), tile)) {
 					istile1Obstacle = true;
 				}
 
-				if (areTilesSameType(currentView.get(adjacentTile2), tile)) {
+				if (TilesChecker.checkTileTypeSame(currentView.get(adjacentTile2), tile)) {
 					istile2Obstacle = true;
 				}
 			}

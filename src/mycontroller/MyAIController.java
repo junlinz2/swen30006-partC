@@ -33,10 +33,9 @@ public class MyAIController extends CarController {
 	// Car Speed to move at
 	public final float MAX_CAR_SPEED = 3;
 	public final float MAX_TURNING_SPEED = 1.4f;
-	public final float MIN_CAR_SPEED = 1f;
+//	public final float MIN_CAR_SPEED = 1f;
 	public final float MIN_ROTATING_SPEED = 0.5f;
 	public final float MIN_CORNER_SPEED = 1.15f;
-	
 
 	// TODO : use a different turning strategy for different corner tile types.
 	public final int OBSTACLE_FOLLOWING_SENSITIVITY = 2;
@@ -65,6 +64,7 @@ public class MyAIController extends CarController {
 		HashMap<Coordinate, MapTile> currentView = getView();
 		currentPosition = updateCoordinate();
 		latestGameMap.updateMap(currentView);
+		
 		checkStateChange();
 		
 		//TODO remove if unused
@@ -317,10 +317,6 @@ public class MyAIController extends CarController {
 //	}
 
 	public boolean justChangedState() {
-		return (isJustChangedState() == true) ? true : false;
-	}
-
-	public boolean isJustChangedState() {
 		return justChangedState;
 	}
 

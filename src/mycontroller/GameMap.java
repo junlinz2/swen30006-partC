@@ -2,8 +2,10 @@ package mycontroller;
 
 import java.util.HashMap;
 
+import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
+import world.World;
 
 public class GameMap {
 	private HashMap<Coordinate, HashMapTile> updatedMap = new HashMap<>();
@@ -31,7 +33,7 @@ public class GameMap {
 			if (tileFromMap.getExplored() == 0) {
 				//get the corresponding tile from view based on coordinate
 				MapTile tileFromView = currentView.get(key);
-				
+
 				//check if its a lava trap by using TilesWithKeysChecker class
 				if (TilesChecker.checkTileWithKeys(tileFromView)) {
 					
@@ -45,6 +47,7 @@ public class GameMap {
 				//set explored and change tile type
 				tileFromMap.setExplored(1);
 				tileFromMap.setTile(tileFromView);
+				updatedMap.put(key, tileFromMap);
 			}
 		}
 	}
