@@ -84,7 +84,7 @@ public class FollowRightWallStrategy extends CarNavigationStrategy {
 
         // New action is relayed by the StrategyControllerRelay singleton to
         // MyAIController
-        StrategyControllerRelay.getInstance().changeState(carController, nextState, delta);
+        StrategyControllerRelay.getInstance().changeState(carController, nextState);
     }
 
     public boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,

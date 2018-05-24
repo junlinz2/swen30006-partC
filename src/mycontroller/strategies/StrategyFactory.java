@@ -17,7 +17,10 @@ public class StrategyFactory {
         switch (strategyName) {
             case FOLLOWLEFTWALL:
                 return new FollowLeftWallStrategy(c);
-
+            case FOLLOWRIGHTWALL:
+                return new FollowRightWallStrategy(c);
+            case HEALING:
+                return new HealingStrategy();
             default:
                 throw new StrategyNotFoundException();
         }

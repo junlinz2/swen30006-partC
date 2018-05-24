@@ -40,11 +40,13 @@ public class MyAIController extends CarController {
 	public final int DISTANCE_TO_TURN = 1;
 	public final int DISTANCE_TO_SLOW_DOWN = getViewSquare();
 
+	private final int HEALING_THRESHOLD = 50;
+
 	// Offset used to differentiate between 0 and 360 degrees
 	private int EAST_THRESHOLD = 3;
     private CarNavigationStrategy carNavigationStrategy;
-    private StrategyFactory strategyFactory;
 
+    private StrategyFactory strategyFactory;
     public enum strategies {FOLLOWLEFTWALL, FOLLOWRIGHTWALL, GOTHROUGHLAVA, HEALING}
 
 	public MyAIController(Car car) throws StrategyNotFoundException {
