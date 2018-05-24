@@ -38,14 +38,14 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 			// If there is wall ahead, turn right!
 			if (distToObstacle <= sensor.getDistToTurn()) {
 				nextState = carControllerActions.ISTURNINGRIGHT;
-			} 
-			
-			//Slow down the car when it's going to turn soon 
-			else if (distToObstacle <= sensor.getDistToSlowDown()
-					|| peekCorner(carController.getOrientation(), currentView, carController.getCurrentPosition())) {
+			}
+
+			// Slow down the car when it's going to turn soon
+			else if (distToObstacle <= sensor.getDistToSlowDown() || peekCorner(carController.getOrientation(),
+					currentView, carController.getCurrentPosition(), carController.getTilesToAvoid())) {
 				nextState = carControllerActions.SLOWDOWN;
-			} 
-			
+			}
+
 			else {
 				nextState = carControllerActions.ACCELERATE;
 			}
@@ -58,14 +58,17 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 			nextState = carControllerActions.SLOWDOWN;
 		}
 
-		// This indicates that I can do a left turn if the car is no longer cruising along an obstacle
+		// This indicates that I can do a left turn if the car is no longer cruising
+		// along an obstacle
 		else {
-			//Turn left if the car is not turning into a deadend
-			if (!isDeadEnd(carController.getOrientation(), currentView, carController.getCurrentPosition())) {
+			// Turn left if the car is not turning into a deadend
+			if (!isDeadEnd(carController.getOrientation(), currentView, carController.getCurrentPosition(),
+					carController.getTilesToAvoid())) {
 				nextState = carControllerActions.ISTURNINGLEFT;
 			}
-			
-			//If it's a deadend, keep driving in the current orientation until the next turn 
+
+			// If it's a deadend, keep driving in the current orientation until the next
+			// turn
 			else {
 				int distToObstacle = checkViewForTile(carController.getOrientation(), currentView,
 						carController.getCurrentPosition(), carController.getTilesToAvoid());
@@ -86,8 +89,9 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
 		// TODO: remove debug statement
 		System.out.println(nextState);
-		
-		//New action is relayed by the StrategyControllerRelay singleton to MyAIController
+
+		// New action is relayed by the StrategyControllerRelay singleton to
+		// MyAIController
 		StrategyControllerRelay.getInstance().changeState(carController, nextState, delta);
 	}
 
@@ -99,17 +103,19 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
 	@Override
 	public boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-			Coordinate currentPosition) {
-		return sensor.peekCorner(orientation, currentView, currentPosition, WorldSpatial.RelativeDirection.LEFT);
+			Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+		return sensor.peekCorner(orientation, currentView, currentPosition, WorldSpatial.RelativeDirection.LEFT,
+				tilesToCheck);
 	}
-	
+
 	@Override
 	public boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-			Coordinate currentPosition) {
-		return sensor.isDeadEnd(orientation, currentView, WorldSpatial.RelativeDirection.LEFT, currentPosition);
+			Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
+		return sensor.isDeadEnd(orientation, currentView, WorldSpatial.RelativeDirection.LEFT, currentPosition,
+				tilesToAvoid);
 	}
-	
-	//TODO: Remove this if not used
+
+	// TODO: Remove this if not used
 	public boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x, float y) {
 		switch (orientation) {
 		case WEST:
