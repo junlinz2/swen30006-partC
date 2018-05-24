@@ -30,8 +30,8 @@ public class MyAIController extends CarController {
 	// Car Speed to move at
 	public final float MAX_CAR_SPEED = 3;
 	public final float MAX_TURNING_SPEED = 1.4f;
-	public final float MIN_CAR_SPEED = 1f;
-
+//	public final float MIN_CAR_SPEED = 1f;
+  
 	public final float MIN_ROTATING_SPEED = 0.5f;
 	public final float MIN_CORNER_SPEED = 1.15f;
 
@@ -343,10 +343,6 @@ public class MyAIController extends CarController {
 //	public float getFloatY() {
 //		return getY();
 //	}
-
-    public boolean justChangedState() {
-        return justChangedState;
-    }
 
     public void setJustChangedState(boolean justChangedState) {
         this.justChangedState = justChangedState;

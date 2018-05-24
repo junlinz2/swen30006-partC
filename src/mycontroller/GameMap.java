@@ -45,6 +45,7 @@ public class GameMap {
 				//set explored and change tile type
 				tileFromMap.setExplored(1);
 				tileFromMap.setTile(tileFromView);
+				updatedMap.put(key, tileFromMap);
 			}
 		}
 	}

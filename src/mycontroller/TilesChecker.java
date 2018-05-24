@@ -14,7 +14,7 @@ public class TilesChecker {
 			Arrays.asList(Type.TRAP, Type.ROAD, Type.START, Type.FINISH));
 	private static ArrayList<String> drivableTraps = new ArrayList<>(
 			Arrays.asList("health", "lava"));
-
+  
 	public static boolean checkTileWithKeys(MapTile tile) {
 		if (checkForTrapTile(tile)) {
 			return checkTrapTileWithKeys(tile);
@@ -76,7 +76,7 @@ public class TilesChecker {
 				//If tileTrap and tileToAvoidTrap not equal, continue with the next if-block
 				if (tileTrap.equals(tileToAvoidTrap)) {
 					return false;
-				}
+				} 
 			} else {
 				return false;
 			}

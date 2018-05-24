@@ -94,7 +94,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
 	@Override
 	public boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-							  Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+				Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
 		return sensor.peekCorner(orientation, currentView, currentPosition, WorldSpatial.RelativeDirection.LEFT,
 				tilesToCheck);
 	}
