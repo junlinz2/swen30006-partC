@@ -17,7 +17,6 @@ public class StrategyFactory {
         switch (strategyName) {
             case FollowLeftWall:
                 return new FollowLeftWallStrategy(c);
-
             default:
                 throw new StrategyNotFoundException();
         }

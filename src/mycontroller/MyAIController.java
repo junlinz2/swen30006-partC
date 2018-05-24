@@ -42,7 +42,7 @@ public class MyAIController extends CarController {
     private final int EAST_THRESHOLD = 3;
 
     private StrategyFactory strategyFactory;
-    public enum strategies {FollowLeftWall, FollowRightWall, GoThroughLava};
+    public enum strategies {FollowLeftWall, FollowRightWall, GoThroughLava, Healing};
 
     public MyAIController(Car car) throws StrategyNotFoundException {
         super(car);
@@ -110,6 +110,15 @@ public class MyAIController extends CarController {
         for (Coordinate key : currentView.keySet()) {
             gameMap.put(key, currentView.get(key));
         }
+    }
+
+    private MyAIController.strategies pickAppropriateStrategy() {
+        // TODO: method stub. Implement how car will find a healing tile, maybe in this method.
+        int healthThreshold = 90;
+        if (getHealth() < healthThreshold) {
+            return strategies.Healing;
+        }
+        return strategies.FollowLeftWall;
     }
 
     /**
