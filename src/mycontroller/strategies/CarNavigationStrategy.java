@@ -12,32 +12,43 @@ import java.util.HashMap;
 //TODO document this
 public abstract class CarNavigationStrategy {
 
-	// Different strategies manipulate the behaviour of the sensor, so we need a
-	// reference to it
-	protected Sensor sensor;
-	protected ArrayList<MapTile> tilesToAvoid;
+    // Different strategies manipulate the behaviour of the sensor, so we need a
+    // reference to it
+    protected Sensor sensor;
+    protected ArrayList<MapTile> tilesToAvoid;
 
-	public abstract void doAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController);
+    public abstract void decideAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController);
 
-	public abstract boolean checkFollowingObstacle(WorldSpatial.Direction orientation,
-			HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid);
+    public abstract boolean checkFollowingObstacle(WorldSpatial.Direction orientation,
+                                                   HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid);
 
-	public int checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-			Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
-		return sensor.checkViewForTile(orientation, currentView, currentPosition, tilesToCheck);
-	}
+    public int checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
+                                Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+        return sensor.checkViewForTile(orientation, currentView, currentPosition, tilesToCheck);
+    }
 
-	public enum carControllerActions {
-		TURNRIGHT, TURNLEFT, ACCELERATE, SLOWDOWN, STOPTURNINGLEFT, STOPTURNINGRIGHT, ISTURNINGLEFT, ISTURNINGRIGHT, REVERSE, DONOTHING
-	}
+    public enum carControllerActions {
+        ACCELERATE, SLOWDOWN, ISTURNINGLEFT, ISTURNINGRIGHT, REVERSE, DONOTHING
+    }
 
-	public abstract boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-			Coordinate currentPosition, ArrayList<MapTile> tilesToCheck);
+    public abstract boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
+                                       Coordinate currentPosition, ArrayList<MapTile> tilesToCheck);
 
-	// TODO: Remove if not used
-	public abstract boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x,
-			float y);
+    // TODO: Remove this if not used
+    public boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x, float y) {
+        switch (orientation) {
+            case WEST:
+                return (x - coordinate.x) < 0.475;
+            case EAST:
+                return (x - coordinate.x) > -0.55;
+            case NORTH:
+                return (y - coordinate.y) > -0.475;
+            case SOUTH:
+                return (y - coordinate.y) < 0.7;
+        }
+        return false;
+    }
 
-	public abstract boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-			Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid);
+    public abstract boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
+                                      Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid);
 }

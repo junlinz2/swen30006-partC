@@ -13,21 +13,13 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 		this.tilesToAvoid = c.getTilesToAvoid();
 	}
 
-	public void doAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController) {
+	public void decideAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController) {
 		CarNavigationStrategy.carControllerActions nextState;
 
-		if (carController.getIsTurningRight()) {
-			nextState = carControllerActions.TURNRIGHT;
-		}
-
-		else if (carController.getIsTurningLeft()) {
-			nextState = carControllerActions.TURNLEFT;
-		}
-
 		// Try to determine whether or not the car is next to a wall.
-		else if (checkFollowingObstacle(carController.getOrientation(), currentView, carController.getCurrentPosition(),
+		if (checkFollowingObstacle(carController.getOrientation(), currentView, carController.getCurrentPosition(),
 				carController.getTilesToAvoid())) {
-			if (carController.isJustChangedState()) {
+			if (carController.justChangedState()) {
 				carController.setJustChangedState(false);
 			}
 
@@ -95,37 +87,22 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 	}
 
 	public boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-			Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
+										  Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
 		return sensor.checkFollowingObstacle(orientation, currentView, WorldSpatial.RelativeDirection.LEFT,
 				currentPosition, tilesToAvoid);
 	}
 
 	@Override
 	public boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-			Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+				Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
 		return sensor.peekCorner(orientation, currentView, currentPosition, WorldSpatial.RelativeDirection.LEFT,
 				tilesToCheck);
 	}
 
 	@Override
 	public boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-			Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
+							 Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
 		return sensor.isDeadEnd(orientation, currentView, WorldSpatial.RelativeDirection.LEFT, currentPosition,
 				tilesToAvoid);
-	}
-
-	// TODO: Remove this if not used
-	public boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x, float y) {
-		switch (orientation) {
-		case WEST:
-			return (x - coordinate.x) < 0.475;
-		case EAST:
-			return (x - coordinate.x) > -0.55;
-		case NORTH:
-			return (y - coordinate.y) > -0.475;
-		case SOUTH:
-			return (y - coordinate.y) < 0.7;
-		}
-		return false;
 	}
 }

@@ -26,7 +26,7 @@ public class GameMap {
 				break;
 			}
 			HashMapTile tileFromMap = updatedMap.get(key);
-			
+
 			//get from map the object to check if it has been explored
 			if (tileFromMap.getExplored() == 0) {
 				//get the corresponding tile from view based on coordinate
@@ -34,14 +34,14 @@ public class GameMap {
 
 				//check if its a lava trap by using TilesWithKeysChecker class
 				if (TilesChecker.checkTileWithKeys(tileFromView)) {
-					
+
 					//Assume without key, key value = 0
 					//if it contains a key, set key value 
 					if (TilesChecker.getKeyFromTile(tileFromView) != 0) {
 						tileFromMap.setKeyValue(TilesChecker.getKeyFromTile(tileFromView));
 					}
 				}
-				
+
 				//set explored and change tile type
 				tileFromMap.setExplored(1);
 				tileFromMap.setTile(tileFromView);
@@ -49,5 +49,4 @@ public class GameMap {
 			}
 		}
 	}
-	
 }

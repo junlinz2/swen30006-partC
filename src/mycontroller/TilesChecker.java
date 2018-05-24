@@ -14,7 +14,7 @@ public class TilesChecker {
 			Arrays.asList(Type.TRAP, Type.ROAD, Type.START, Type.FINISH));
 	private static ArrayList<String> drivableTraps = new ArrayList<>(
 			Arrays.asList("health", "lava"));
-	
+  
 	public static boolean checkTileWithKeys(MapTile tile) {
 		if (checkForTrapTile(tile)) {
 			return checkTrapTileWithKeys(tile);
@@ -33,11 +33,11 @@ public class TilesChecker {
 	public static int getKeyFromTile(MapTile tile) {
 		String trap = ((TrapTile) tile).getTrap();
 		switch (trap) {
-		case "lava":
-			return ((LavaTrap) tile).getKey();
+			case "lava":
+				return ((LavaTrap) tile).getKey();
 
-		default:
-			return 0;
+			default:
+				return 0;
 		}
 	}
 
@@ -55,19 +55,19 @@ public class TilesChecker {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Check if the car can drive on the given tile
 	 * First check if the tile is of the same type as tileToAvoid (if yes, means the car cannot drive on it so return false)
-	 * If tile is not same as tileToAvoid, then check if the tile's type is one of the default drivable tiles. 
+	 * If tile is not same as tileToAvoid, then check if the tile's type is one of the default drivable tiles.
 	 * @param tile
-	 * @param tileToAvoid 
+	 * @param tileToAvoid
 	 * @return yes or no
 	 */
 	public static boolean checkTileTraversable(MapTile tile, MapTile tileToAvoid) {
 		Type tileType = tile.getType();
 		Type tileToAvoidType = tileToAvoid.getType();
-		
+
 		//Check if tile and tileToAvoid are of same type/trap
 		if (tileType.equals(tileToAvoidType)) {
 			if (tileType.equals(Type.TRAP)) {
@@ -81,13 +81,12 @@ public class TilesChecker {
 				return false;
 			}
 		}
-		
+
 		//Check if tile is one of the drivable types
 		if (drivableTileTypes.contains(tileType)) {
 			if (tileType.equals(Type.TRAP)) {
-				return drivableTraps.contains(((TrapTile) tile).getTrap()) ? true : false;
+				return drivableTraps.contains(((TrapTile) tile).getTrap());
 			}
-			
 			return true;
 		} else {
 			return false;
