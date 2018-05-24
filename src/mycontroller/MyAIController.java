@@ -75,7 +75,7 @@ public class MyAIController extends CarController {
 			}
 			// Turn towards the north
 			if (!getOrientation().equals(WorldSpatial.Direction.NORTH)) {
-				lastTurnDirection = WorldSpatial.RelativeDirection.LEFT;
+				setLastTurnDirection(WorldSpatial.RelativeDirection.LEFT);
 				applyLeftTurn(getOrientation(), delta);
 			}
 
@@ -87,11 +87,10 @@ public class MyAIController extends CarController {
 					applyReverseAcceleration();
 			}
 
-			// TODO: magic number here "1"
-			if (distToObstacleAhead == 1) {
+			if (distToObstacleAhead == DISTANCE_TO_TURN) {
 				// Turn right until we go back to east!
 				if (!getOrientation().equals(WorldSpatial.Direction.EAST)) {
-					lastTurnDirection = WorldSpatial.RelativeDirection.RIGHT;
+					setLastTurnDirection(WorldSpatial.RelativeDirection.RIGHT);
 					applyRightTurn(getOrientation(), delta);
 				} else {
 					isFollowingWall = true;
@@ -103,8 +102,9 @@ public class MyAIController extends CarController {
 		else {
 
 			// Readjust the car if it is misaligned.
-			readjust(lastTurnDirection, delta);
-
+			readjust(getLastTurnDirection(), delta);
+			
+			//TODO: TURNINGLEFT and TURNINGRIGHT logic should be here
 			carNavigationStrategy.doAction(delta, currentView, this);
 		}
 	}
@@ -322,5 +322,9 @@ public class MyAIController extends CarController {
 
 	public void setJustChangedState(boolean justChangedState) {
 		this.justChangedState = justChangedState;
+	}
+
+	public WorldSpatial.RelativeDirection getLastTurnDirection() {
+		return lastTurnDirection;
 	}
 }

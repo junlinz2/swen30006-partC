@@ -9,6 +9,8 @@ import world.WorldSpatial;
 import java.util.*;
 
 public class Sensor {
+	//TODO: Remove this and add tilesToAvoid in those involved methods (Protected Variation)
+	private final MapTile WALL = new MapTile(MapTile.Type.WALL);
 
 	// How many minimum units obstacles are away from the player.
 	private int obstacleFollowingSensitivity;
@@ -121,21 +123,30 @@ public class Sensor {
 
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if (tile.getType() == MapTile.Type.TRAP && tileInView.getValue().getType() == MapTile.Type.TRAP) {
-					if (((TrapTile) tileInView.getValue()).getTrap().equals(((TrapTile) tile).getTrap())
-							&& i <= obstacleFollowingSensitivity) {
-						return true;
-					}
-				} else if (tileInView.getValue().getType().equals(tile.getType())
-						&& i <= obstacleFollowingSensitivity) {
+
+				if (areTilesSameType(tile, tileInView.getValue()) && i <= obstacleFollowingSensitivity)
 					return true;
-				}
 			}
+
 			i++;
 			if (i > obstacleFollowingSensitivity) {
 				break;
 			}
 		}
+		return false;
+	}
+
+	private boolean areTilesSameType(MapTile tile1, MapTile tile2) {
+		if (tile1.getType() == MapTile.Type.TRAP && tile2.getType() == MapTile.Type.TRAP) {
+			if (((TrapTile) tile1).getTrap().equals(((TrapTile) tile2).getTrap())) {
+				return true;
+			}
+		}
+
+		else if (tile1.getType().equals(tile2.getType())) {
+			return true;
+		}
+
 		return false;
 	}
 
@@ -164,14 +175,11 @@ public class Sensor {
 
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if (tile.getType() == MapTile.Type.TRAP && tileInView.getValue().getType() == MapTile.Type.TRAP) {
-					if (((TrapTile) tileInView.getValue()).getTrap().equals(((TrapTile) tile).getTrap())) {
-						return i;
-					}
-				} else if (tileInView.getValue().getType() == tile.getType()) {
+
+				if (areTilesSameType(tile, tileInView.getValue()))
 					return i;
-				}
 			}
+
 			i++;
 		}
 		return Integer.MAX_VALUE;
@@ -187,6 +195,7 @@ public class Sensor {
 	 * @param direction
 	 * @return
 	 */
+	//TODO: Make use of obstacleFollowingSensitivity
 	public boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			Coordinate currentPosition, WorldSpatial.RelativeDirection direction) {
 		LinkedHashMap<Coordinate, MapTile> view = null;
@@ -284,14 +293,11 @@ public class Sensor {
 	public int getDistToSlowDown() {
 		return distToSlowDown;
 	}
-	
-	
-	//TODO:Explain code logic
+
+	// TODO:Explain code logic
 	public boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-			WorldSpatial.RelativeDirection direction, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
-		
-		MapTile wall = new MapTile(MapTile.Type.WALL);
-		
+			WorldSpatial.RelativeDirection direction, Coordinate currentPosition) {
+
 		LinkedHashMap<Coordinate, MapTile> view = null;
 		if (direction == WorldSpatial.RelativeDirection.LEFT) {
 			switch (orientation) {
@@ -324,20 +330,13 @@ public class Sensor {
 				break;
 			}
 		}
-		
-		int i = 1;
+
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
-			
-			if (i < obstacleFollowingSensitivity ) {
-				i++;
-				continue;
-			}
-			
-			if (tileInView.getValue().getType().equals(wall.getType())) {
+			if (areTilesSameType(tileInView.getValue(), WALL)) {
 				Coordinate roadBeforeObstacle = null;
 				int obstacleX = tileInView.getKey().x;
 				int obstacleY = tileInView.getKey().y;
-				
+
 				switch (orientation) {
 				case EAST:
 					roadBeforeObstacle = new Coordinate(obstacleX, obstacleY - 1);
@@ -352,14 +351,51 @@ public class Sensor {
 					roadBeforeObstacle = new Coordinate(obstacleX, obstacleY + 1);
 					break;
 				}
-				
-				if (isSinglePath(roadBeforeObstacle, orientation)) {
-					return true;
-				}
-				
-			}
 
+				if (isSinglePath(roadBeforeObstacle, orientation, currentView)) {
+					return true;
+				} else {
+					return false;
+				}
+			}
 		}
+		
+		//No wallTile found in currentView in the interested direction/path
+		//Assume all deadends can be seen in currentView
 		return false;
+	}
+
+	private boolean isSinglePath(Coordinate roadBeforeObstacle, WorldSpatial.Direction orientation,
+			HashMap<Coordinate, MapTile> currentView) {
+		Coordinate adjacentTile1 = null;
+		Coordinate adjacentTile2 = null;
+
+		switch (orientation) {
+		case NORTH:
+		case SOUTH:
+			adjacentTile1 = new Coordinate(roadBeforeObstacle.x, roadBeforeObstacle.y + 1);
+			adjacentTile2 = new Coordinate(roadBeforeObstacle.x, roadBeforeObstacle.y - 1);
+			break;
+			
+		case EAST:
+		case WEST:
+			adjacentTile1 = new Coordinate(roadBeforeObstacle.x + 1, roadBeforeObstacle.y);
+			adjacentTile2 = new Coordinate(roadBeforeObstacle.x - 1, roadBeforeObstacle.y);
+			break;
+		}
+		
+		if (adjacentTile1 == null && adjacentTile2 == null) {
+			//TODO: Create Exception (Invalid direction)
+			return false;
+		}
+		
+		else if (areTilesSameType(currentView.get(adjacentTile1), WALL) 
+				&& areTilesSameType(currentView.get(adjacentTile2), WALL)) {
+			return true;
+		} 
+		
+		else {
+			return false;
+		}	
 	}
 }

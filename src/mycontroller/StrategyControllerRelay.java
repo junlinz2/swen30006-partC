@@ -77,12 +77,6 @@ public class StrategyControllerRelay {
 			carController.setLastTurnDirection(WorldSpatial.RelativeDirection.RIGHT);
 			carController.setTurningRight(true);
 			break;
-		case STOPTURNINGLEFT:
-			carController.setTurningLeft(false);
-			break;
-		case STOPTURNINGRIGHT:
-			carController.setTurningRight(false);
-			break;
 		default:
 		    break;
 		}
