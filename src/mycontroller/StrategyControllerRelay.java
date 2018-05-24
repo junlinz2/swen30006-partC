@@ -13,6 +13,12 @@ import world.WorldSpatial;
  */
 public class StrategyControllerRelay {
 
+	//Temporary
+	//right
+	private final float MIN_ROTATING_SPEED = 0.5f;
+	//left
+	private final float MIN_CORNER_SPEED = 1.15f;
+
 	private static StrategyControllerRelay instance;
 
 	public static StrategyControllerRelay getInstance() {
@@ -32,16 +38,14 @@ public class StrategyControllerRelay {
 			carController.applyLeftTurn(orientation, delta);
 			break;
 		case ACCELERATE:
-			if (carController.getSpeed() < carController.getMaxCarSpeed()) {
-				carController.applyForwardAcceleration();				
+			if (carController.getSpeed() < carController.MAX_CAR_SPEED) {
+				carController.applyForwardAcceleration();
 			}
 			break;
-		case DECELERATE:
-			if (carController.getSpeed() > carController.getMaxTurningSpeed()) {
+		case SLOWDOWN:
+			carController.applyForwardAcceleration();
+			if (carController.getSpeed() > carController.MAX_TURNING_SPEED) {
 				carController.applyReverseAcceleration();
-			}
-			if (carController.getSpeed() < carController.getMinCarSpeed()) {
-				carController.applyForwardAcceleration();
 			}
 			break;
 		case REVERSE:
@@ -50,18 +54,10 @@ public class StrategyControllerRelay {
 		case ISTURNINGLEFT:
 			carController.setLastTurnDirection(WorldSpatial.RelativeDirection.LEFT);
 			carController.setTurningLeft(true);
-			carController.applyBrake();
 			break;
 		case ISTURNINGRIGHT:
 			carController.setLastTurnDirection(WorldSpatial.RelativeDirection.RIGHT);
 			carController.setTurningRight(true);
-			carController.applyBrake();
-			break;
-		case STOPTURNINGLEFT:
-			carController.setTurningLeft(false);
-			break;
-		case STOPTURNINGRIGHT:
-			carController.setTurningRight(false);
 			break;
 		default:
 		    break;
