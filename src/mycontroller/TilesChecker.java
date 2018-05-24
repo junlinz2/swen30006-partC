@@ -7,6 +7,7 @@ import tiles.LavaTrap;
 import tiles.MapTile;
 import tiles.TrapTile;
 import tiles.MapTile.Type;
+import utilities.Coordinate;
 
 public class TilesChecker {
 	private static ArrayList<String> nameOfTilesWithKeys = new ArrayList<>(Arrays.asList("lava"));

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import controller.CarController;
 import mycontroller.exceptions.StrategyNotFoundException;
 import mycontroller.strategies.CarNavigationStrategy;
+import mycontroller.strategies.HealingStrategy;
 import mycontroller.strategies.StrategyFactory;
 import tiles.LavaTrap;
 import tiles.MapTile;
@@ -40,6 +41,7 @@ public class MyAIController extends CarController {
 	public final int DISTANCE_TO_TURN = 1;
 	public final int DISTANCE_TO_SLOW_DOWN = getViewSquare();
 
+    private float strategyCheckTimer = 0;
 	private final int HEALING_THRESHOLD = 50;
 
 	// Offset used to differentiate between 0 and 360 degrees
@@ -58,7 +60,7 @@ public class MyAIController extends CarController {
 		//TODO (Junlin) - check implementations as I have created a factory here.
 		/** default to following left wall when simulation starts **/
         strategyFactory = new StrategyFactory(this);
-        carNavigationStrategy = strategyFactory.changeCarStrategy(this, strategies.FOLLOWLEFTWALL);
+        carNavigationStrategy = strategyFactory.createCarStrategy(this, strategies.FOLLOWLEFTWALL);
 	}
 
     @Override
@@ -108,7 +110,7 @@ public class MyAIController extends CarController {
 
         // Once the car is already stuck to a wall, apply the following logic
         else {
-
+            decideStrategy(delta);
             // Readjust the car if it is misaligned.
             readjust(getLastTurnDirection(), delta);
 
@@ -125,6 +127,20 @@ public class MyAIController extends CarController {
         }
     }
 
+    public void decideStrategy(float delta) {
+        // check if I NEED HEALING. Assumes the carController cannot simply find the healing tile.
+        float strategyCheckThreshold = 0.5f;
+        float previousHealth = getHealth();
+        if (strategyCheckTimer > strategyCheckThreshold) {
+            if (getHealth() > previousHealth) {
+                carNavigationStrategy = strategyFactory.createCarStrategy(this, strategies.HEALING);
+            }
+            strategyCheckTimer = 0;
+        }
+        else {
+            strategyCheckTimer += delta;
+        }
+    }
 
     /**
      * Note: Trying implementing moving away from wall if crashed Readjust the

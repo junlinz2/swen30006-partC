@@ -14,7 +14,7 @@ public class Sensor {
     private int obstacleFollowingSensitivity;
     private int distToSlowDown;
 
-    public Sensor(int obstacleFollowingSensitivity, int distToTurn, int distToSlowDown) {
+    public Sensor(int obstacleFollowingSensitivity, int distToSlowDown) {
         this.obstacleFollowingSensitivity = obstacleFollowingSensitivity;
         this.distToSlowDown = distToSlowDown;
     }
@@ -117,7 +117,7 @@ public class Sensor {
         return Integer.MAX_VALUE;
     }
 
-	// TODO:Explain code logic
+	// TODO: Explain code logic
 	// TODO: Implement fucking exception (probably won't have time for that)
 	public boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			WorldSpatial.RelativeDirection direction, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {

@@ -68,7 +68,8 @@ public class Car extends Sprite{
 	public Car(Sprite sprite){
 		super(sprite);
 
-		health = MAX_HEALTH;
+		//TODO: change this back to MAX_HEALTH
+		health = 50;
 		velocity = new Vector2();
 
 		if (World.getStart() == null) {

@@ -9,7 +9,7 @@ import java.util.*;
 public class FollowRightWallStrategy extends CarNavigationStrategy {
 
     public FollowRightWallStrategy(MyAIController c) {
-        sensor = new Sensor(c.OBSTACLE_FOLLOWING_SENSITIVITY, c.DISTANCE_TO_TURN, c.DISTANCE_TO_SLOW_DOWN);
+        sensor = new Sensor(c.OBSTACLE_FOLLOWING_SENSITIVITY, c.DISTANCE_TO_SLOW_DOWN);
         this.tilesToAvoid = c.getTilesToAvoid();
     }
 
