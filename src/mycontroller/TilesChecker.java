@@ -93,4 +93,10 @@ public class TilesChecker {
 			return false;
 		}
 	}
+
+	public static boolean checkForWallTile(MapTile tile) {
+		return tile.getType() == Type.WALL;
+	}
+
+
 }

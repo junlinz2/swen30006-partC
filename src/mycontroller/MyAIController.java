@@ -2,15 +2,16 @@ package mycontroller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import controller.CarController;
-import mycontroller.exceptions.StrategyNotFoundException;
-import mycontroller.strategies.CarNavigationStrategy;
-import mycontroller.strategies.HealingStrategy;
-import mycontroller.strategies.StrategyFactory;
+import mycontroller.strategies.*;
+import mycontroller.strategies.AStarSearch;
 import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.Car;
+import world.World;
 import world.WorldSpatial;
 
 public class MyAIController extends CarController {
@@ -41,23 +42,43 @@ public class MyAIController extends CarController {
 	public final int DISTANCE_TO_TURN = 1;
 	public final int DISTANCE_TO_SLOW_DOWN = getViewSquare();
 
-    private float strategyCheckTimer = 0;
-	private final int HEALING_THRESHOLD = 50;
+    public float getPreviousHealth() {
+        return previousHealth;
+    }
+
+    private float previousHealth = 0;
+	public final int HEALING_THRESHOLD = 50;
 
 	// Offset used to differentiate between 0 and 360 degrees
 	private int EAST_THRESHOLD = 3;
     private CarNavigationStrategy carNavigationStrategy;
 
     private StrategyFactory strategyFactory;
-    public enum strategies {FOLLOWLEFTWALL, FOLLOWRIGHTWALL, GOTHROUGHLAVA, HEALING}
 
-	public MyAIController(Car car) throws StrategyNotFoundException {
+    public void setPreviousHealth(float previousHealth) {
+        this.previousHealth = previousHealth;
+    }
+
+    public enum strategies {FOLLOWLEFTWALL, FOLLOWRIGHTWALL, GOTHROUGHLAVA, HEALING, FINDKEY}
+
+    //TODO TEST ASTAR
+    private Node initialNode;
+    private Node finalNode;
+    private AStarSearch aStar;
+
+	public MyAIController(Car car) {
 		super(car);
 		tilesToAvoid.add(new MapTile(MapTile.Type.WALL));
 		tilesToAvoid.add(new LavaTrap());
-		latestGameMap = new GameMap(getMap());
+		latestGameMap = new GameMap(getMap(), getKey()-1);
 
-		//TODO (Junlin) - check implementations as I have created a factory here.
+        //TODO TEST ASTAR
+        initialNode = new Node(1, 1, latestGameMap.getUpdatedMap().get(new Coordinate(1,1)).getTile());
+        finalNode = new Node(40, 8, latestGameMap.getUpdatedMap().get(new Coordinate(40,8)).getTile());
+        aStar = new AStarSearch(World.MAP_WIDTH, World.MAP_HEIGHT, initialNode, finalNode,
+                latestGameMap.getUpdatedMap());
+        List<Node> path = aStar.findPath();
+        
 		/** default to following left wall when simulation starts **/
         strategyFactory = new StrategyFactory(this);
         carNavigationStrategy = strategyFactory.createCarStrategy(this, strategies.FOLLOWLEFTWALL);
@@ -110,15 +131,13 @@ public class MyAIController extends CarController {
 
         // Once the car is already stuck to a wall, apply the following logic
         else {
-            decideStrategy(delta);
+            strategyFactory.decideStrategy(this, delta);
             // Readjust the car if it is misaligned.
             readjust(getLastTurnDirection(), delta);
 
-            //TODO: TURNINGLEFT and TURNINGRIGHT logic should be here
             if (getIsTurningRight()) {
                 applyRightTurn(getOrientation(), delta);
             }
-
             else if (getIsTurningLeft()) {
                 applyLeftTurn(getOrientation(), delta);
             }
@@ -127,20 +146,6 @@ public class MyAIController extends CarController {
         }
     }
 
-    public void decideStrategy(float delta) {
-        // check if I NEED HEALING. Assumes the carController cannot simply find the healing tile.
-        float strategyCheckThreshold = 0.5f;
-        float previousHealth = getHealth();
-        if (strategyCheckTimer > strategyCheckThreshold) {
-            if (getHealth() > previousHealth) {
-                carNavigationStrategy = strategyFactory.createCarStrategy(this, strategies.HEALING);
-            }
-            strategyCheckTimer = 0;
-        }
-        else {
-            strategyCheckTimer += delta;
-        }
-    }
 
     /**
      * Note: Trying implementing moving away from wall if crashed Readjust the
