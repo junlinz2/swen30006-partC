@@ -53,7 +53,7 @@ public abstract class CarNavigationStrategy {
     public abstract boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
                                       Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid);
     
-	public abstract void registerObstaclesToFollow(GameMap gameMap, HashMap<Coordinate, MapTile> currentView,
+	public abstract void registerFollowedObstacles(GameMap gameMap, HashMap<Coordinate, MapTile> currentView,
 			WorldSpatial.Direction orientation, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck);
 	
 	public abstract void deregisterFollowedObstacles(GameMap gameMap, HashMap<Coordinate, MapTile> currentView,

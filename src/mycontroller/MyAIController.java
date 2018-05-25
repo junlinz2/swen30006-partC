@@ -122,8 +122,7 @@ public class MyAIController extends CarController {
 			}
 
 			carNavigationStrategy.decideAction(delta, currentView, this);
-			carNavigationStrategy.deregisterFollowedObstacles(getLatestGameMap(), currentView, getOrientation(),
-					currentPosition, tilesToAvoid);
+		
 		}
 	}
 

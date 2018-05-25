@@ -3,7 +3,11 @@ import mycontroller.MyAIController;
 import mycontroller.exceptions.StrategyNotFoundException;
 
 public class StrategyFactory {
-
+	
+	//StrategyFactory should decide when to change strategies, so the list obstaclesToFollow should be here
+	//Followed obstacles should be here in a list as well instead of in GameMap
+	
+	
     public StrategyFactory(MyAIController c) throws StrategyNotFoundException {
 
         // set the default behaviour of controller to follow left wall

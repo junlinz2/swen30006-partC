@@ -15,7 +15,7 @@ public class Sensor {
 	private int distToSlowDown;
 
 	public Sensor(int obstacleFollowingSensitivity, int distToTurn, int distToSlowDown) {
-		this.obstacleFollowingSensitivity = obstacleFollowingSensitivity;
+		this.setObstacleFollowingSensitivity(obstacleFollowingSensitivity);
 		this.distToSlowDown = distToSlowDown;
 	}
 
@@ -108,6 +108,9 @@ public class Sensor {
 		int i = 1;
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
+				if(tileInView == null || tile == null) {
+					System.out.println("SDFSDFSFSDF");
+				}
 				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()))
 					return i;
 			}
@@ -122,7 +125,7 @@ public class Sensor {
 	public boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			WorldSpatial.RelativeDirection direction, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
 
-		LinkedHashMap<Coordinate, MapTile> view = getOrientationView(currentView, orientation, direction,
+		LinkedHashMap<Coordinate, MapTile> view = getOrientationViewInFollowingDirection(currentView, orientation, direction,
 				currentPosition);
 
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
@@ -199,7 +202,7 @@ public class Sensor {
 		}
 	}
 
-	public LinkedHashMap<Coordinate, MapTile> getOrientationView(HashMap<Coordinate, MapTile> currentView,
+	public LinkedHashMap<Coordinate, MapTile> getOrientationViewInFollowingDirection(HashMap<Coordinate, MapTile> currentView,
 			WorldSpatial.Direction orientation, WorldSpatial.RelativeDirection direction, Coordinate currentPosition) {
 
 		if (direction == WorldSpatial.RelativeDirection.LEFT) {
@@ -285,7 +288,7 @@ public class Sensor {
 
 	public boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			WorldSpatial.RelativeDirection direction, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
-		LinkedHashMap<Coordinate, MapTile> view = getOrientationView(currentView, orientation, direction,
+		LinkedHashMap<Coordinate, MapTile> view = getOrientationViewInFollowingDirection(currentView, orientation, direction,
 				currentPosition);
 
 		// Loops through Map to allow some flexibility in how close Car should
@@ -294,15 +297,23 @@ public class Sensor {
 		int i = 1;
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()) && i <= obstacleFollowingSensitivity)
+				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()) && i <= getObstacleFollowingSensitivity())
 					return true;
 			}
 			i++;
 
-			if (i > obstacleFollowingSensitivity) {
+			if (i > getObstacleFollowingSensitivity()) {
 				break;
 			}
 		}
 		return false;
+	}
+
+	public int getObstacleFollowingSensitivity() {
+		return obstacleFollowingSensitivity;
+	}
+
+	public void setObstacleFollowingSensitivity(int obstacleFollowingSensitivity) {
+		this.obstacleFollowingSensitivity = obstacleFollowingSensitivity;
 	}
 }
