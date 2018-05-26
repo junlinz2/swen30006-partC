@@ -9,9 +9,6 @@ public class StrategyFactory {
         c.setCarNavigationStrategy(initialStrategy);
     }
 
-    private float strategyCheckTimer = 0;
-    private float strategyCheckThreshold = 0.5f;
-
     public void decideStrategy(MyAIController controller, float delta) {
         if (controller.getLatestGameMap().getNearestHealthTile() != null && controller.getHealth() < controller.HEALING_THRESHOLD) {
             controller.setCarNavigationStrategy(createCarStrategy(controller, MyAIController.strategies.HEALING));
