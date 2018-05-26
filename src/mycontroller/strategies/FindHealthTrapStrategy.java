@@ -18,7 +18,7 @@ public class FindHealthTrapStrategy extends GoalCompletionStrategy {
     private AStarSearch aStar;
     private List<Node> path;
 
-    public FindHealthTrapStrategy(StrategyFactory s, MyAIController c) {
+    public FindHealthTrapStrategy(MyAIController c) {
 
         nearestHealthNode = new Node(c.getLatestGameMap().getNearestHealthTile().x, c.getLatestGameMap().getNearestHealthTile().y,
                 c.getLatestGameMap().getUpdatedMap().get(new Coordinate(c.getLatestGameMap().getNearestHealthTile().x,

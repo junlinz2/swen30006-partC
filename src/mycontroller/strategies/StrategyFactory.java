@@ -26,7 +26,7 @@ public class StrategyFactory {
             case FOLLOWRIGHTWALL:
                 return new FollowRightWallStrategy(c);
             case HEALING:
-                return new FindHealthTrapStrategy(this, c);
+                return new FindHealthTrapStrategy(c);
             case GOTHROUGHLAVA:
                 return new GoThroughLavaStrategy(this, c);
             case FINDKEY:
