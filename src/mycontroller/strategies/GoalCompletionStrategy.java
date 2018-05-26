@@ -7,8 +7,7 @@ public abstract class GoalCompletionStrategy implements CarControllerStrategy {
 
     public abstract void decideAction(MyAIController carController);
 
-    public AStarSearch performSearch() {
-
-        return null;
-    }
+    public abstract void startAStarSearch(MyAIController carController);
+    
+    public enum Movement {STRAIGHT, LEFT, RIGHT};
 }
