@@ -17,7 +17,7 @@ public class FindKeyStrategy extends GoalCompletionStrategy {
 	private Node keyNode;
 
 	public FindKeyStrategy(MyAIController c) {
-		// TODO Auto-generated constructor stub
+
         keyNode = findNextKey(c);
 		startAStarSearch(keyNode, c);
 		currentOrientation = c.getOrientation();
