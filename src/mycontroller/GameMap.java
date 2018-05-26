@@ -8,11 +8,6 @@ import utilities.Coordinate;
 
 public class GameMap {
 	private HashMap<Coordinate, HashMapTile> updatedMap = new HashMap<>();
-	private ArrayList<Coordinate> obstaclesToFollow = new ArrayList<>();
-	
-	public void setObstaclesToFollow(ArrayList<Coordinate> obstaclesToFollow) {
-		this.obstaclesToFollow = obstaclesToFollow;
-	}
 
 	public GameMap(HashMap<Coordinate, MapTile> map) {
 		createMap(map);
@@ -54,10 +49,6 @@ public class GameMap {
 				getUpdatedMap().put(key, tileFromMap);
 			}
 		}
-	}
-
-	public ArrayList<Coordinate> getObstaclesToFollow() {
-		return obstaclesToFollow;
 	}
 
 	public HashMap<Coordinate, HashMapTile> getUpdatedMap() {

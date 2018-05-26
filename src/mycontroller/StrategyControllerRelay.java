@@ -20,8 +20,7 @@ public class StrategyControllerRelay {
 		return instance;
 	}
 
-	public void changeState(MyAIController carController, CarNavigationStrategy.carControllerActions action, float delta) {
-		WorldSpatial.Direction orientation = carController.getOrientation();
+	public void changeState(MyAIController carController, CarNavigationStrategy.CarControllerActions action) {
 		switch (action) {
 			case ACCELERATE:
 				if (carController.getSpeed() < carController.MAX_CAR_SPEED) {

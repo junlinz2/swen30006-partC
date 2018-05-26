@@ -11,11 +11,11 @@ import java.util.*;
 public class Sensor {
 
 	// How many minimum units obstacles are away from the player.
-	private int obstacleFollowingSensitivity;
+	private int tileFollowingSensitivity;
 	private int distToSlowDown;
 
-	public Sensor(int obstacleFollowingSensitivity, int distToTurn, int distToSlowDown) {
-		this.setObstacleFollowingSensitivity(obstacleFollowingSensitivity);
+	public Sensor(int tileFollowingSensitivity, int distToSlowDown) {
+		this.tileFollowingSensitivity = tileFollowingSensitivity;
 		this.distToSlowDown = distToSlowDown;
 	}
 
@@ -29,7 +29,7 @@ public class Sensor {
 	 * @param direction
 	 * @return
 	 */
-	// TODO: Make use of obstacleFollowingSensitivity
+	// TODO: Make use of tileFollowingSensitivity
 	public boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			Coordinate currentPosition, WorldSpatial.RelativeDirection direction, ArrayList<MapTile> tilesToCheck) {
 		LinkedHashMap<Coordinate, MapTile> view = null;
@@ -87,7 +87,7 @@ public class Sensor {
 	/**
 	 * Returns how close the nearest tile in tilesToCheck is to the car.
 	 */
-	public int checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
+	public int checkDistToObstacleAhead(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
 		LinkedHashMap<Coordinate, MapTile> view = null;
 		switch (orientation) {
@@ -108,9 +108,6 @@ public class Sensor {
 		int i = 1;
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if(tileInView == null || tile == null) {
-					System.out.println("SDFSDFSFSDF");
-				}
 				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()))
 					return i;
 			}
@@ -125,8 +122,8 @@ public class Sensor {
 	public boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			WorldSpatial.RelativeDirection direction, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
 
-		LinkedHashMap<Coordinate, MapTile> view = getOrientationViewInFollowingDirection(currentView, orientation, direction,
-				currentPosition);
+		LinkedHashMap<Coordinate, MapTile> view = getOrientationViewInFollowingDirection(currentView, orientation,
+				direction, currentPosition);
 
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
@@ -202,8 +199,9 @@ public class Sensor {
 		}
 	}
 
-	public LinkedHashMap<Coordinate, MapTile> getOrientationViewInFollowingDirection(HashMap<Coordinate, MapTile> currentView,
-			WorldSpatial.Direction orientation, WorldSpatial.RelativeDirection direction, Coordinate currentPosition) {
+	public LinkedHashMap<Coordinate, MapTile> getOrientationViewInFollowingDirection(
+			HashMap<Coordinate, MapTile> currentView, WorldSpatial.Direction orientation,
+			WorldSpatial.RelativeDirection direction, Coordinate currentPosition) {
 
 		if (direction == WorldSpatial.RelativeDirection.LEFT) {
 			switch (orientation) {
@@ -282,14 +280,10 @@ public class Sensor {
 		return view;
 	}
 
-	public int getDistToSlowDown() {
-		return distToSlowDown;
-	}
-
 	public boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			WorldSpatial.RelativeDirection direction, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
-		LinkedHashMap<Coordinate, MapTile> view = getOrientationViewInFollowingDirection(currentView, orientation, direction,
-				currentPosition);
+		LinkedHashMap<Coordinate, MapTile> view = getOrientationViewInFollowingDirection(currentView, orientation,
+				direction, currentPosition);
 
 		// Loops through Map to allow some flexibility in how close Car should
 		// be to
@@ -297,23 +291,62 @@ public class Sensor {
 		int i = 1;
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()) && i <= getObstacleFollowingSensitivity())
+				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue())
+						&& i <= getTileFollowingSensitivity())
 					return true;
 			}
 			i++;
 
-			if (i > getObstacleFollowingSensitivity()) {
+			if (i > getTileFollowingSensitivity()) {
 				break;
 			}
 		}
 		return false;
 	}
 
-	public int getObstacleFollowingSensitivity() {
-		return obstacleFollowingSensitivity;
+	public Coordinate findClosestObstacleInOrientation(WorldSpatial.Direction orientation,
+			HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+		LinkedHashMap<Coordinate, MapTile> viewInOrientation = null;
+
+		switch (orientation) {
+		case NORTH:
+			viewInOrientation = getNorthView(currentView, currentPosition);
+			break;
+		case SOUTH:
+			viewInOrientation = getSouthView(currentView, currentPosition);
+			break;
+		case EAST:
+			viewInOrientation = getEastView(currentView, currentPosition);
+			break;
+		case WEST:
+			viewInOrientation = getWestView(currentView, currentPosition);
+			break;
+		}
+
+		for (Map.Entry<Coordinate, MapTile> tileInView : viewInOrientation.entrySet()) {
+			for (MapTile tile : tilesToCheck) {
+				System.out.println("============================");
+				System.out.println("TileInView: " + tileInView.getValue().getType());
+				System.out.println("Tile: "+ tile.getType());
+				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue())) {
+					System.out.println("ENTERS");
+					return tileInView.getKey();
+				}
+			}
+		}
+		
+		return null;
 	}
 
-	public void setObstacleFollowingSensitivity(int obstacleFollowingSensitivity) {
-		this.obstacleFollowingSensitivity = obstacleFollowingSensitivity;
+	public int getTileFollowingSensitivity() {
+		return tileFollowingSensitivity;
+	}
+
+	public void setTileFollowingSensitivity(int tileFollowingSensitivity) {
+		this.tileFollowingSensitivity = tileFollowingSensitivity;
+	}
+	
+	public int getDistToSlowDown() {
+		return distToSlowDown;
 	}
 }

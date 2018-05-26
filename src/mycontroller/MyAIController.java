@@ -36,16 +36,19 @@ public class MyAIController extends CarController {
 	public final float MIN_CORNER_SPEED = 1.15f;
 
 	// TODO : use a different turning strategy for different corner tile types.
-	public final int OBSTACLE_FOLLOWING_SENSITIVITY = 2;
+	public final int TILE_FOLLOWING_SENSITIVITY = 2;
 	public final int DISTANCE_TO_TURN = 1;
 	public final int DISTANCE_TO_SLOW_DOWN = getViewSquare();
 
 	// Offset used to differentiate between 0 and 360 degrees
 	private int EAST_THRESHOLD = 3;
+
 	private CarNavigationStrategy carNavigationStrategy;
 	private StrategyFactory strategyFactory;
+	private boolean justFoundSwitchingPoint = false;
+	private boolean turningPointFound = false;
 
-	public enum strategies {
+	public enum Strategies {
 		FOLLOWLEFTWALL, FOLLOWRIGHTWALL, GOTHROUGHLAVA, HEALING
 	}
 
@@ -57,25 +60,20 @@ public class MyAIController extends CarController {
 
 		// TODO (Junlin) - check implementations as I have created a factory here.
 		/** default to following left wall when simulation starts **/
-		strategyFactory = new StrategyFactory(this);
-		carNavigationStrategy = strategyFactory.changeCarStrategy(this, strategies.FOLLOWLEFTWALL);
+		strategyFactory = new StrategyFactory();
+		carNavigationStrategy = strategyFactory.createCarStrategy(tilesToAvoid, TILE_FOLLOWING_SENSITIVITY,
+				DISTANCE_TO_SLOW_DOWN, Strategies.FOLLOWLEFTWALL);
 	}
 
 	@Override
 	public void update(float delta) {
-		// TODO print statement here
-		// System.out.println(getFloatX() + " " + getFloatY());
-
 		// Gets what the car can see
 		HashMap<Coordinate, MapTile> currentView = getView();
 		currentPosition = updateCoordinate();
 		getLatestGameMap().updateMap(currentView);
 		checkStateChange();
 
-		// TODO remove if unused
-		// x = getX();
-		// y = getY();
-
+		// TODO: Encapsulate the following blocks into methods
 		// If you are not following a wall initially, find a wall to stick to!
 		if (!isFollowingWall) {
 			if (getSpeed() < MAX_CAR_SPEED) {
@@ -108,28 +106,67 @@ public class MyAIController extends CarController {
 
 		// Once the car is already stuck to a wall, apply the following logic
 		else {
-
 			// Readjust the car if it is misaligned.
 			readjust(getLastTurnDirection(), delta);
 
-			// TODO: TURNINGLEFT and TURNINGRIGHT logic should be here
 			if (getIsTurningRight()) {
 				applyRightTurn(getOrientation(), delta);
+				// TODO: Remove debug
+				System.out.println("TURNRIGHT");
 			}
 
 			else if (getIsTurningLeft()) {
 				applyLeftTurn(getOrientation(), delta);
+				// TODO: Remove debug
+				System.out.println("TURNLEFT");
 			}
 
-			carNavigationStrategy.decideAction(delta, currentView, this);
-		
+			else {
+				if (carNavigationStrategy.changeStrategyNow()) {
+					carNavigationStrategy = strategyFactory.changeCarStrategy(tilesToAvoid, TILE_FOLLOWING_SENSITIVITY,
+							DISTANCE_TO_SLOW_DOWN);
+				}
+
+				strategyFactory.registerTilesToFollow(currentView, getOrientation(), currentPosition);
+				strategyFactory.deregisterFollowedObstacles(currentView, getOrientation(), currentPosition,
+						tilesToAvoid);
+
+				Coordinate currentFollowingObstacle = carNavigationStrategy.getFollowingObstacle(currentView,
+						getOrientation(), currentPosition, tilesToAvoid);
+
+				if (currentFollowingObstacle != null && strategyFactory.getSwitchingPoint() == null) {
+					strategyFactory.setSwitchingPoint(currentFollowingObstacle);
+					justFoundSwitchingPoint = true;
+				}
+
+				if (justFoundSwitchingPoint && currentFollowingObstacle != null
+						&& !strategyFactory.getSwitchingPoint().equals(currentFollowingObstacle)) {
+					justFoundSwitchingPoint = false;
+				}
+
+				// TODO: Remove debug
+
+				if (!justFoundSwitchingPoint && !turningPointFound && currentFollowingObstacle != null
+						&& currentFollowingObstacle.equals(strategyFactory.getSwitchingPoint())) {
+					System.out.println("testing------------------------------------------------------------");
+					// If turningPointFound is true, isTurningLeft/isTurningRight becomes true
+					turningPointFound = carNavigationStrategy.findTurningPointForNewStrategy(this,
+							strategyFactory.getObstaclesToFollow(), getOrientation(), currentView, currentPosition);
+					if (turningPointFound) {
+						System.out.println("turningPOinttrue------------------------------------------------------------");
+						return;
+					}
+				}
+
+				carNavigationStrategy.decideAction(currentView, this);
+			}
 		}
 	}
 
 	/**
 	 * Note: Trying implementing moving away from wall if crashed Readjust the car
 	 * to the orientation we are in.
-	 *
+	 * 
 	 * @param lastTurnDirection
 	 * @param delta
 	 */
@@ -362,5 +399,13 @@ public class MyAIController extends CarController {
 
 	public void setLatestGameMap(GameMap latestGameMap) {
 		this.latestGameMap = latestGameMap;
+	}
+
+	public boolean isTurningPointFound() {
+		return turningPointFound;
+	}
+
+	public void setTurningPointFound(boolean turningPointFound) {
+		this.turningPointFound = turningPointFound;
 	}
 }
