@@ -17,7 +17,7 @@ public class FindKeyStrategy extends CarNavigationStrategy {
     private Node nextKey;
     private AStarSearch aStar;
 
-    public KeyFindingStrategy(MyAIController c) {
+    public FindKeyStrategy(MyAIController c) {
         carCurrentPositionTile = new Node(c.getCurrentPosition().x, c.getCurrentPosition().y,
                 c.getLatestGameMap().getUpdatedMap().get(new Coordinate(c.getCurrentPosition().x,c.getCurrentPosition().y)).getTile());
         nextKey = findNextKey(c);
@@ -36,7 +36,7 @@ public class FindKeyStrategy extends CarNavigationStrategy {
 
     // TODO: stub
     public boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-                                      Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
+                             Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
         return false;
     }
 }
