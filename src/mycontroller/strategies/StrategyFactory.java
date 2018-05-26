@@ -12,18 +12,9 @@ public class StrategyFactory {
     private float strategyCheckTimer = 0;
     private float strategyCheckThreshold = 0.5f;
 
-    public void decideStrategy(MyAIController c, float delta) {
-        if (strategyCheckTimer == 0) {
-            c.setPreviousHealth(c.getHealth());
-        }
-        if (strategyCheckTimer > strategyCheckThreshold) {
-            if (c.getHealth() < c.HEALING_THRESHOLD && c.getHealth() > c.getPreviousHealth()) {
-                c.setCarNavigationStrategy(createCarStrategy(c, MyAIController.strategies.HEALING));
-            }
-            strategyCheckTimer = 0;
-        }
-        else {
-            strategyCheckTimer += delta;
+    public void decideStrategy(MyAIController controller, float delta) {
+        if (controller.getLatestGameMap().getNearestHealthTile() != null && controller.getHealth() < controller.HEALING_THRESHOLD) {
+            controller.setCarNavigationStrategy(createCarStrategy(controller, MyAIController.strategies.HEALING));
         }
     }
 
