@@ -12,7 +12,6 @@ import com.badlogic.gdx.math.Vector2;
 
 import swen30006.driving.Simulation;
 
-import exceptions.NoStartLocationException;
 import tiles.MapTile;
 import tiles.TrapTile;
 import utilities.Coordinate;
@@ -71,17 +70,10 @@ public class Car extends Sprite{
 		health = MAX_HEALTH;
 		velocity = new Vector2();
 
-		if (World.getStart() == null) {
-			try {
-				throw new NoStartLocationException();
-			} catch (NoStartLocationException e) {
-				e.printStackTrace();
-			}
-		} else {
-			// System.out.println("Start - Coord: "+World.getStart());
-			setX(World.getCarStart().x);
-			setY(World.getCarStart().y);
-		}
+		// System.out.println("Start - Coord: "+World.getStart());
+		setX(World.getCarStart().x);
+		setY(World.getCarStart().y);
+		
 		CAR_WIDTH = (int) Math.min(sprite.getWidth(), sprite.getHeight());
 		CAR_HEIGHT = CAR_WIDTH;
 
