@@ -11,6 +11,8 @@ import utilities.Coordinate;
 
 public class TilesChecker {
 	private static ArrayList<String> nameOfTilesWithKeys = new ArrayList<>(Arrays.asList("lava"));
+	private static ArrayList<String> nameofTilesWithHealth = new ArrayList<>(Arrays.asList("health"));
+
 	private static ArrayList<Type> drivableTileTypes = new ArrayList<>(
 			Arrays.asList(Type.TRAP, Type.ROAD, Type.START, Type.FINISH));
 	private static ArrayList<String> drivableTraps = new ArrayList<>(
@@ -30,6 +32,13 @@ public class TilesChecker {
 	public static boolean checkTrapTileWithKeys(MapTile tile) {
 		return nameOfTilesWithKeys.contains(((TrapTile) tile).getTrap());
 	}
+
+	public static boolean checkForHealthTile(MapTile tile) {
+	    if (checkForTrapTile(tile)) {
+	        return nameofTilesWithHealth.contains(((TrapTile) tile).getTrap());
+        }
+        return false;
+    }
 
 	public static int getKeyFromTile(MapTile tile) {
 		String trap = ((TrapTile) tile).getTrap();

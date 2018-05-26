@@ -19,9 +19,6 @@ public abstract class CarNavigationStrategy {
 
     public abstract void decideAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController);
 
-    public abstract boolean checkFollowingObstacle(WorldSpatial.Direction orientation,
-                                                   HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid);
-
     public int checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
                                 Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
         return sensor.checkViewForTile(orientation, currentView, currentPosition, tilesToCheck);
@@ -30,9 +27,6 @@ public abstract class CarNavigationStrategy {
     public enum carControllerActions {
         ACCELERATE, SLOWDOWN, ISTURNINGLEFT, ISTURNINGRIGHT, REVERSE, DONOTHING
     }
-
-    public abstract boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-                                       Coordinate currentPosition, ArrayList<MapTile> tilesToCheck);
 
     // TODO: Remove this if not used
     public boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x, float y) {

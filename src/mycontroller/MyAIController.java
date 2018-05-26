@@ -6,7 +6,6 @@ import java.util.List;
 
 import controller.CarController;
 import mycontroller.strategies.*;
-import mycontroller.strategies.AStarSearch;
 import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
@@ -66,19 +65,16 @@ public class MyAIController extends CarController {
     private Node finalNode;
     private AStarSearch aStar;
 
-	public MyAIController(Car car) {
+    public GameMap getLatestGameMap() {
+        return latestGameMap;
+    }
+
+    public MyAIController(Car car) {
 		super(car);
 		tilesToAvoid.add(new MapTile(MapTile.Type.WALL));
 		tilesToAvoid.add(new LavaTrap());
 		latestGameMap = new GameMap(getMap(), getKey()-1);
 
-        //TODO TEST ASTAR
-        initialNode = new Node(1, 1, latestGameMap.getUpdatedMap().get(new Coordinate(1,1)).getTile());
-        finalNode = new Node(40, 8, latestGameMap.getUpdatedMap().get(new Coordinate(40,8)).getTile());
-        aStar = new AStarSearch(World.MAP_WIDTH, World.MAP_HEIGHT, initialNode, finalNode,
-                latestGameMap.getUpdatedMap());
-        List<Node> path = aStar.findPath();
-        
 		/** default to following left wall when simulation starts **/
         strategyFactory = new StrategyFactory(this);
         carNavigationStrategy = strategyFactory.createCarStrategy(this, strategies.FOLLOWLEFTWALL);
