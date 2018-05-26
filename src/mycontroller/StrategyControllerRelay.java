@@ -11,66 +11,41 @@ import world.WorldSpatial;
  * Strategy decides the Controller should act.
  */
 public class StrategyControllerRelay {
-	
+
 	private static StrategyControllerRelay instance;
 	public static StrategyControllerRelay getInstance() {
-	    if (instance == null) {
-	        instance = new StrategyControllerRelay();
-        }
-        return instance;
-    }
+		if (instance == null) {
+			instance = new StrategyControllerRelay();
+		}
+		return instance;
+	}
 
-	public void changeState(MyAIController carController, CarNavigationStrategy.carControllerActions action, float delta) {
-		WorldSpatial.Direction orientation = carController.getOrientation();
+	public void changeState(MyAIController carController, CarNavigationStrategy.CarControllerActions action) {
 		switch (action) {
-		case TURNRIGHT:
-            carController.applyRightTurn(orientation, delta);
-            if (carController.getSpeed() > carController.MAX_TURNING_SPEED) {
-				carController.applyReverseAcceleration();	
-			}
-            //else if (carController.getSpeed() < carController.getMinCarSpeed()) { 
-            else if (carController.getSpeed() < carController.MIN_ROTATING_SPEED) { 
-            	carController.applyForwardAcceleration();	
-			}
-			break;
-		case TURNLEFT:
-			carController.applyLeftTurn(orientation, delta);
-			//if (carController.getSpeed() < carController.getMinCarSpeed()) { 
-			if (carController.getSpeed() < carController.MIN_CORNER_SPEED) { 
-				carController.applyForwardAcceleration();	
-			}
-			else if (carController.getSpeed() > carController.MAX_TURNING_SPEED) {
-				carController.applyReverseAcceleration();	
-			}
-			break;
-		case ACCELERATE:
-			if (carController.getSpeed() < carController.MAX_CAR_SPEED) {
-				carController.applyForwardAcceleration();				
-			}
-			break;
-			
-		case SLOWDOWN:
-			carController.applyForwardAcceleration();
-			if (carController.getSpeed() > carController.MAX_TURNING_SPEED) {
+			case ACCELERATE:
+				if (carController.getSpeed() < carController.MAX_CAR_SPEED) {
+					carController.applyForwardAcceleration();
+				}
+				break;
+			case SLOWDOWN:
+				carController.applyForwardAcceleration();
+				if (carController.getSpeed() > carController.MAX_TURNING_SPEED) {
+					carController.applyReverseAcceleration();
+				}
+				break;
+			case REVERSE:
 				carController.applyReverseAcceleration();
-			}
-//			else if (carController.getSpeed() < carController.getMinCarSpeed()) {
-//				carController.applyForwardAcceleration();
-//			}
-			break;
-		case REVERSE:
-			carController.applyReverseAcceleration();
-			break;
-		case ISTURNINGLEFT:
-			carController.setLastTurnDirection(WorldSpatial.RelativeDirection.LEFT);
-			carController.setTurningLeft(true);
-			break;
-		case ISTURNINGRIGHT:
-			carController.setLastTurnDirection(WorldSpatial.RelativeDirection.RIGHT);
-			carController.setTurningRight(true);
-			break;
-		default:
-		    break;
+				break;
+			case ISTURNINGLEFT:
+				carController.setLastTurnDirection(WorldSpatial.RelativeDirection.LEFT);
+				carController.setTurningLeft(true);
+				break;
+			case ISTURNINGRIGHT:
+				carController.setLastTurnDirection(WorldSpatial.RelativeDirection.RIGHT);
+				carController.setTurningRight(true);
+				break;
+			default:
+				break;
 		}
 	}
 }

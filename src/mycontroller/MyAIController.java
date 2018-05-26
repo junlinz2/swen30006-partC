@@ -3,8 +3,9 @@ package mycontroller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import controller.CarController;
+import mycontroller.exceptions.StrategyNotFoundException;
 import mycontroller.strategies.CarNavigationStrategy;
-import mycontroller.strategies.FollowLeftWallStrategy;
+import mycontroller.strategies.StrategyFactory;
 import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
@@ -12,65 +13,71 @@ import world.Car;
 import world.WorldSpatial;
 
 public class MyAIController extends CarController {
-	
-	// This is initialized when the car sticks to a wall.
-	private boolean isFollowingWall = false; 
-	
-	// Shows the last turning direction
-	private WorldSpatial.RelativeDirection lastTurnDirection = null; 
-	
+
+	private boolean isFollowingWall = false; // This is initialized when the car sticks to a wall.
+	private WorldSpatial.RelativeDirection lastTurnDirection = null; // Shows the last turn direction the car takes.
+
 	private boolean isTurningLeft = false;
 	private boolean isTurningRight = false;
 	private Coordinate currentPosition;
-	
+
 	// Keeps track of the previous state
-	private WorldSpatial.Direction previousState = null; 
+	private WorldSpatial.Direction previousState = null;
 	private boolean justChangedState = false;
 	private ArrayList<MapTile> tilesToAvoid = new ArrayList<>();
-	private CarNavigationStrategy carNavigationStrategy;
 	private GameMap latestGameMap;
 
 	// Car Speed to move at
 	public final float MAX_CAR_SPEED = 3;
 	public final float MAX_TURNING_SPEED = 1.4f;
-	public final float MIN_CAR_SPEED = 1f;
+	// public final float MIN_CAR_SPEED = 1f;
+
 	public final float MIN_ROTATING_SPEED = 0.5f;
 	public final float MIN_CORNER_SPEED = 1.15f;
-	
 
 	// TODO : use a different turning strategy for different corner tile types.
-	public final int OBSTACLE_FOLLOWING_SENSITIVITY = 2;
+	public final int TILE_FOLLOWING_SENSITIVITY = 2;
 	public final int DISTANCE_TO_TURN = 1;
 	public final int DISTANCE_TO_SLOW_DOWN = getViewSquare();
-	
 
 	// Offset used to differentiate between 0 and 360 degrees
 	private int EAST_THRESHOLD = 3;
 
-	public MyAIController(Car car) {
+	private CarNavigationStrategy carNavigationStrategy;
+	private StrategyFactory strategyFactory;
+	private boolean justFoundSwitchingPoint = false;
+	private boolean turningPointFound = false;
+
+	public enum Strategies {
+		FOLLOWLEFTWALL, FOLLOWRIGHTWALL, GOTHROUGHLAVA, HEALING
+	}
+
+	public MyAIController(Car car) throws StrategyNotFoundException {
 		super(car);
 		tilesToAvoid.add(new MapTile(MapTile.Type.WALL));
 		tilesToAvoid.add(new LavaTrap());
-		latestGameMap = new GameMap(getMap());
+		setLatestGameMap(new GameMap(getMap()));
+
+		// TODO (Junlin) - check implementations as I have created a factory here.
 		/** default to following left wall when simulation starts **/
-		carNavigationStrategy = new FollowLeftWallStrategy(this);
+		strategyFactory = new StrategyFactory();
+		carNavigationStrategy = strategyFactory.createCarStrategy(tilesToAvoid, TILE_FOLLOWING_SENSITIVITY,
+				DISTANCE_TO_SLOW_DOWN, Strategies.FOLLOWLEFTWALL);
 	}
 
 	@Override
 	public void update(float delta) {
-		//TODO print statement here
-		//System.out.println(getFloatX() + " " + getFloatY());
-
 		// Gets what the car can see
 		HashMap<Coordinate, MapTile> currentView = getView();
 		currentPosition = updateCoordinate();
-		latestGameMap.updateMap(currentView);
+		getLatestGameMap().updateMap(currentView);
 		checkStateChange();
-		
-		//TODO remove if unused
+
+		// TODO remove if unused
 		// x = getX();
 		// y = getY();
 
+		// TODO: Encapsulate the following blocks into methods
 		// If you are not following a wall initially, find a wall to stick to!
 		if (!isFollowingWall) {
 			if (getSpeed() < MAX_CAR_SPEED) {
@@ -103,18 +110,54 @@ public class MyAIController extends CarController {
 
 		// Once the car is already stuck to a wall, apply the following logic
 		else {
-
 			// Readjust the car if it is misaligned.
 			readjust(getLastTurnDirection(), delta);
-			
-			//TODO: TURNINGLEFT and TURNINGRIGHT logic should be here
-			carNavigationStrategy.doAction(delta, currentView, this);
+
+			if (getIsTurningRight()) {
+				applyRightTurn(getOrientation(), delta);
+				System.out.println("TURNRIGHT");
+			}
+
+			else if (getIsTurningLeft()) {
+				applyLeftTurn(getOrientation(), delta);
+				System.out.println("TURNLEFT");
+			}
+
+			else {
+				if (carNavigationStrategy.changeStrategyNow()) {
+					carNavigationStrategy = strategyFactory.changeCarStrategy(tilesToAvoid, TILE_FOLLOWING_SENSITIVITY,
+							DISTANCE_TO_SLOW_DOWN);
+				}
+
+				strategyFactory.registerTilesToFollow(currentView, getOrientation(), currentPosition);
+				strategyFactory.deregisterFollowedObstacles(currentView, getOrientation(), currentPosition,
+						tilesToAvoid);
+
+				Coordinate currentFollowingObstacle = carNavigationStrategy.getFollowingObstacle(currentView,
+						getOrientation(), currentPosition, tilesToAvoid);
+
+				if (currentFollowingObstacle != null && strategyFactory.getSwitchingPoint() == null) {
+					strategyFactory.setSwitchingPoint(currentFollowingObstacle);
+				}
+
+				if (!turningPointFound && currentFollowingObstacle != null
+						&& currentFollowingObstacle.equals(strategyFactory.getSwitchingPoint())) {
+					// If turningPointFound is true, isTurningLeft/isTurningRight becomes true
+					turningPointFound = carNavigationStrategy.findTurningPointForNewStrategy(this,
+							strategyFactory.getObstaclesToFollow(), getOrientation(), currentView, currentPosition,
+							tilesToAvoid);
+					if (turningPointFound)
+						return;
+				}
+
+				carNavigationStrategy.decideAction(currentView, this);
+			}
 		}
 	}
 
 	/**
-	 * Note: Trying implementing moving away from wall if crashed Readjust the
-	 * car to the orientation we are in.
+	 * Note: Trying implementing moving away from wall if crashed Readjust the car
+	 * to the orientation we are in.
 	 * 
 	 * @param lastTurnDirection
 	 * @param delta
@@ -213,8 +256,7 @@ public class MyAIController extends CarController {
 	}
 
 	/**
-	 * Turn the car counter clock wise (think of a compass going counter
-	 * clock-wise)
+	 * Turn the car counter clock wise (think of a compass going counter clock-wise)
 	 */
 	public void applyLeftTurn(WorldSpatial.Direction orientation, float delta) {
 		switch (orientation) {
@@ -242,7 +284,11 @@ public class MyAIController extends CarController {
 			break;
 
 		}
-
+		if (getSpeed() < MIN_CORNER_SPEED) {
+			applyForwardAcceleration();
+		} else if (getSpeed() > MAX_TURNING_SPEED) {
+			applyReverseAcceleration();
+		}
 	}
 
 	/**
@@ -273,6 +319,21 @@ public class MyAIController extends CarController {
 		default:
 			break;
 		}
+		if (getSpeed() > MAX_TURNING_SPEED) {
+			applyReverseAcceleration();
+		}
+		// else if (carController.getSpeed() < carController.getMinCarSpeed()) {
+		else if (getSpeed() < MIN_ROTATING_SPEED) {
+			applyForwardAcceleration();
+		}
+	}
+
+	public boolean justChangedState() {
+		return justChangedState;
+	}
+
+	public void setCarNavigationStrategy(CarNavigationStrategy strategy) {
+		this.carNavigationStrategy = strategy;
 	}
 
 	public boolean getIsTurningLeft() {
@@ -307,22 +368,14 @@ public class MyAIController extends CarController {
 		return tilesToAvoid;
 	}
 
-	//TODO Remove if unused
-//	public float getFloatX() {
-//		return getX();
-//	}
-//
-//	public float getFloatY() {
-//		return getY();
-//	}
-
-	public boolean justChangedState() {
-		return (isJustChangedState() == true) ? true : false;
-	}
-
-	public boolean isJustChangedState() {
-		return justChangedState;
-	}
+	// TODO Remove if unused
+	// public float getFloatX() {
+	// return getX();
+	// }
+	//
+	// public float getFloatY() {
+	// return getY();
+	// }
 
 	public void setJustChangedState(boolean justChangedState) {
 		this.justChangedState = justChangedState;
@@ -330,5 +383,21 @@ public class MyAIController extends CarController {
 
 	public WorldSpatial.RelativeDirection getLastTurnDirection() {
 		return lastTurnDirection;
+	}
+
+	public GameMap getLatestGameMap() {
+		return latestGameMap;
+	}
+
+	public void setLatestGameMap(GameMap latestGameMap) {
+		this.latestGameMap = latestGameMap;
+	}
+
+	public boolean isTurningPointFound() {
+		return turningPointFound;
+	}
+
+	public void setTurningPointFound(boolean turningPointFound) {
+		this.turningPointFound = turningPointFound;
 	}
 }

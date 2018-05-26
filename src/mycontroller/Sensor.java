@@ -9,144 +9,18 @@ import world.WorldSpatial;
 import java.util.*;
 
 public class Sensor {
+
 	// How many minimum units obstacles are away from the player.
-	private int obstacleFollowingSensitivity;
+	private int tileFollowingSensitivity;
 	private int distToSlowDown;
 
-	public Sensor(int obstacleFollowingSensitivity, int distToTurn, int distToSlowDown) {
-		this.obstacleFollowingSensitivity = obstacleFollowingSensitivity;
+	public Sensor(int tileFollowingSensitivity, int distToSlowDown) {
+		this.tileFollowingSensitivity = tileFollowingSensitivity;
 		this.distToSlowDown = distToSlowDown;
 	}
 
 	/**
-	 * Method below just iterates through the list and check in the correct
-	 * coordinates. i.e. Given your current position is 10,10 getEastView will
-	 * check up to obstacleFollowingSensitivity amount of tiles to the right.
-	 * getWestView will check up to obstacleFollowingSensitivity amount of tiles
-	 * to the left. getNorthView will check up to obstacleFollowingSensitivity
-	 * amount of tiles to the top. getSouthView will check up to
-	 * obstacleFollowingSensitivity amount of tiles below.
-	 */
-
-	public LinkedHashMap<Coordinate, MapTile> getEastView(HashMap<Coordinate, MapTile> currentView,
-			Coordinate currentPosition) {
-		LinkedHashMap<Coordinate, MapTile> view = new LinkedHashMap<>();
-		// Check tiles to my right
-		for (int i = 1; i <= distToSlowDown; i++) {
-			Coordinate coordinate = new Coordinate(currentPosition.x + i, currentPosition.y);
-			MapTile tile = currentView.get(coordinate);
-			view.put(coordinate, tile);
-		}
-		return view;
-	}
-
-	public LinkedHashMap<Coordinate, MapTile> getWestView(HashMap<Coordinate, MapTile> currentView,
-			Coordinate currentPosition) {
-		LinkedHashMap<Coordinate, MapTile> view = new LinkedHashMap<>();
-		// Check tiles to my left
-		for (int i = 1; i <= distToSlowDown; i++) {
-			Coordinate coordinate = new Coordinate(currentPosition.x - i, currentPosition.y);
-			MapTile tile = currentView.get(coordinate);
-			view.put(coordinate, tile);
-		}
-		return view;
-	}
-
-	public LinkedHashMap<Coordinate, MapTile> getNorthView(HashMap<Coordinate, MapTile> currentView,
-			Coordinate currentPosition) {
-		LinkedHashMap<Coordinate, MapTile> view = new LinkedHashMap<>();
-		// Check tiles towards the top
-		for (int i = 1; i <= distToSlowDown; i++) {
-			Coordinate coordinate = new Coordinate(currentPosition.x, currentPosition.y + i);
-			MapTile tile = currentView.get(coordinate);
-			view.put(coordinate, tile);
-		}
-		return view;
-	}
-
-	public LinkedHashMap<Coordinate, MapTile> getSouthView(HashMap<Coordinate, MapTile> currentView,
-			Coordinate currentPosition) {
-		LinkedHashMap<Coordinate, MapTile> view = new LinkedHashMap<>();
-		// Check tiles towards the bottom
-		for (int i = 1; i <= distToSlowDown; i++) {
-			Coordinate coordinate = new Coordinate(currentPosition.x, currentPosition.y - i);
-			MapTile tile = currentView.get(coordinate);
-			view.put(coordinate, tile);
-		}
-		return view;
-	}
-
-	public boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-			WorldSpatial.RelativeDirection direction, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
-		LinkedHashMap<Coordinate, MapTile> view = getOrientationView(currentView, orientation, direction,
-				currentPosition);
-
-		// Loops through Map to allow some flexibility in how close Car should
-		// be to
-		// wall.
-		int i = 1;
-		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
-			for (MapTile tile : tilesToCheck) {
-				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()) && i <= obstacleFollowingSensitivity)
-					return true;
-			}
-			i++;
-			if (i > obstacleFollowingSensitivity) {
-				break;
-			}
-		}
-		return false;
-	}
-
-	private boolean areTilesSameType(MapTile tile1, MapTile tile2) {
-		if (tile1.getType() == MapTile.Type.TRAP && tile2.getType() == MapTile.Type.TRAP) {
-			if (((TrapTile) tile1).getTrap().equals(((TrapTile) tile2).getTrap())) {
-				return true;
-			}
-		}
-
-		else if (tile1.getType().equals(tile2.getType())) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Returns how close the nearest tile in tilesToCheck is to the car.
-	 */
-	public int checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
-			Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
-		LinkedHashMap<Coordinate, MapTile> view = null;
-		switch (orientation) {
-		case EAST:
-			view = getEastView(currentView, currentPosition);
-			break;
-		case NORTH:
-			view = getNorthView(currentView, currentPosition);
-			break;
-		case SOUTH:
-			view = getSouthView(currentView, currentPosition);
-			break;
-		case WEST:
-			view = getWestView(currentView, currentPosition);
-			break;
-		}
-
-		int i = 1;
-		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
-			for (MapTile tile : tilesToCheck) {
-				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()))
-					return i;
-			}
-
-			i++;
-		}
-		return Integer.MAX_VALUE;
-	}
-
-	/**
-	 * Return true if a peeked is traversable (ie: a road tile) within four
+	 * Return true if a peeked tile is traversable (ie: a road tile) within four
 	 * tiles away.
 	 * 
 	 * @param orientation
@@ -155,7 +29,7 @@ public class Sensor {
 	 * @param direction
 	 * @return
 	 */
-	// TODO: Make use of obstacleFollowingSensitivity
+	// TODO: Make use of tileFollowingSensitivity
 	public boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			Coordinate currentPosition, WorldSpatial.RelativeDirection direction, ArrayList<MapTile> tilesToCheck) {
 		LinkedHashMap<Coordinate, MapTile> view = null;
@@ -201,34 +75,60 @@ public class Sensor {
 
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if (tileInView.getValue() != null && areTilesSameType(tileInView.getValue(), tile) {
+				if (tileInView.getValue() != null && TilesChecker.checkTileTraversable(tileInView.getValue(), tile)) {
 					return true;
 				}
 			}
-			
-			if (tileInView.getValue() != null && tileInView.getValue().getType() == MapTile.Type.ROAD) {
-				return true;
-			}
-			
-			if (tileInView.getValue() != null && ) {
-				return true;
-			}
-			
-			
 		}
+
 		return false;
 	}
 
+	/**
+	 * Returns how close the nearest tile in tilesToCheck is to the car.
+	 */
+	public int checkDistToObstacleAhead(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
+			Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+		LinkedHashMap<Coordinate, MapTile> view = null;
+		switch (orientation) {
+		case EAST:
+			view = getEastView(currentView, currentPosition);
+			break;
+		case NORTH:
+			view = getNorthView(currentView, currentPosition);
+			break;
+		case SOUTH:
+			view = getSouthView(currentView, currentPosition);
+			break;
+		case WEST:
+			view = getWestView(currentView, currentPosition);
+			break;
+		}
+
+		int i = 1;
+		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
+			for (MapTile tile : tilesToCheck) {
+				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()))
+					return i;
+			}
+
+			i++;
+		}
+		return Integer.MAX_VALUE;
+	}
+
 	// TODO:Explain code logic
+	// TODO: Implement fucking exception (probably won't have time for that)
 	public boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			WorldSpatial.RelativeDirection direction, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
 
-		LinkedHashMap<Coordinate, MapTile> view = getOrientationView(currentView, orientation, direction,
-				currentPosition);
+		LinkedHashMap<Coordinate, MapTile> view = getOrientationViewInFollowingDirection(currentView, orientation,
+				direction, currentPosition);
 
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if (areTilesSameType(tileInView.getValue(), tile)) {
+				// if (areTilesSameType(tileInView.getValue(), tile)) {
+				if (TilesChecker.checkTileTypeSame(tileInView.getValue(), tile)) {
 					Coordinate roadBeforeObstacle = null;
 					int obstacleX = tileInView.getKey().x;
 					int obstacleY = tileInView.getKey().y;
@@ -286,11 +186,11 @@ public class Sensor {
 			boolean istile2Obstacle = false;
 
 			for (MapTile tile : tilesToCheck) {
-				if (areTilesSameType(currentView.get(adjacentTile1), tile)) {
+				if (TilesChecker.checkTileTypeSame(currentView.get(adjacentTile1), tile)) {
 					istile1Obstacle = true;
 				}
 
-				if (areTilesSameType(currentView.get(adjacentTile2), tile)) {
+				if (TilesChecker.checkTileTypeSame(currentView.get(adjacentTile2), tile)) {
 					istile2Obstacle = true;
 				}
 			}
@@ -299,8 +199,9 @@ public class Sensor {
 		}
 	}
 
-	private LinkedHashMap<Coordinate, MapTile> getOrientationView(HashMap<Coordinate, MapTile> currentView,
-			WorldSpatial.Direction orientation, WorldSpatial.RelativeDirection direction, Coordinate currentPosition) {
+	public LinkedHashMap<Coordinate, MapTile> getOrientationViewInFollowingDirection(
+			HashMap<Coordinate, MapTile> currentView, WorldSpatial.Direction orientation,
+			WorldSpatial.RelativeDirection direction, Coordinate currentPosition) {
 
 		if (direction == WorldSpatial.RelativeDirection.LEFT) {
 			switch (orientation) {
@@ -329,47 +230,118 @@ public class Sensor {
 		return null;
 	}
 
-	// TODO: Remove if not used
-	public Coordinate getCornerTileCoordinate(WorldSpatial.Direction orientation, Coordinate currentPosition,
-			WorldSpatial.RelativeDirection direction) {
-		if (direction == WorldSpatial.RelativeDirection.LEFT) {
-			switch (orientation) {
-			case EAST:
-				currentPosition.y = currentPosition.y + 1;
-				break;
-			case NORTH:
-				currentPosition.x = currentPosition.x - 1;
-				break;
-			case SOUTH:
-				currentPosition.x = currentPosition.x + 1;
-				break;
-			case WEST:
-				currentPosition.y = currentPosition.y - 1;
-				break;
+	// TODO: change distToSlowDown to getViewSquare() (Same thing but naming
+	// matters)
+	public LinkedHashMap<Coordinate, MapTile> getEastView(HashMap<Coordinate, MapTile> currentView,
+			Coordinate currentPosition) {
+		LinkedHashMap<Coordinate, MapTile> view = new LinkedHashMap<>();
+		// Check tiles to my right
+		for (int i = 1; i <= distToSlowDown; i++) {
+			Coordinate coordinate = new Coordinate(currentPosition.x + i, currentPosition.y);
+			MapTile tile = currentView.get(coordinate);
+			view.put(coordinate, tile);
+		}
+		return view;
+	}
+
+	public LinkedHashMap<Coordinate, MapTile> getWestView(HashMap<Coordinate, MapTile> currentView,
+			Coordinate currentPosition) {
+		LinkedHashMap<Coordinate, MapTile> view = new LinkedHashMap<>();
+		// Check tiles to my left
+		for (int i = 1; i <= distToSlowDown; i++) {
+			Coordinate coordinate = new Coordinate(currentPosition.x - i, currentPosition.y);
+			MapTile tile = currentView.get(coordinate);
+			view.put(coordinate, tile);
+		}
+		return view;
+	}
+
+	public LinkedHashMap<Coordinate, MapTile> getNorthView(HashMap<Coordinate, MapTile> currentView,
+			Coordinate currentPosition) {
+		LinkedHashMap<Coordinate, MapTile> view = new LinkedHashMap<>();
+		// Check tiles towards the top
+		for (int i = 1; i <= distToSlowDown; i++) {
+			Coordinate coordinate = new Coordinate(currentPosition.x, currentPosition.y + i);
+			MapTile tile = currentView.get(coordinate);
+			view.put(coordinate, tile);
+		}
+		return view;
+	}
+
+	public LinkedHashMap<Coordinate, MapTile> getSouthView(HashMap<Coordinate, MapTile> currentView,
+			Coordinate currentPosition) {
+		LinkedHashMap<Coordinate, MapTile> view = new LinkedHashMap<>();
+		// Check tiles towards the bottom
+		for (int i = 1; i <= distToSlowDown; i++) {
+			Coordinate coordinate = new Coordinate(currentPosition.x, currentPosition.y - i);
+			MapTile tile = currentView.get(coordinate);
+			view.put(coordinate, tile);
+		}
+		return view;
+	}
+
+	public boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
+			WorldSpatial.RelativeDirection direction, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+		LinkedHashMap<Coordinate, MapTile> view = getOrientationViewInFollowingDirection(currentView, orientation,
+				direction, currentPosition);
+
+		// Loops through Map to allow some flexibility in how close Car should
+		// be to
+		// wall.
+		int i = 1;
+		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
+			for (MapTile tile : tilesToCheck) {
+				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue())
+						&& i <= getTileFollowingSensitivity())
+					return true;
 			}
-		} else {
-			switch (orientation) {
-			case EAST:
-				currentPosition.y = currentPosition.y - 1;
-				break;
-			case NORTH:
-				currentPosition.x = currentPosition.x + 1;
-				break;
-			case SOUTH:
-				currentPosition.x = currentPosition.x - 1;
-				break;
-			case WEST:
-				currentPosition.y = currentPosition.y + 1;
+			i++;
+
+			if (i > getTileFollowingSensitivity()) {
 				break;
 			}
 		}
-		return currentPosition;
+		return false;
 	}
 
-	public int getObstacleFollowingSensitivity() {
-		return obstacleFollowingSensitivity;
+	public Coordinate findClosestObstacleInOrientation(WorldSpatial.Direction orientation,
+			HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+		LinkedHashMap<Coordinate, MapTile> viewInOrientation = null;
+
+		switch (orientation) {
+		case NORTH:
+			viewInOrientation = getNorthView(currentView, currentPosition);
+			break;
+		case SOUTH:
+			viewInOrientation = getSouthView(currentView, currentPosition);
+			break;
+		case EAST:
+			viewInOrientation = getEastView(currentView, currentPosition);
+			break;
+		case WEST:
+			viewInOrientation = getWestView(currentView, currentPosition);
+			break;
+		}
+
+		for (Map.Entry<Coordinate, MapTile> tileInView : viewInOrientation.entrySet()) {
+			for (MapTile tile : tilesToCheck) {
+				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue())) {
+					return tileInView.getKey();
+				}
+			}
+		}
+		
+		return null;
 	}
 
+	public int getTileFollowingSensitivity() {
+		return tileFollowingSensitivity;
+	}
+
+	public void setTileFollowingSensitivity(int tileFollowingSensitivity) {
+		this.tileFollowingSensitivity = tileFollowingSensitivity;
+	}
+	
 	public int getDistToSlowDown() {
 		return distToSlowDown;
 	}

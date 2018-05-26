@@ -4,57 +4,61 @@ import mycontroller.*;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
+import world.WorldSpatial.Direction;
+
 import java.util.*;
 
 public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
-	public FollowLeftWallStrategy(MyAIController c) {
-		sensor = new Sensor(c.OBSTACLE_FOLLOWING_SENSITIVITY, c.DISTANCE_TO_TURN, c.DISTANCE_TO_SLOW_DOWN);
-		this.tilesToAvoid = c.getTilesToAvoid();
+	public FollowLeftWallStrategy(ArrayList<MapTile> tilesToAvoid, int tileFollowingSensitivity, int distToSlowDown) {
+		super(tilesToAvoid, tileFollowingSensitivity, distToSlowDown);
 	}
 
-	public void doAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController) {
-		CarNavigationStrategy.carControllerActions nextState;
+	public void decideAction(HashMap<Coordinate, MapTile> currentView, MyAIController carController) {
 
-		if (carController.getIsTurningRight()) {
-			nextState = carControllerActions.TURNRIGHT;
-		}
+		CarNavigationStrategy.CarControllerActions nextState;
 
-		else if (carController.getIsTurningLeft()) {
-			nextState = carControllerActions.TURNLEFT;
+		// When the car just finishes turning and is searching for an obstacle ahead to
+		// switch strategy
+		if (carController.isTurningPointFound() && carController.justChangedState()) {
+			int distToObstacle = checkViewForTile(carController.getOrientation(), currentView,
+					carController.getCurrentPosition(), carController.getTilesToAvoid());
+			// Turn left when an obstacle is ahead so that the obstacle will be on the right
+			// in order to use followRightWallStrategy.
+			nextState = decideTurning(distToObstacle, WorldSpatial.RelativeDirection.LEFT,
+					carController.DISTANCE_TO_TURN, carController.DISTANCE_TO_SLOW_DOWN);
+
+			if (nextState == CarControllerActions.ISTURNINGLEFT || nextState == CarControllerActions.ISTURNINGRIGHT) {
+				carController.setTurningPointFound(false);
+				carController.setJustChangedState(false);
+				changeStrategyNow = true;
+			}
 		}
 
 		// Try to determine whether or not the car is next to a wall.
 		else if (checkFollowingObstacle(carController.getOrientation(), currentView, carController.getCurrentPosition(),
 				carController.getTilesToAvoid())) {
-			if (carController.isJustChangedState()) {
+
+			if (carController.justChangedState()) {
 				carController.setJustChangedState(false);
 			}
 
 			int distToObstacle = checkViewForTile(carController.getOrientation(), currentView,
 					carController.getCurrentPosition(), carController.getTilesToAvoid());
-
+			boolean followedTilesEndAhead = peekCorner(carController.getOrientation(), currentView,
+					carController.getCurrentPosition(), carController.getTilesToAvoid());
 			// If there is wall ahead, turn right!
-			if (distToObstacle <= carController.DISTANCE_TO_TURN) {
-				nextState = carControllerActions.ISTURNINGRIGHT;
-			}
-
-			// Slow down the car when it's going to turn soon
-			else if (distToObstacle <= sensor.getDistToSlowDown() || peekCorner(carController.getOrientation(),
-					currentView, carController.getCurrentPosition(), carController.getTilesToAvoid())) {
-				nextState = carControllerActions.SLOWDOWN;
-			}
-
-			else {
-				nextState = carControllerActions.ACCELERATE;
-			}
+			// Or slow down the car when it's going to turn soon
+			nextState = decideTurning(distToObstacle, WorldSpatial.RelativeDirection.RIGHT,
+					carController.DISTANCE_TO_TURN, carController.DISTANCE_TO_SLOW_DOWN, followedTilesEndAhead);
 		}
 
-		// Ensure the car can find a new wall/lava to follow after turning left by
-		// keeping it drive along the new orientation
+		// Ensure the car can find a new wall/lava to follow after turning left when
+		// previous followed obstacles ended by keeping it drive along the new
+		// orientation
 		else if (carController.justChangedState()
 				&& carController.getLastTurnDirection() == WorldSpatial.RelativeDirection.LEFT) {
-			nextState = carControllerActions.SLOWDOWN;
+			nextState = CarControllerActions.SLOWDOWN;
 		}
 
 		// This indicates that I can do a left turn if the car is no longer cruising
@@ -63,7 +67,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 			// Turn left if the car is not turning into a deadend
 			if (!isDeadEnd(carController.getOrientation(), currentView, carController.getCurrentPosition(),
 					carController.getTilesToAvoid())) {
-				nextState = carControllerActions.ISTURNINGLEFT;
+				nextState = CarControllerActions.ISTURNINGLEFT;
 			}
 
 			// If it's a deadend, keep driving in the current orientation until the next
@@ -71,18 +75,8 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 			else {
 				int distToObstacle = checkViewForTile(carController.getOrientation(), currentView,
 						carController.getCurrentPosition(), carController.getTilesToAvoid());
-
-				if (distToObstacle <= carController.DISTANCE_TO_TURN) {
-					nextState = carControllerActions.ISTURNINGRIGHT;
-				}
-
-				else if (distToObstacle <= sensor.getDistToSlowDown()) {
-					nextState = carControllerActions.SLOWDOWN;
-				}
-
-				else {
-					nextState = carControllerActions.ACCELERATE;
-				}
+				nextState = decideTurning(distToObstacle, WorldSpatial.RelativeDirection.RIGHT,
+						carController.DISTANCE_TO_TURN, carController.DISTANCE_TO_SLOW_DOWN);
 			}
 		}
 
@@ -91,7 +85,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
 		// New action is relayed by the StrategyControllerRelay singleton to
 		// MyAIController
-		StrategyControllerRelay.getInstance().changeState(carController, nextState, delta);
+		StrategyControllerRelay.getInstance().changeState(carController, nextState);
 	}
 
 	public boolean checkFollowingObstacle(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
@@ -114,18 +108,47 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 				tilesToAvoid);
 	}
 
-	// TODO: Remove this if not used
-	public boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x, float y) {
-		switch (orientation) {
-		case WEST:
-			return (x - coordinate.x) < 0.475;
-		case EAST:
-			return (x - coordinate.x) > -0.55;
-		case NORTH:
-			return (y - coordinate.y) > -0.475;
-		case SOUTH:
-			return (y - coordinate.y) < 0.7;
+	@Override
+	public LinkedHashMap<Coordinate, MapTile> getOrientationViewInFollowingDirection(
+			HashMap<Coordinate, MapTile> currentView, Direction orientation, Coordinate currentPosition) {
+		return sensor.getOrientationViewInFollowingDirection(currentView, orientation,
+				WorldSpatial.RelativeDirection.LEFT, currentPosition);
+	}
+
+	@Override
+	public boolean findTurningPointForNewStrategy(MyAIController carController, ArrayList<Coordinate> obstaclesToFollow,
+			WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition,
+			ArrayList<MapTile> tilesToCheck) {
+
+		Coordinate obstacleOnRight = findTilesOnOtherSide(currentView, orientation, currentPosition);
+
+		// TODO: If travelling too fast while turning results in following the wrong
+		// wall, implement SLOWDOWN before turning
+		if (obstaclesToFollow.contains(obstacleOnRight)) {
+			StrategyControllerRelay.getInstance().changeState(carController, CarControllerActions.ISTURNINGRIGHT);
+			return true;
 		}
+
 		return false;
+	}
+
+	public Coordinate findTilesOnOtherSide(HashMap<Coordinate, MapTile> currentView, WorldSpatial.Direction orientation,
+			Coordinate currentPosition) {
+		switch (orientation) {
+		case NORTH:
+			return sensor.findClosestObstacleInOrientation(WorldSpatial.Direction.EAST, currentView, currentPosition,
+					tilesToAvoid);
+		case SOUTH:
+			return sensor.findClosestObstacleInOrientation(WorldSpatial.Direction.WEST, currentView, currentPosition,
+					tilesToAvoid);
+		case EAST:
+			return sensor.findClosestObstacleInOrientation(WorldSpatial.Direction.SOUTH, currentView, currentPosition,
+					tilesToAvoid);
+		case WEST:
+			return sensor.findClosestObstacleInOrientation(WorldSpatial.Direction.NORTH, currentView, currentPosition,
+					tilesToAvoid);
+		default:
+			return null;
+		}
 	}
 }
