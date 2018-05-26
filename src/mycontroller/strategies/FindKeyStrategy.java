@@ -1,16 +1,9 @@
 package mycontroller.strategies;
-
-import java.util.HashMap;
-import java.util.List;
-import mycontroller.AStarSearch;
 import mycontroller.GameMap;
-import mycontroller.HashMapTile;
 import mycontroller.MyAIController;
 import mycontroller.Node;
 import tiles.MapTile;
 import utilities.Coordinate;
-import world.World;
-import world.WorldSpatial;
 
 public class FindKeyStrategy extends GoalCompletionStrategy {
 
