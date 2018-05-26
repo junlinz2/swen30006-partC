@@ -6,24 +6,24 @@ import utilities.Coordinate;
 import world.WorldSpatial;
 import java.util.*;
 
-public class FollowLeftWallStrategy extends CarNavigationStrategy {
+public class FollowLeftWallStrategy extends PathFindingStrategy {
 
 	public FollowLeftWallStrategy(MyAIController c) {
 		sensor = new Sensor(c.OBSTACLE_FOLLOWING_SENSITIVITY, c.DISTANCE_TO_SLOW_DOWN);
 		this.tilesToAvoid = c.getTilesToAvoid();
 	}
 
-	public void decideAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController) {
-		CarNavigationStrategy.carControllerActions nextState;
+	public void decideAction(MyAIController carController) {
+		PathFindingStrategy.carControllerActions nextState;
 
 		// Try to determine whether or not the car is next to a wall.
-		if (checkFollowingObstacle(carController.getOrientation(), currentView, carController.getCurrentPosition(),
+		if (checkFollowingObstacle(carController.getOrientation(), carController.getView(), carController.getCurrentPosition(),
 				carController.getTilesToAvoid())) {
 			if (carController.justChangedState()) {
 				carController.setJustChangedState(false);
 			}
 
-			int distToObstacle = checkViewForTile(carController.getOrientation(), currentView,
+			int distToObstacle = checkViewForTile(carController.getOrientation(), carController.getView(),
 					carController.getCurrentPosition(), carController.getTilesToAvoid());
 
 			// If there is wall ahead, turn right!
@@ -33,7 +33,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 
 			// Slow down the car when it's going to turn soon
 			else if (distToObstacle <= sensor.getDistToSlowDown() || peekCorner(carController.getOrientation(),
-					currentView, carController.getCurrentPosition(), carController.getTilesToAvoid())) {
+					carController.getView(), carController.getCurrentPosition(), carController.getTilesToAvoid())) {
 				nextState = carControllerActions.SLOWDOWN;
 			}
 
@@ -53,7 +53,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 		// along an obstacle
 		else {
 			// Turn left if the car is not turning into a deadend
-			if (!isDeadEnd(carController.getOrientation(), currentView, carController.getCurrentPosition(),
+			if (!isDeadEnd(carController.getOrientation(), carController.getView(), carController.getCurrentPosition(),
 					carController.getTilesToAvoid())) {
 				nextState = carControllerActions.ISTURNINGLEFT;
 			}
@@ -61,7 +61,7 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 			// If it's a deadend, keep driving in the current orientation until the next
 			// turn
 			else {
-				int distToObstacle = checkViewForTile(carController.getOrientation(), currentView,
+				int distToObstacle = checkViewForTile(carController.getOrientation(), carController.getView(),
 						carController.getCurrentPosition(), carController.getTilesToAvoid());
 
 				if (distToObstacle <= carController.DISTANCE_TO_TURN) {
@@ -92,7 +92,6 @@ public class FollowLeftWallStrategy extends CarNavigationStrategy {
 				currentPosition, tilesToAvoid);
 	}
 
-	@Override
 	public boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 				Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
 		return sensor.peekCorner(orientation, currentView, currentPosition, WorldSpatial.RelativeDirection.LEFT,

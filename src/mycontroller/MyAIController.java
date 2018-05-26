@@ -2,7 +2,6 @@ package mycontroller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import controller.CarController;
 import mycontroller.strategies.*;
@@ -10,7 +9,6 @@ import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.Car;
-import world.World;
 import world.WorldSpatial;
 
 public class MyAIController extends CarController {
@@ -50,7 +48,7 @@ public class MyAIController extends CarController {
 
 	// Offset used to differentiate between 0 and 360 degrees
 	private int EAST_THRESHOLD = 3;
-    private CarNavigationStrategy carNavigationStrategy;
+    private CarControllerStrategy carNavigationStrategy;
 
     private StrategyFactory strategyFactory;
 
@@ -106,7 +104,8 @@ public class MyAIController extends CarController {
                 applyLeftTurn(getOrientation(), delta);
             }
 
-            int distToObstacleAhead = carNavigationStrategy.checkViewForTile(WorldSpatial.Direction.NORTH, currentView,
+            int distToObstacleAhead = ((PathFindingStrategy) carNavigationStrategy).
+                    checkViewForTile(WorldSpatial.Direction.NORTH, currentView,
                     currentPosition, tilesToAvoid);
 
             if (distToObstacleAhead <= DISTANCE_TO_SLOW_DOWN && distToObstacleAhead > DISTANCE_TO_TURN) {
@@ -138,7 +137,7 @@ public class MyAIController extends CarController {
                 applyLeftTurn(getOrientation(), delta);
             }
 
-            carNavigationStrategy.decideAction(delta, currentView, this);
+            carNavigationStrategy.decideAction(this);
         }
     }
 
@@ -322,7 +321,7 @@ public class MyAIController extends CarController {
         return justChangedState;
     }
 
-    public void setCarNavigationStrategy(CarNavigationStrategy strategy) {
+    public void setCarNavigationStrategy(CarControllerStrategy strategy) {
         this.carNavigationStrategy = strategy;
     }
 

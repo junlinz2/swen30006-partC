@@ -11,30 +11,30 @@ import world.World;
 import java.util.HashMap;
 import java.util.List;
 
-public class FindHealthTrapStrategy extends CarNavigationStrategy {
+public class FindHealthTrapStrategy extends GoalCompletionStrategy {
 
-    private Node carCurrentPositionTile;
+    private Node carCurrentPositionNode;
     private Node nearestHealthNode;
     private AStarSearch aStar;
     private List<Node> path;
 
     public FindHealthTrapStrategy(StrategyFactory s, MyAIController c) {
 
-        //TODO TEST ASTAR
-        carCurrentPositionTile = new Node(c.getCurrentPosition().x, c.getCurrentPosition().y,
-                c.getLatestGameMap().getUpdatedMap().get(new Coordinate(c.getCurrentPosition().x,c.getCurrentPosition().y)).getTile());
         nearestHealthNode = new Node(c.getLatestGameMap().getNearestHealthTile().x, c.getLatestGameMap().getNearestHealthTile().y,
                 c.getLatestGameMap().getUpdatedMap().get(new Coordinate(c.getLatestGameMap().getNearestHealthTile().x,
                         c.getLatestGameMap().getNearestHealthTile().y)).getTile());
-        aStar = new AStarSearch(World.MAP_WIDTH, World.MAP_HEIGHT, carCurrentPositionTile, nearestHealthNode,
+        aStar = new AStarSearch(World.MAP_WIDTH, World.MAP_HEIGHT, carCurrentPositionNode, nearestHealthNode,
                 c.getLatestGameMap().getUpdatedMap());
     }
 
     @Override
-    public void decideAction(float delta, HashMap<Coordinate, MapTile> currentView, MyAIController carController) {
+    public void decideAction(MyAIController carController) {
+        //TODO : abstract this
+        Coordinate currentPosition = new Coordinate(carController.getCurrentPosition().x ,carController.getCurrentPosition().y);
+        MapTile carCurrentPositionTile = carController.getLatestGameMap().getUpdatedMap().get(currentPosition).getTile();
+        carCurrentPositionNode = new Node(currentPosition.x, currentPosition.y, carCurrentPositionTile);
 
-        //
-        CarNavigationStrategy.carControllerActions nextState = null;
+        CarControllerStrategy.carControllerActions nextState = null;
 
         StrategyControllerRelay.getInstance().changeState(carController, nextState);
     }

@@ -70,7 +70,7 @@ public class AStarSearch {
                 addAdjacentNodes(currentNode);
             }
         }
-        return new ArrayList<Node>();
+        return new ArrayList<>();
     }
 
     private List<Node> getPath(Node currentNode) {

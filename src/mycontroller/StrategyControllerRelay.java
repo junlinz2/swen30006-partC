@@ -1,6 +1,7 @@
 package mycontroller;
 
-import mycontroller.strategies.CarNavigationStrategy;
+import mycontroller.strategies.CarControllerStrategy;
+import mycontroller.strategies.PathFindingStrategy;
 import world.WorldSpatial;
 
 /**
@@ -20,7 +21,7 @@ public class StrategyControllerRelay {
 		return instance;
 	}
 
-	public void changeState(MyAIController carController, CarNavigationStrategy.carControllerActions action) {
+	public void changeState(MyAIController carController, CarControllerStrategy.carControllerActions action) {
 		switch (action) {
 			case ACCELERATE:
 				if (carController.getSpeed() < carController.MAX_CAR_SPEED) {

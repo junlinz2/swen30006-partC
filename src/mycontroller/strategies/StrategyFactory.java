@@ -5,7 +5,7 @@ public class StrategyFactory {
 
     public StrategyFactory(MyAIController c) {
         // set the default behaviour of controller to follow left wall
-        CarNavigationStrategy initialStrategy = createCarStrategy(c, MyAIController.strategies.FOLLOWLEFTWALL);
+        CarControllerStrategy initialStrategy = createCarStrategy(c, MyAIController.strategies.FOLLOWLEFTWALL);
         c.setCarNavigationStrategy(initialStrategy);
     }
 
@@ -19,7 +19,7 @@ public class StrategyFactory {
     }
 
     // TODO : add the other strategies
-    public CarNavigationStrategy createCarStrategy(MyAIController c, MyAIController.strategies strategyName) {
+    public CarControllerStrategy createCarStrategy(MyAIController c, MyAIController.strategies strategyName) {
         switch (strategyName) {
             case FOLLOWLEFTWALL:
                 return new FollowLeftWallStrategy(c);
@@ -30,7 +30,7 @@ public class StrategyFactory {
             case GOTHROUGHLAVA:
                 return new GoThroughLavaStrategy(this, c);
             case FINDKEY:
-                return new FindKeyStrategy();
+                return new FindKeyStrategy(c);
             default:
                 return null;
         }
