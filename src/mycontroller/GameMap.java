@@ -79,9 +79,10 @@ public class GameMap {
 		}
 	}
 
-    public Coordinate getNextKeyCoordinate(int keyNum) {
+    public Coordinate getNextKeyCoordinate() {
+	     int nextKey = findingKeyOrder.remove(0);
 	     for (Map.Entry<Coordinate, HashMapTile> entry : updatedMap.entrySet()) {
-	         if (entry.getValue().getKeyValue() == keyNum) {
+	         if (entry.getValue().getKeyValue() == nextKey) {
 	             return entry.getKey();
              }
          }

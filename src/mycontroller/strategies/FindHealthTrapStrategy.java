@@ -7,9 +7,7 @@ import mycontroller.StrategyControllerRelay;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.World;
-import world.WorldSpatial;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,7 +26,8 @@ public class FindHealthTrapStrategy extends CarNavigationStrategy {
         nearestHealthNode = new Node(c.getLatestGameMap().getNearestHealthTile().x, c.getLatestGameMap().getNearestHealthTile().y,
                 c.getLatestGameMap().getUpdatedMap().get(new Coordinate(c.getLatestGameMap().getNearestHealthTile().x,
                         c.getLatestGameMap().getNearestHealthTile().y)).getTile());
-        aStar = new AStarSearch(World.MAP_WIDTH, World.MAP_HEIGHT, carCurrentPositionTile, nearestHealthNode, c.getLatestGameMap().getUpdatedMap());
+        aStar = new AStarSearch(World.MAP_WIDTH, World.MAP_HEIGHT, carCurrentPositionTile, nearestHealthNode,
+                c.getLatestGameMap().getUpdatedMap());
     }
 
     @Override
