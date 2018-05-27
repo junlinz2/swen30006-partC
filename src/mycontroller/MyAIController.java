@@ -141,6 +141,7 @@ public class MyAIController extends CarController {
         }
     }
 
+    // TODO: implement a tilesToAvoid modifier in order to implement goThroughLava
 
     /**
      * Note: Trying implementing moving away from wall if crashed Readjust the
@@ -356,15 +357,6 @@ public class MyAIController extends CarController {
     public ArrayList<MapTile> getTilesToAvoid() {
         return tilesToAvoid;
     }
-
-    //TODO Remove if unused
-//	public float getFloatX() {
-//		return getX();
-//	}
-//
-//	public float getFloatY() {
-//		return getY();
-//	}
 
     public void setJustChangedState(boolean justChangedState) {
         this.justChangedState = justChangedState;
