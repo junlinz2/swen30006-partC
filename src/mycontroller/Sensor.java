@@ -117,8 +117,6 @@ public class Sensor {
         return Integer.MAX_VALUE;
     }
 
-	// TODO: Explain code logic
-	// TODO: Implement fucking exception (probably won't have time for that)
 	public boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			WorldSpatial.RelativeDirection direction, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
 

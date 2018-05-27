@@ -18,12 +18,12 @@ import java.util.HashMap;
  */
 public class GoThroughLavaStrategy extends PathFindingStrategy {
 
-    private PathFindingStrategy followLeftWallStrategy;
-    private PathFindingStrategy followRightWallStrategy;
+    private PathFindingStrategy followLeftObstacleStrategy;
+    private PathFindingStrategy followRightObstacleStrategy;
 
     public GoThroughLavaStrategy(StrategyFactory s, MyAIController c) {
-        followLeftWallStrategy = (PathFindingStrategy) s.createCarStrategy(c, MyAIController.strategies.FOLLOWLEFTWALL);
-        followRightWallStrategy = (PathFindingStrategy) s.createCarStrategy(c, MyAIController.strategies.FOLLOWRIGHTWALL);
+        followLeftObstacleStrategy = (PathFindingStrategy) s.createCarStrategy(c, MyAIController.strategies.FOLLOWLEFTWALL);
+        followRightObstacleStrategy = (PathFindingStrategy) s.createCarStrategy(c, MyAIController.strategies.FOLLOWRIGHTWALL);
 
         tilesToAvoid = new ArrayList<>();
         tilesToAvoid.add(new LavaTrap());
