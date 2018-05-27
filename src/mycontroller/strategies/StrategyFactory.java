@@ -25,18 +25,18 @@ public class StrategyFactory {
 
 	// TODO : add the other strategies
 	// TODO: remove this if unused
-	public CarNavigationStrategy createCarStrategy(ArrayList<MapTile> tilesToAvoid, int tileFollowingSensitivity,
+	public CarNavigationStrategy createCarStrategy(int tileFollowingSensitivity,
 			int distToSlowDown, MyAIController.Strategies strategyName) throws StrategyNotFoundException {
 
 		CarNavigationStrategy newStrategy = null;
 		switch (strategyName) {
 		case FOLLOWLEFTWALL:
 			currentStrategyName = MyAIController.Strategies.FOLLOWLEFTWALL;
-			newStrategy = new FollowLeftWallStrategy(tilesToAvoid, tileFollowingSensitivity, distToSlowDown);
+			newStrategy = new FollowLeftWallStrategy(tileFollowingSensitivity, distToSlowDown);
 			break;
 		case FOLLOWRIGHTWALL:
 			currentStrategyName = MyAIController.Strategies.FOLLOWRIGHTWALL;
-			newStrategy = new FollowRightWallStrategy(tilesToAvoid, tileFollowingSensitivity, distToSlowDown);
+			newStrategy = new FollowRightWallStrategy(tileFollowingSensitivity, distToSlowDown);
 			break;
 		default:
 			break;
@@ -53,13 +53,13 @@ public class StrategyFactory {
 		
 		if (currentStrategyName == MyAIController.Strategies.FOLLOWLEFTWALL) {
 			currentStrategyName = MyAIController.Strategies.FOLLOWRIGHTWALL;
-			currentStrategy = new FollowRightWallStrategy(tilesToAvoid, tileFollowingSensitivity, distToSlowDown);
+			currentStrategy = new FollowRightWallStrategy(tileFollowingSensitivity, distToSlowDown);
 			return currentStrategy;
 		}
 
 		else if (currentStrategyName == MyAIController.Strategies.FOLLOWRIGHTWALL) {
 			currentStrategyName = MyAIController.Strategies.FOLLOWLEFTWALL;
-			currentStrategy = new FollowLeftWallStrategy(tilesToAvoid, tileFollowingSensitivity, distToSlowDown);
+			currentStrategy = new FollowLeftWallStrategy(tileFollowingSensitivity, distToSlowDown);
 			return currentStrategy;
 		}
 

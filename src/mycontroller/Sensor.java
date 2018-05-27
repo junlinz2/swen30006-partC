@@ -325,11 +325,7 @@ public class Sensor {
 
 		for (Map.Entry<Coordinate, MapTile> tileInView : viewInOrientation.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				System.out.println("============================");
-				System.out.println("TileInView: " + tileInView.getValue().getType());
-				System.out.println("Tile: "+ tile.getType());
 				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue())) {
-					System.out.println("ENTERS");
 					return tileInView.getKey();
 				}
 			}

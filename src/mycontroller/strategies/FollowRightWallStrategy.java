@@ -2,6 +2,7 @@ package mycontroller.strategies;
 
 import mycontroller.*;
 import mycontroller.strategies.CarNavigationStrategy.CarControllerActions;
+import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
@@ -11,8 +12,9 @@ import java.util.*;
 
 public class FollowRightWallStrategy extends CarNavigationStrategy {
 
-    public FollowRightWallStrategy(ArrayList<MapTile> tilesToAvoid, int tileFollowingSensitivity, int distToSlowDown) {
-        super(tilesToAvoid, tileFollowingSensitivity, distToSlowDown);
+    public FollowRightWallStrategy(int tileFollowingSensitivity, int distToSlowDown) {
+        super(tileFollowingSensitivity, distToSlowDown);
+		tilesToAvoid = new ArrayList<>(Arrays.asList(new MapTile(MapTile.Type.WALL), new LavaTrap()));
     }
 
     public void decideAction(HashMap<Coordinate, MapTile> currentView, MyAIController carController) {
@@ -22,7 +24,7 @@ public class FollowRightWallStrategy extends CarNavigationStrategy {
         // When the car just finishes turning and is searching for an obstacle ahead to switch strategy
 		if (carController.isTurningPointFound() && carController.justChangedState()) {
 			int distToObstacle = checkViewForTile(carController.getOrientation(), currentView,
-					carController.getCurrentPosition(), carController.getTilesToAvoid());
+					carController.getCurrentPosition(), tilesToAvoid);
 			// Turn right when an obstacle is ahead so that the obstacle will be on the left
 			// in order to use followLeftWallStrategy.
 			nextState = decideTurning(distToObstacle, WorldSpatial.RelativeDirection.RIGHT,
@@ -37,16 +39,16 @@ public class FollowRightWallStrategy extends CarNavigationStrategy {
      		
         // Try to determine whether or not the car is next to a wall.
 		else if (checkFollowingObstacle(carController.getOrientation(), currentView, carController.getCurrentPosition(),
-                carController.getTilesToAvoid())) {
+				tilesToAvoid)) {
          
 			if (carController.justChangedState()) {
                 carController.setJustChangedState(false);
             }
 			
 			int distToObstacle = checkViewForTile(carController.getOrientation(), currentView,
-					carController.getCurrentPosition(), carController.getTilesToAvoid());
+					carController.getCurrentPosition(), tilesToAvoid);
 			boolean followedTilesEndAhead = peekCorner(carController.getOrientation(), currentView,
-					carController.getCurrentPosition(), carController.getTilesToAvoid());
+					carController.getCurrentPosition(), tilesToAvoid);
 			// If there is wall ahead, turn left!
 			// Or slow down the car when it's going to turn soon
 			nextState = decideTurning(distToObstacle, WorldSpatial.RelativeDirection.LEFT,
@@ -65,14 +67,14 @@ public class FollowRightWallStrategy extends CarNavigationStrategy {
         else {
             // Turn right if the car is not turning into a deadend
             if (!isDeadEnd(carController.getOrientation(), currentView, carController.getCurrentPosition(),
-                    carController.getTilesToAvoid())) {
+            		tilesToAvoid)) {
                 nextState = CarControllerActions.ISTURNINGRIGHT;
             }
             
             // If it's a deadend, keep driving in the current orientation until the next turn
  			else {
  				int distToObstacle = checkViewForTile(carController.getOrientation(), currentView,
- 						carController.getCurrentPosition(), carController.getTilesToAvoid());
+ 						carController.getCurrentPosition(), tilesToAvoid);
  				nextState = decideTurning(distToObstacle, WorldSpatial.RelativeDirection.LEFT,
  						carController.DISTANCE_TO_TURN, carController.DISTANCE_TO_SLOW_DOWN);
  			}
@@ -117,7 +119,7 @@ public class FollowRightWallStrategy extends CarNavigationStrategy {
 	public boolean findTurningPointForNewStrategy(MyAIController carController, ArrayList<Coordinate> obstaclesToFollow,
 			WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition) {
 
-		Coordinate obstacleOnLeft = findTilesOnOtherSide(currentView, orientation, currentPosition);
+		Coordinate obstacleOnLeft = findTileOnOtherSide(currentView, orientation, currentPosition);
 
 		// TODO: If travelling too fast while turning results in following the wrong
 		// wall, implement SLOWDOWN before turning
@@ -130,7 +132,7 @@ public class FollowRightWallStrategy extends CarNavigationStrategy {
 	}
 
 	@Override
-	public Coordinate findTilesOnOtherSide(HashMap<Coordinate, MapTile> currentView, WorldSpatial.Direction orientation,
+	public Coordinate findTileOnOtherSide(HashMap<Coordinate, MapTile> currentView, WorldSpatial.Direction orientation,
 			Coordinate currentPosition) {
 		switch (orientation) {
 		case NORTH:
@@ -149,4 +151,5 @@ public class FollowRightWallStrategy extends CarNavigationStrategy {
 			return null;
 		}
 	}
+
 }

@@ -24,7 +24,6 @@ public class MyAIController extends CarController {
 	// Keeps track of the previous state
 	private WorldSpatial.Direction previousState = null;
 	private boolean justChangedState = false;
-	private ArrayList<MapTile> tilesToAvoid = new ArrayList<>();
 	private GameMap latestGameMap;
 
 	// Car Speed to move at
@@ -47,6 +46,7 @@ public class MyAIController extends CarController {
 	private StrategyFactory strategyFactory;
 	private boolean justFoundSwitchingPoint = false;
 	private boolean turningPointFound = false;
+	private boolean testFlag = false;
 
 	public enum Strategies {
 		FOLLOWLEFTWALL, FOLLOWRIGHTWALL, GOTHROUGHLAVA, HEALING
@@ -54,14 +54,12 @@ public class MyAIController extends CarController {
 
 	public MyAIController(Car car) throws StrategyNotFoundException {
 		super(car);
-		tilesToAvoid.add(new MapTile(MapTile.Type.WALL));
-		tilesToAvoid.add(new LavaTrap());
 		setLatestGameMap(new GameMap(getMap()));
 
 		// TODO (Junlin) - check implementations as I have created a factory here.
 		/** default to following left wall when simulation starts **/
 		strategyFactory = new StrategyFactory();
-		carNavigationStrategy = strategyFactory.createCarStrategy(tilesToAvoid, TILE_FOLLOWING_SENSITIVITY,
+		carNavigationStrategy = strategyFactory.createCarStrategy(TILE_FOLLOWING_SENSITIVITY,
 				DISTANCE_TO_SLOW_DOWN, Strategies.FOLLOWLEFTWALL);
 	}
 
@@ -86,7 +84,7 @@ public class MyAIController extends CarController {
 			}
 
 			int distToObstacleAhead = carNavigationStrategy.checkViewForTile(WorldSpatial.Direction.NORTH, currentView,
-					currentPosition, tilesToAvoid);
+					currentPosition, carNavigationStrategy.getTilesToAvoid());
 
 			if (distToObstacleAhead <= DISTANCE_TO_SLOW_DOWN && distToObstacleAhead > DISTANCE_TO_TURN) {
 				if (getSpeed() > MAX_TURNING_SPEED)
@@ -123,16 +121,16 @@ public class MyAIController extends CarController {
 
 			else {
 				if (carNavigationStrategy.changeStrategyNow()) {
-					carNavigationStrategy = strategyFactory.changeCarStrategy(tilesToAvoid, TILE_FOLLOWING_SENSITIVITY,
+					carNavigationStrategy = strategyFactory.changeCarStrategy(carNavigationStrategy.getTilesToAvoid(), TILE_FOLLOWING_SENSITIVITY,
 							DISTANCE_TO_SLOW_DOWN);
 				}
 
 				strategyFactory.registerTilesToFollow(currentView, getOrientation(), currentPosition);
 				strategyFactory.deregisterFollowedObstacles(currentView, getOrientation(), currentPosition,
-						tilesToAvoid);
+						carNavigationStrategy.getTilesToAvoid());
 
 				Coordinate currentFollowingObstacle = carNavigationStrategy.getFollowingObstacle(currentView,
-						getOrientation(), currentPosition, tilesToAvoid);
+						getOrientation(), currentPosition, carNavigationStrategy.getTilesToAvoid());
 
 				if (currentFollowingObstacle != null && strategyFactory.getSwitchingPoint() == null) {
 					strategyFactory.setSwitchingPoint(currentFollowingObstacle);
@@ -145,15 +143,23 @@ public class MyAIController extends CarController {
 				}
 
 				// TODO: Remove debug
+				if(getCurrentPosition().equals(new Coordinate(5,18)))
+				{
+					System.out.println("===============");
+				}
+				
+				
 
 				if (!justFoundSwitchingPoint && !turningPointFound && currentFollowingObstacle != null
 						&& currentFollowingObstacle.equals(strategyFactory.getSwitchingPoint())) {
-					System.out.println("testing------------------------------------------------------------");
+					testFlag = true;
+				}
+				
+				if(testFlag){
 					// If turningPointFound is true, isTurningLeft/isTurningRight becomes true
 					turningPointFound = carNavigationStrategy.findTurningPointForNewStrategy(this,
 							strategyFactory.getObstaclesToFollow(), getOrientation(), currentView, currentPosition);
 					if (turningPointFound) {
-						System.out.println("turningPOinttrue------------------------------------------------------------");
 						return;
 					}
 				}
@@ -372,10 +378,6 @@ public class MyAIController extends CarController {
 		return new Coordinate(getPosition());
 	}
 
-	public ArrayList<MapTile> getTilesToAvoid() {
-		return tilesToAvoid;
-	}
-
 	// TODO Remove if unused
 	// public float getFloatX() {
 	// return getX();
@@ -407,5 +409,9 @@ public class MyAIController extends CarController {
 
 	public void setTurningPointFound(boolean turningPointFound) {
 		this.turningPointFound = turningPointFound;
+	}
+	
+	public void setTestFlag(boolean flag){
+		this.testFlag = flag;
 	}
 }

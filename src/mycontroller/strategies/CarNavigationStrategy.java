@@ -1,10 +1,8 @@
 package mycontroller.strategies;
 
-import mycontroller.GameMap;
 import mycontroller.MyAIController;
 import mycontroller.Sensor;
 import mycontroller.TilesChecker;
-import mycontroller.strategies.CarNavigationStrategy.CarControllerActions;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
@@ -24,9 +22,8 @@ public abstract class CarNavigationStrategy {
 	protected ArrayList<MapTile> tilesToAvoid;
 	protected boolean changeStrategyNow = false;
 
-	public CarNavigationStrategy(ArrayList<MapTile> tilesToAvoid, int tileFollowingSensitivity, int distToSlowDown ) {
+	public CarNavigationStrategy(int tileFollowingSensitivity, int distToSlowDown ) {
 		sensor = new Sensor(tileFollowingSensitivity, distToSlowDown);
-		this.tilesToAvoid = tilesToAvoid;
 	} 
 	
 	public abstract void decideAction(HashMap<Coordinate, MapTile> currentView, MyAIController carController);
@@ -167,4 +164,9 @@ public abstract class CarNavigationStrategy {
 
 	public abstract Coordinate findTileOnOtherSide(HashMap<Coordinate, MapTile> currentView, Direction orientation,
 			Coordinate currentPosition);
+	
+	public ArrayList<MapTile> getTilesToAvoid() {
+		return tilesToAvoid;
+	}
+
 }
