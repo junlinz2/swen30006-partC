@@ -13,8 +13,8 @@ import java.util.HashMap;
 public abstract class PathFindingStrategy implements CarControllerStrategy {
 
     // Different strategies manipulate the behaviour of the sensor, so we need a reference to it
-    protected Sensor sensor;
     protected ArrayList<MapTile> tilesToAvoid;
+    protected Sensor sensor;
 
     public int checkViewForTile(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
                                 Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
@@ -23,4 +23,8 @@ public abstract class PathFindingStrategy implements CarControllerStrategy {
 
     public abstract boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
                                       Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid);
+
+    public ArrayList<MapTile> getTilesToAvoid() {
+        return tilesToAvoid;
+    }
 }

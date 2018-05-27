@@ -1,16 +1,19 @@
 package mycontroller.strategies;
 
 import mycontroller.*;
+import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
 import java.util.*;
 
-public class FollowRightWallStrategy extends PathFindingStrategy {
+public class FollowRightObstacleStrategy extends PathFindingStrategy {
 
-    public FollowRightWallStrategy(MyAIController c) {
+    public FollowRightObstacleStrategy(MyAIController c) {
         sensor = new Sensor(c.OBSTACLE_FOLLOWING_SENSITIVITY, c.DISTANCE_TO_SLOW_DOWN);
-        this.tilesToAvoid = c.getTilesToAvoid();
+        super.tilesToAvoid = new ArrayList<>();
+        tilesToAvoid.add(new MapTile(MapTile.Type.WALL));
+        tilesToAvoid.add(new LavaTrap());
     }
 
     public void decideAction(MyAIController carController) {
@@ -19,13 +22,13 @@ public class FollowRightWallStrategy extends PathFindingStrategy {
 
         // Try to determine whether or not the car is next to a wall.
         if (checkFollowingObstacle(carController.getOrientation(), carController.getView(), carController.getCurrentPosition(),
-                carController.getTilesToAvoid())) {
+                tilesToAvoid)) {
             if (carController.justChangedState()) {
                 carController.setJustChangedState(false);
             }
 
             int distToObstacle = checkViewForTile(carController.getOrientation(), carController.getView(),
-                    carController.getCurrentPosition(), carController.getTilesToAvoid());
+                    carController.getCurrentPosition(), tilesToAvoid);
 
             // If there is wall ahead, turn right!
             if (distToObstacle <= carController.DISTANCE_TO_TURN) {
@@ -34,7 +37,7 @@ public class FollowRightWallStrategy extends PathFindingStrategy {
 
             // Slow down the car when it's going to turn soon
             else if (distToObstacle <= sensor.getDistToSlowDown() || peekCorner(carController.getOrientation(),
-                    carController.getView(), carController.getCurrentPosition(), carController.getTilesToAvoid())) {
+                    carController.getView(), carController.getCurrentPosition(), tilesToAvoid)) {
                 nextState = carControllerActions.SLOWDOWN;
             }
 
@@ -55,7 +58,7 @@ public class FollowRightWallStrategy extends PathFindingStrategy {
         else {
             // Turn left if the car is not turning into a deadend
             if (!isDeadEnd(carController.getOrientation(), carController.getView(), carController.getCurrentPosition(),
-                    carController.getTilesToAvoid())) {
+                    tilesToAvoid)) {
                 nextState = carControllerActions.ISTURNINGRIGHT;
             }
 
@@ -63,7 +66,7 @@ public class FollowRightWallStrategy extends PathFindingStrategy {
             // turn
             else {
                 int distToObstacle = checkViewForTile(carController.getOrientation(), carController.getView(),
-                        carController.getCurrentPosition(), carController.getTilesToAvoid());
+                        carController.getCurrentPosition(), tilesToAvoid);
 
                 if (distToObstacle <= carController.DISTANCE_TO_TURN) {
                     nextState = carControllerActions.ISTURNINGLEFT;

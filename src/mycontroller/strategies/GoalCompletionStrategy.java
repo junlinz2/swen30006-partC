@@ -1,18 +1,21 @@
 package mycontroller.strategies;
 
-import mycontroller.AStarSearch;
+import mycontroller.AStarSearch.AStarSearch;
 import mycontroller.HashMapTile;
 import mycontroller.MyAIController;
-import mycontroller.Node;
+import mycontroller.AStarSearch.Node;
+import tiles.MapTile;
 import utilities.Coordinate;
 import world.World;
 import world.WorldSpatial;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public abstract class GoalCompletionStrategy implements CarControllerStrategy {
 
+    protected ArrayList<MapTile> tilesToAvoid;
     protected Node carCurrentNode;
     protected WorldSpatial.Direction currentOrientation;
     protected List<Node> path;
@@ -27,7 +30,8 @@ public abstract class GoalCompletionStrategy implements CarControllerStrategy {
         int carX = carController.getCurrentPosition().x;
         int carY = carController.getCurrentPosition().y;
         carCurrentNode = new Node(carX, carY, updateMap.get(new Coordinate(carX, carY)).getTile());
-        AStarSearch aStar = new AStarSearch(World.MAP_WIDTH, World.MAP_HEIGHT, carCurrentNode, targetNode, updateMap);
+        AStarSearch aStar = new AStarSearch(World.MAP_WIDTH, World.MAP_HEIGHT, carCurrentNode, targetNode, updateMap,
+                tilesToAvoid);
         path = aStar.findPath();
     }
 
@@ -98,5 +102,54 @@ public abstract class GoalCompletionStrategy implements CarControllerStrategy {
                 }
         }
         return null;
+    }
+
+    public ArrayList<MapTile> getTilesToAvoid() {
+        return tilesToAvoid;
+    }
+
+    public carControllerActions determineState(MyAIController carController) {
+        carControllerActions nextState;
+        int distUntilTurn = getDistUntilNextTurn(carController.DISTANCE_TO_SLOW_DOWN);
+
+        // If the car is to immediately turn, decide which way to turn
+        if (movement.get(0) == Movement.LEFT || movement.get(0) == Movement.RIGHT) {
+            Movement nextMovement = movement.remove(0);
+            switch (nextMovement) {
+                case LEFT:
+                    nextState = carControllerActions.ISTURNINGLEFT;
+                    break;
+                case RIGHT:
+                    nextState = carControllerActions.ISTURNINGRIGHT;
+                    break;
+                default:
+                    nextState = carControllerActions.ACCELERATE;
+            }
+        }
+        //Prepare the car to turn
+        else if (distUntilTurn <= carController.DISTANCE_TO_SLOW_DOWN) {
+            nextState = carControllerActions.SLOWDOWN;
+        }
+
+        else {
+            nextState = carControllerActions.ACCELERATE;
+        }
+        return nextState;
+    }
+
+    public int getDistUntilNextTurn(int distToSlowDown) {
+        int i;
+        for (i = 0; i < movement.size(); i++) {
+            int j = i+1;
+            if (j < movement.size()) {
+                if (j > distToSlowDown) {
+                    return distToSlowDown;
+                }
+                else if ((movement.get(j) == Movement.LEFT || movement.get(j) == Movement.RIGHT)) {
+                    return j;
+                }
+            }
+        }
+        return i;
     }
 }

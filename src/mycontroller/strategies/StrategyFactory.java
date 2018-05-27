@@ -9,7 +9,8 @@ public class StrategyFactory {
         c.setCarNavigationStrategy(initialStrategy);
     }
 
-    public void decideStrategy(MyAIController controller, float delta) {
+    // TODO : fill this in
+    public void decideStrategy(MyAIController controller) {
         if (controller.getLatestGameMap().getNearestHealthTile() != null && controller.getHealth() < controller.HEALING_THRESHOLD) {
             controller.setCarNavigationStrategy(createCarStrategy(controller, MyAIController.strategies.HEALING));
         }
@@ -19,9 +20,9 @@ public class StrategyFactory {
     public CarControllerStrategy createCarStrategy(MyAIController c, MyAIController.strategies strategyName) {
         switch (strategyName) {
             case FOLLOWLEFTWALL:
-                return new FollowLeftWallStrategy(c);
+                return new FollowLeftObstacleStrategy(c);
             case FOLLOWRIGHTWALL:
-                return new FollowRightWallStrategy(c);
+                return new FollowRightObstacleStrategy(c);
             case HEALING:
                 return new FindHealthTrapStrategy(c);
             case GOTHROUGHLAVA:

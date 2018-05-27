@@ -1,6 +1,8 @@
 package mycontroller.strategies;
 
 import mycontroller.MyAIController;
+import mycontroller.StrategyControllerRelay;
+import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
@@ -20,12 +22,19 @@ public class GoThroughLavaStrategy extends PathFindingStrategy {
     private PathFindingStrategy followRightWallStrategy;
 
     public GoThroughLavaStrategy(StrategyFactory s, MyAIController c) {
-        //followLeftWallStrategy = s.createCarStrategy(c, MyAIController.strategies.FOLLOWLEFTWALL);
-        //followRightWallStrategy = s.createCarStrategy(c, MyAIController.strategies.FOLLOWRIGHTWALL);
+        followLeftWallStrategy = (PathFindingStrategy) s.createCarStrategy(c, MyAIController.strategies.FOLLOWLEFTWALL);
+        followRightWallStrategy = (PathFindingStrategy) s.createCarStrategy(c, MyAIController.strategies.FOLLOWRIGHTWALL);
+
+        tilesToAvoid = new ArrayList<>();
+        tilesToAvoid.add(new LavaTrap());
     }
 
     public void decideAction(MyAIController carController) {
 
+        CarControllerStrategy.carControllerActions nextState = null;
+
+        // New action is relayed by the StrategyControllerRelay singleton to MyAIController
+        StrategyControllerRelay.getInstance().changeState(carController, nextState);
     }
 
     @Override

@@ -23,7 +23,6 @@ public class MyAIController extends CarController {
 	// Keeps track of the previous state
 	private WorldSpatial.Direction previousState = null; 
 	private boolean justChangedState = false;
-	private ArrayList<MapTile> tilesToAvoid = new ArrayList<>();
 	private GameMap latestGameMap;
 
 	// Car Speed to move at
@@ -52,16 +51,7 @@ public class MyAIController extends CarController {
 
     private StrategyFactory strategyFactory;
 
-    public void setPreviousHealth(float previousHealth) {
-        this.previousHealth = previousHealth;
-    }
-
     public enum strategies {FOLLOWLEFTWALL, FOLLOWRIGHTWALL, GOTHROUGHLAVA, HEALING, FINDKEY}
-
-    //TODO TEST ASTAR
-    private Node initialNode;
-    private Node finalNode;
-    private AStarSearch aStar;
 
     public GameMap getLatestGameMap() {
         return latestGameMap;
@@ -69,8 +59,6 @@ public class MyAIController extends CarController {
 
     public MyAIController(Car car) {
 		super(car);
-		tilesToAvoid.add(new MapTile(MapTile.Type.WALL));
-		tilesToAvoid.add(new LavaTrap());
 		latestGameMap = new GameMap(getMap(), getKey()-1);
 
 		/** default to following left wall when simulation starts **/
@@ -106,7 +94,7 @@ public class MyAIController extends CarController {
 
             int distToObstacleAhead = ((PathFindingStrategy) carNavigationStrategy).
                     checkViewForTile(WorldSpatial.Direction.NORTH, currentView,
-                    currentPosition, tilesToAvoid);
+                    currentPosition, ((PathFindingStrategy) carNavigationStrategy).getTilesToAvoid());
 
             if (distToObstacleAhead <= DISTANCE_TO_SLOW_DOWN && distToObstacleAhead > DISTANCE_TO_TURN) {
                 if (getSpeed() > MAX_TURNING_SPEED)
@@ -126,7 +114,7 @@ public class MyAIController extends CarController {
 
         // Once the car is already stuck to a wall, apply the following logic
         else {
-            strategyFactory.decideStrategy(this, delta);
+            strategyFactory.decideStrategy(this);
             // Readjust the car if it is misaligned.
             readjust(getLastTurnDirection(), delta);
 
@@ -219,7 +207,6 @@ public class MyAIController extends CarController {
             default:
                 break;
         }
-
     }
 
     /**
@@ -352,10 +339,6 @@ public class MyAIController extends CarController {
 
     private Coordinate updateCoordinate() {
         return new Coordinate(getPosition());
-    }
-
-    public ArrayList<MapTile> getTilesToAvoid() {
-        return tilesToAvoid;
     }
 
     public void setJustChangedState(boolean justChangedState) {

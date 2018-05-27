@@ -1,5 +1,4 @@
-package mycontroller;
-
+package mycontroller.AStarSearch;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -8,8 +7,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import mycontroller.HashMapTile;
-import mycontroller.Node;
 import utilities.Coordinate;
+import tiles.MapTile;
 
 /**
  * Node for A* Algorithm
@@ -27,8 +26,10 @@ public class AStarSearch {
     private Node initialNode;
     private Node finalNode;
     private HashMap<Coordinate, HashMapTile> map;
+    private ArrayList<MapTile> tilesToAvoid;
 
-    public AStarSearch(int rows, int cols, Node initialNode, Node finalNode, int hvCost, HashMap<Coordinate, HashMapTile> map) {
+    public AStarSearch(int rows, int cols, Node initialNode, Node finalNode, int hvCost,
+                       HashMap<Coordinate, HashMapTile> map, ArrayList<MapTile> tilesToAvoid) {
         this.hvCost = hvCost;
         this.map = map;
         setInitialNode(initialNode);
@@ -41,11 +42,13 @@ public class AStarSearch {
             }
         });
         setNodes();
-        this.closedList = new ArrayList<Node>();
+        this.closedList = new ArrayList<>();
+        this.tilesToAvoid = tilesToAvoid;
     }
 
-    public AStarSearch(int rows, int cols, Node initialNode, Node finalNode, HashMap<Coordinate, HashMapTile> map) {
-    	this(rows, cols, initialNode, finalNode, DEFAULT_HV_COST, map);
+    public AStarSearch(int rows, int cols, Node initialNode, Node finalNode, HashMap<Coordinate, HashMapTile> map,
+                       ArrayList<MapTile> tilesToAvoid) {
+    	this(rows, cols, initialNode, finalNode, DEFAULT_HV_COST, map, tilesToAvoid);
     }
 
     private void setNodes() {
@@ -134,7 +137,7 @@ public class AStarSearch {
 
     private void checkNode(Node currentNode, int col, int row, int cost) {
         Node adjacentNode = getSearchArea()[row][col];
-        if (!adjacentNode.isBlock() && !getClosedList().contains(adjacentNode)) {
+        if (!adjacentNode.isTileToAvoid(tilesToAvoid) && !getClosedList().contains(adjacentNode)) {
             if (!getOpenList().contains(adjacentNode)) {
             	//TODO Set new cost
                 adjacentNode.setNodeData(currentNode, cost);

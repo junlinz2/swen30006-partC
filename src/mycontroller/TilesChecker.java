@@ -103,9 +103,7 @@ public class TilesChecker {
 		}
 	}
 
-	public static boolean checkForWallTile(MapTile tile) {
-		return tile.getType() == Type.WALL;
+	public static boolean checkForTileToAvoid(MapTile tile1, MapTile tile2) {
+		return checkTileTypeSame(tile1, tile2);
 	}
-
-
 }

@@ -1,6 +1,9 @@
 package mycontroller.strategies;
 
 import mycontroller.MyAIController;
+import tiles.MapTile;
+
+import java.util.ArrayList;
 
 /**
  * Group 39

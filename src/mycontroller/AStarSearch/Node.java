@@ -1,6 +1,9 @@
-package mycontroller;
+package mycontroller.AStarSearch;
 
+import mycontroller.TilesChecker;
 import tiles.MapTile;
+
+import java.util.ArrayList;
 
 /**
  * Node for A* Algorithm
@@ -92,8 +95,13 @@ public class Node {
         this.parent = parent;
     }
 
-    public boolean isBlock() {
-        return TilesChecker.checkForWallTile(this.tile);
+    public boolean isTileToAvoid(ArrayList<MapTile> tilesToAvoid) {
+        for (MapTile tileToAvoid : tilesToAvoid) {
+            if (TilesChecker.checkForTileToAvoid(tileToAvoid, this.tile)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getX() {
