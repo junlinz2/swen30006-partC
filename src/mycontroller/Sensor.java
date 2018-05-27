@@ -89,21 +89,7 @@ public class Sensor {
 	 */
 	public int checkDistToObstacleAhead(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
-		LinkedHashMap<Coordinate, MapTile> view = null;
-		switch (orientation) {
-		case EAST:
-			view = getEastView(currentView, currentPosition);
-			break;
-		case NORTH:
-			view = getNorthView(currentView, currentPosition);
-			break;
-		case SOUTH:
-			view = getSouthView(currentView, currentPosition);
-			break;
-		case WEST:
-			view = getWestView(currentView, currentPosition);
-			break;
-		}
+		LinkedHashMap<Coordinate, MapTile> view = getOrientationView(orientation, currentView, currentPosition);
 
 		int i = 1;
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
@@ -111,9 +97,9 @@ public class Sensor {
 				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()))
 					return i;
 			}
-
 			i++;
 		}
+
 		return Integer.MAX_VALUE;
 	}
 
@@ -291,8 +277,7 @@ public class Sensor {
 		int i = 1;
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue())
-						&& i <= getTileFollowingSensitivity())
+				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()) && i <= getTileFollowingSensitivity())
 					return true;
 			}
 			i++;
@@ -306,22 +291,8 @@ public class Sensor {
 
 	public Coordinate findClosestObstacleInOrientation(WorldSpatial.Direction orientation,
 			HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
-		LinkedHashMap<Coordinate, MapTile> viewInOrientation = null;
-
-		switch (orientation) {
-		case NORTH:
-			viewInOrientation = getNorthView(currentView, currentPosition);
-			break;
-		case SOUTH:
-			viewInOrientation = getSouthView(currentView, currentPosition);
-			break;
-		case EAST:
-			viewInOrientation = getEastView(currentView, currentPosition);
-			break;
-		case WEST:
-			viewInOrientation = getWestView(currentView, currentPosition);
-			break;
-		}
+		LinkedHashMap<Coordinate, MapTile> viewInOrientation = getOrientationView(orientation, currentView,
+				currentPosition);
 
 		for (Map.Entry<Coordinate, MapTile> tileInView : viewInOrientation.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
@@ -330,8 +301,24 @@ public class Sensor {
 				}
 			}
 		}
-		
+
 		return null;
+	}
+
+	public LinkedHashMap<Coordinate, MapTile> getOrientationView(WorldSpatial.Direction orientation,
+			HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition) {
+		switch (orientation) {
+		case NORTH:
+			return getNorthView(currentView, currentPosition);
+		case SOUTH:
+			return getSouthView(currentView, currentPosition);
+		case EAST:
+			return getEastView(currentView, currentPosition);
+		case WEST:
+			return getWestView(currentView, currentPosition);
+		default:
+			return null;
+		}
 	}
 
 	public int getTileFollowingSensitivity() {
@@ -341,7 +328,7 @@ public class Sensor {
 	public void setTileFollowingSensitivity(int tileFollowingSensitivity) {
 		this.tileFollowingSensitivity = tileFollowingSensitivity;
 	}
-	
+
 	public int getDistToSlowDown() {
 		return distToSlowDown;
 	}

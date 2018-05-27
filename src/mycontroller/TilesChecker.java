@@ -92,4 +92,34 @@ public class TilesChecker {
 			return false;
 		}
 	}
+	
+	public static boolean checkTileTraversable(MapTile tile, ArrayList<MapTile> tilesToAvoid) {
+		Type tileType = tile.getType();
+		for (MapTile tileToAvoid : tilesToAvoid) {
+			Type tileToAvoidType = tileToAvoid.getType();
+			//Check if tile and tileToAvoid are of same type/trap
+			if (tileType.equals(tileToAvoidType)) {
+				if (tileType.equals(Type.TRAP)) {
+					String tileTrap = ((TrapTile) tile).getTrap();
+					String tileToAvoidTrap = ((TrapTile) tileToAvoid).getTrap();
+					//If tileTrap and tileToAvoidTrap not equal, continue with the next if-block
+					if (tileTrap.equals(tileToAvoidTrap)) {
+						return false;
+					} 
+				} else {
+					return false;
+				}
+			}
+		}
+		
+		//Check if tile is one of the drivable types
+		if (drivableTileTypes.contains(tileType)) {
+			if (tileType.equals(Type.TRAP)) {
+				return drivableTraps.contains(((TrapTile) tile).getTrap());
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

@@ -21,9 +21,11 @@ public abstract class CarNavigationStrategy {
 	protected Sensor sensor;
 	protected ArrayList<MapTile> tilesToAvoid;
 	protected boolean changeStrategyNow = false;
+	public final int DISTANCE_TO_CHECK_FOR_TURNING_POINT = 1;
 
-	public CarNavigationStrategy(int tileFollowingSensitivity, int distToSlowDown ) {
+	public CarNavigationStrategy(ArrayList<MapTile> tilesToAvoid, int tileFollowingSensitivity, int distToSlowDown ) {
 		sensor = new Sensor(tileFollowingSensitivity, distToSlowDown);
+		this.tilesToAvoid = tilesToAvoid;
 	} 
 	
 	public abstract void decideAction(HashMap<Coordinate, MapTile> currentView, MyAIController carController);
@@ -133,14 +135,14 @@ public abstract class CarNavigationStrategy {
 			HashMap<Coordinate, MapTile> currentView, WorldSpatial.Direction orientation, Coordinate currentPosition);
 
 	public Coordinate getFollowingObstacle(HashMap<Coordinate, MapTile> currentView, Direction orientation,
-			Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+			Coordinate currentPosition) {
 		
 		LinkedHashMap<Coordinate, MapTile> viewInFollowingDirection = getOrientationViewInFollowingDirection(
 				currentView, orientation, currentPosition);
 
 		int i = 1;
 		for (Map.Entry<Coordinate, MapTile> tileInView : viewInFollowingDirection.entrySet()) {
-			for (MapTile tile : tilesToCheck) {
+			for (MapTile tile : tilesToAvoid) {
 				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue())
 						&& i <= sensor.getTileFollowingSensitivity())
 					return tileInView.getKey();
@@ -155,7 +157,7 @@ public abstract class CarNavigationStrategy {
 		return null;
 	}
 
-	public abstract boolean findTurningPointForNewStrategy(MyAIController carController, ArrayList<Coordinate> obstaclesToFollow,
+	public abstract CarControllerActions findTurningPointForNewStrategy(MyAIController carController, ArrayList<Coordinate> obstaclesToFollow,
 			WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition);
 	
 	public boolean changeStrategyNow() {
@@ -164,9 +166,4 @@ public abstract class CarNavigationStrategy {
 
 	public abstract Coordinate findTileOnOtherSide(HashMap<Coordinate, MapTile> currentView, Direction orientation,
 			Coordinate currentPosition);
-	
-	public ArrayList<MapTile> getTilesToAvoid() {
-		return tilesToAvoid;
-	}
-
 }
