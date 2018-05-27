@@ -6,6 +6,7 @@ import controller.CarController;
 import mycontroller.exceptions.StrategyNotFoundException;
 import mycontroller.strategies.CarNavigationStrategy;
 import mycontroller.strategies.CarNavigationStrategy.CarControllerActions;
+import mycontroller.strategies.PathFindingStrategy;
 import mycontroller.strategies.StrategyFactory;
 import tiles.LavaTrap;
 import tiles.MapTile;
@@ -25,13 +26,11 @@ public class MyAIController extends CarController {
 	// Keeps track of the previous state
 	private WorldSpatial.Direction previousState = null;
 	private boolean justChangedState = false;
-	private ArrayList<MapTile> tilesToAvoid = new ArrayList<>();
 	private GameMap latestGameMap;
 
 	// Car Speed to move at
 	public final float MAX_CAR_SPEED = 3;
 	public final float MAX_TURNING_SPEED = 1.4f;
-	// public final float MIN_CAR_SPEED = 1f;
 
 	public final float MIN_ROTATING_SPEED = 0.5f;
 	public final float MIN_CORNER_SPEED = 1.15f;
@@ -52,11 +51,9 @@ public class MyAIController extends CarController {
 		FOLLOWLEFTWALL, FOLLOWRIGHTWALL, GOTHROUGHLAVA, HEALING
 	}
 
-	public MyAIController(Car car) throws StrategyNotFoundException {
+	public MyAIController(Car car){
 		super(car);
-		tilesToAvoid.add(new MapTile(MapTile.Type.WALL));
-		tilesToAvoid.add(new LavaTrap());
-		setLatestGameMap(new GameMap(getMap()));
+		latestGameMap = new GameMap(getMap(), getKey()-1);
 
 		// TODO (Junlin) - check implementations as I have created a factory here.
 		/** default to following left wall when simulation starts **/
@@ -84,9 +81,11 @@ public class MyAIController extends CarController {
 				setLastTurnDirection(WorldSpatial.RelativeDirection.LEFT);
 				applyLeftTurn(getOrientation(), delta);
 			}
+			
+			int distToObstacleAhead = ((PathFindingStrategy) carNavigationStrategy).
+            checkViewForTile(WorldSpatial.Direction.NORTH, currentView,
+            currentPosition, ((PathFindingStrategy) carNavigationStrategy).getTilesToAvoid());
 
-			int distToObstacleAhead = carNavigationStrategy.checkViewForTile(WorldSpatial.Direction.NORTH, currentView,
-					currentPosition, tilesToAvoid);
 
 			if (distToObstacleAhead <= DISTANCE_TO_SLOW_DOWN && distToObstacleAhead > DISTANCE_TO_TURN) {
 				if (getSpeed() > MAX_TURNING_SPEED)

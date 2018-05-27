@@ -1,5 +1,5 @@
-package mycontroller.strategies;
 
+package mycontroller.strategies;
 import mycontroller.MyAIController;
 import mycontroller.Sensor;
 import mycontroller.TilesChecker;
@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 //TODO document this
-public abstract class CarNavigationStrategy {
+public abstract class PathFindingStrategy implements CarControllerStrategy {
 
 	// Different strategies manipulate the behaviour of the sensor, so we need a
 	// reference to it
@@ -23,27 +23,13 @@ public abstract class CarNavigationStrategy {
 	protected boolean changeStrategyNow = false;
 	public final int DISTANCE_TO_CHECK_FOR_TURNING_POINT = 1;
 
-	public CarNavigationStrategy(ArrayList<MapTile> tilesToAvoid, int tileFollowingSensitivity, int distToSlowDown ) {
-		sensor = new Sensor(tileFollowingSensitivity, distToSlowDown);
-		this.tilesToAvoid = tilesToAvoid;
-	} 
 	
-	public abstract void decideAction(HashMap<Coordinate, MapTile> currentView, MyAIController carController);
+	public abstract void decideAction(MyAIController carController);
 
-	/**
-	 * Adjusts the speed of the car before a turning event occurs and decides when
-	 * the car should turn to avoid obstacle
-	 * 
-	 * @param distToObstacle
-	 * @param The
-	 *            relativeDirection the car takes when there is an obstacle ahead
-	 * @param maxDistToTurn
-	 * @param maxDistToSlowDown
-	 * @param is
-	 *            the followed tiles ending ahead? (Note: the car won't take the
-	 *            turningDirection if this is true)
-	 * @return
-	 */
+	public enum CarControllerActions {
+		ACCELERATE, SLOWDOWN, ISTURNINGLEFT, ISTURNINGRIGHT, REVERSE, DONOTHING
+	}
+
 	public static CarControllerActions decideTurning(int distToObstacle,
 			WorldSpatial.RelativeDirection turningDirection, int maxDistToTurn, int maxDistToSlowDown,
 			boolean followedTilesEndAhead) {
@@ -67,12 +53,13 @@ public abstract class CarNavigationStrategy {
 	}
 
 	/**
-	 * Adjusts the speed of the car before a turning event occurs and decides when
-	 * the car should turn to avoid obstacle
+	 * Adjusts the speed of the car before a turning event occurs and decides
+	 * when the car should turn to avoid obstacle
 	 * 
 	 * @param distToObstacle
 	 * @param The
-	 *            relativeDirection the car takes when there is an obstacle ahead
+	 *            relativeDirection the car takes when there is an obstacle
+	 *            ahead
 	 * @param maxDistToTurn
 	 * @param maxDistToSlowDown
 	 * @return
@@ -106,27 +93,9 @@ public abstract class CarNavigationStrategy {
 		return sensor.checkDistToObstacleAhead(orientation, currentView, currentPosition, tilesToCheck);
 	}
 
-	public enum CarControllerActions {
-		ACCELERATE, SLOWDOWN, ISTURNINGLEFT, ISTURNINGRIGHT, REVERSE, DONOTHING
-	}
 
 	public abstract boolean peekCorner(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			Coordinate currentPosition, ArrayList<MapTile> tilesToCheck);
-
-	// TODO: Remove this if not used
-	public boolean checkTileAccuracy(WorldSpatial.Direction orientation, Coordinate coordinate, float x, float y) {
-		switch (orientation) {
-		case WEST:
-			return (x - coordinate.x) < 0.475;
-		case EAST:
-			return (x - coordinate.x) > -0.55;
-		case NORTH:
-			return (y - coordinate.y) > -0.475;
-		case SOUTH:
-			return (y - coordinate.y) < 0.7;
-		}
-		return false;
-	}
 
 	public abstract boolean isDeadEnd(WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView,
 			Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid);
@@ -136,7 +105,7 @@ public abstract class CarNavigationStrategy {
 
 	public Coordinate getFollowingObstacle(HashMap<Coordinate, MapTile> currentView, Direction orientation,
 			Coordinate currentPosition) {
-		
+
 		LinkedHashMap<Coordinate, MapTile> viewInFollowingDirection = getOrientationViewInFollowingDirection(
 				currentView, orientation, currentPosition);
 
@@ -157,9 +126,10 @@ public abstract class CarNavigationStrategy {
 		return null;
 	}
 
-	public abstract CarControllerActions findTurningPointForNewStrategy(MyAIController carController, ArrayList<Coordinate> obstaclesToFollow,
-			WorldSpatial.Direction orientation, HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition);
-	
+	public abstract CarControllerActions findTurningPointForNewStrategy(MyAIController carController,
+			ArrayList<Coordinate> obstaclesToFollow, WorldSpatial.Direction orientation,
+			HashMap<Coordinate, MapTile> currentView, Coordinate currentPosition);
+
 	public boolean changeStrategyNow() {
 		return changeStrategyNow;
 	}

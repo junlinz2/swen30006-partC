@@ -28,18 +28,18 @@ public class StrategyFactory {
 	private CarControllerActions actionAtTurningPoint = null;
 
 	// TODO : add the other strategies
-	public CarNavigationStrategy createCarStrategy(ArrayList<MapTile> tilesToAvoid, int tileFollowingSensitivity,
-			int distToSlowDown, MyAIController.Strategies strategyName) throws StrategyNotFoundException {
+	public CarNavigationStrategy createCarStrategy(int tileFollowingSensitivity,
+			int distToSlowDown, MyAIController.Strategies strategyName){
 
 		CarNavigationStrategy newStrategy = null;
 		switch (strategyName) {
 		case FOLLOWLEFTWALL:
 			currentStrategyName = MyAIController.Strategies.FOLLOWLEFTWALL;
-			newStrategy = new FollowLeftWallStrategy(tilesToAvoid, tileFollowingSensitivity, distToSlowDown);
+			newStrategy = new FollowLeftWallStrategy(tileFollowingSensitivity, distToSlowDown);
 			break;
 		case FOLLOWRIGHTWALL:
 			currentStrategyName = MyAIController.Strategies.FOLLOWRIGHTWALL;
-			newStrategy = new FollowRightWallStrategy(tilesToAvoid, tileFollowingSensitivity, distToSlowDown);
+			newStrategy = new FollowRightWallStrategy(tileFollowingSensitivity, distToSlowDown);
 			break;
 		default:
 			break;
