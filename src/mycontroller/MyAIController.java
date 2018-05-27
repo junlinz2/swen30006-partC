@@ -1,14 +1,8 @@
 package mycontroller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import controller.CarController;
-import mycontroller.exceptions.StrategyNotFoundException;
-import mycontroller.strategies.CarNavigationStrategy;
-import mycontroller.strategies.CarNavigationStrategy.CarControllerActions;
-import mycontroller.strategies.PathFindingStrategy;
-import mycontroller.strategies.StrategyFactory;
-import tiles.LavaTrap;
+import mycontroller.strategies.*;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.Car;
@@ -44,8 +38,8 @@ public class MyAIController extends CarController {
 	private int EAST_THRESHOLD = 3;
 
 	private StrategyFactory strategyFactory;
-	private CarNavigationStrategy carNavigationStrategy;
-	private CarControllerActions actionAtTurningPoint = null;
+	private CarControllerStrategy carNavigationStrategy;
+	private CarControllerStrategy.CarControllerActions actionAtTurningPoint = null;
 
 	public enum Strategies {
 		FOLLOWLEFTWALL, FOLLOWRIGHTWALL, GOTHROUGHLAVA, HEALING
@@ -55,10 +49,9 @@ public class MyAIController extends CarController {
 		super(car);
 		latestGameMap = new GameMap(getMap(), getKey()-1);
 
-		// TODO (Junlin) - check implementations as I have created a factory here.
 		/** default to following left wall when simulation starts **/
 		strategyFactory = new StrategyFactory();
-		carNavigationStrategy = strategyFactory.createCarStrategy(tilesToAvoid, TILE_FOLLOWING_SENSITIVITY,
+		carNavigationStrategy = strategyFactory.createCarStrategy(TILE_FOLLOWING_SENSITIVITY,
 				DISTANCE_TO_SLOW_DOWN, Strategies.FOLLOWLEFTWALL);
 	}
 
@@ -81,11 +74,10 @@ public class MyAIController extends CarController {
 				setLastTurnDirection(WorldSpatial.RelativeDirection.LEFT);
 				applyLeftTurn(getOrientation(), delta);
 			}
-			
-			int distToObstacleAhead = ((PathFindingStrategy) carNavigationStrategy).
-            checkViewForTile(WorldSpatial.Direction.NORTH, currentView,
-            currentPosition, ((PathFindingStrategy) carNavigationStrategy).getTilesToAvoid());
 
+			int distToObstacleAhead = ((PathFindingStrategy) carNavigationStrategy).checkViewForTile(
+					WorldSpatial.Direction.NORTH, currentView, currentPosition,
+					((PathFindingStrategy) carNavigationStrategy).getTilesToAvoid());
 
 			if (distToObstacleAhead <= DISTANCE_TO_SLOW_DOWN && distToObstacleAhead > DISTANCE_TO_TURN) {
 				if (getSpeed() > MAX_TURNING_SPEED)
@@ -121,20 +113,18 @@ public class MyAIController extends CarController {
 			}
 
 			else {
-				if (carNavigationStrategy.changeStrategyNow()) {
-					carNavigationStrategy = strategyFactory.changeCarStrategy(tilesToAvoid, TILE_FOLLOWING_SENSITIVITY,
+				if (((PathFindingStrategy) carNavigationStrategy).changeStrategyNow()) {
+					carNavigationStrategy = strategyFactory.changeCarStrategy(TILE_FOLLOWING_SENSITIVITY,
 							DISTANCE_TO_SLOW_DOWN);
 				}
 
 				strategyFactory.registerTilesToFollow(currentView, getOrientation(), currentPosition);
 				strategyFactory.deregisterFollowedObstacles(currentView, getOrientation(), currentPosition,
-						tilesToAvoid);
-				
-				if (strategyFactory.monitorStrategyChange(this, currentView, getOrientation(), currentPosition) != null) {
-					return;
-				}
+						((PathFindingStrategy) carNavigationStrategy).getTilesToAvoid());
 
-				carNavigationStrategy.decideAction(currentView, this);
+				actionAtTurningPoint = strategyFactory.monitorStrategyChange(this, actionAtTurningPoint, currentView, getOrientation(),
+						currentPosition);
+				((PathFindingStrategy) carNavigationStrategy).decideAction(this);
 			}
 		}
 	}
@@ -316,7 +306,7 @@ public class MyAIController extends CarController {
 		return justChangedState;
 	}
 
-	public void setCarNavigationStrategy(CarNavigationStrategy strategy) {
+	public void setCarNavigationStrategy(CarControllerStrategy strategy) {
 		this.carNavigationStrategy = strategy;
 	}
 
@@ -348,19 +338,6 @@ public class MyAIController extends CarController {
 		return new Coordinate(getPosition());
 	}
 
-	public ArrayList<MapTile> getTilesToAvoid() {
-		return tilesToAvoid;
-	}
-
-	// TODO Remove if unused
-	// public float getFloatX() {
-	// return getX();
-	// }
-	//
-	// public float getFloatY() {
-	// return getY();
-	// }
-
 	public void setJustChangedState(boolean justChangedState) {
 		this.justChangedState = justChangedState;
 	}
@@ -377,11 +354,11 @@ public class MyAIController extends CarController {
 		this.latestGameMap = latestGameMap;
 	}
 
-	public CarControllerActions getActionAtTurningPoint() {
+	public CarControllerStrategy.CarControllerActions getActionAtTurningPoint() {
 		return actionAtTurningPoint;
 	}
 
-	public void setActionAtTurningPoint(CarControllerActions action) {
+	public void setActionAtTurningPoint( CarControllerStrategy.	CarControllerActions action) {
 		actionAtTurningPoint = action;
 	}
 

@@ -14,7 +14,8 @@ public class TilesChecker {
 			Arrays.asList(Type.TRAP, Type.ROAD, Type.START, Type.FINISH));
 	private static ArrayList<String> drivableTraps = new ArrayList<>(
 			Arrays.asList("health", "lava"));
-  
+	private static ArrayList<String> nameOfHealingTiles = new ArrayList<>(Arrays.asList("health"));
+	
 	public static boolean checkTileWithKeys(MapTile tile) {
 		if (checkForTrapTile(tile)) {
 			return checkTrapTileWithKeys(tile);
@@ -45,7 +46,7 @@ public class TilesChecker {
 		return tile.getType() == MapTile.Type.EMPTY;
 	}
 
-	public static boolean checkTileTypeSame(MapTile tile1, MapTile tile2) {
+	public static boolean checkTileSameType(MapTile tile1, MapTile tile2) {
 		if (tile1.getType() == MapTile.Type.TRAP && tile2.getType() == MapTile.Type.TRAP) {
 			if (((TrapTile) tile1).getTrap().equals(((TrapTile) tile2).getTrap())) {
 				return true;
@@ -121,5 +122,17 @@ public class TilesChecker {
 		} else {
 			return false;
 		}
+	}
+	
+	public static boolean checkForHealthTile(MapTile tile) {
+		if (checkForTrapTile(tile)) {
+			return nameOfHealingTiles.contains(((TrapTile) tile).getTrap());
+		}
+		
+		return false;
+	}
+	
+	public static boolean checkForTileToAvoid(MapTile tile1, MapTile tile2) {
+		return checkTileSameType(tile1, tile2);
 	}
 }

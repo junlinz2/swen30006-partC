@@ -7,8 +7,7 @@ import java.util.Map;
 
 import mycontroller.MyAIController;
 import mycontroller.TilesChecker;
-import mycontroller.exceptions.StrategyNotFoundException;
-import mycontroller.strategies.CarNavigationStrategy.CarControllerActions;
+import mycontroller.strategies.CarControllerStrategy.CarControllerActions;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
@@ -21,25 +20,24 @@ public class StrategyFactory {
 	private ArrayList<Coordinate> obstaclesToFollow = new ArrayList<>();
 	private ArrayList<Coordinate> followedObstacles = new ArrayList<>();
 	private MyAIController.Strategies currentStrategyName = null;
-	private CarNavigationStrategy currentStrategy = null;
+	private CarControllerStrategy currentStrategy = null;
 	private Coordinate switchingPoint = null;
 	private boolean justFoundSwitchingPoint = false;
 	private boolean searchForTurningPoint = false;
-	private CarControllerActions actionAtTurningPoint = null;
 
 	// TODO : add the other strategies
-	public CarNavigationStrategy createCarStrategy(int tileFollowingSensitivity,
-			int distToSlowDown, MyAIController.Strategies strategyName){
+	public CarControllerStrategy createCarStrategy(int tileFollowingSensitivity, int distToSlowDown,
+			MyAIController.Strategies strategyName) {
 
-		CarNavigationStrategy newStrategy = null;
+		CarControllerStrategy newStrategy = null;
 		switch (strategyName) {
 		case FOLLOWLEFTWALL:
 			currentStrategyName = MyAIController.Strategies.FOLLOWLEFTWALL;
-			newStrategy = new FollowLeftWallStrategy(tileFollowingSensitivity, distToSlowDown);
+			newStrategy = new FollowLeftObstacleStrategy(tileFollowingSensitivity, distToSlowDown);
 			break;
 		case FOLLOWRIGHTWALL:
 			currentStrategyName = MyAIController.Strategies.FOLLOWRIGHTWALL;
-			newStrategy = new FollowRightWallStrategy(tileFollowingSensitivity, distToSlowDown);
+			newStrategy = new FollowRightObstacleStrategy(tileFollowingSensitivity, distToSlowDown);
 			break;
 		default:
 			break;
@@ -49,20 +47,19 @@ public class StrategyFactory {
 		return newStrategy;
 	}
 
-	public CarNavigationStrategy changeCarStrategy(ArrayList<MapTile> tilesToAvoid, int tileFollowingSensitivity,
-			int distToSlowDown) {
+	public CarControllerStrategy changeCarStrategy(int tileFollowingSensitivity, int distToSlowDown) {
 		// Set it null to get a new switching point in myAiController
 		switchingPoint = null;
 
 		if (currentStrategyName == MyAIController.Strategies.FOLLOWLEFTWALL) {
 			currentStrategyName = MyAIController.Strategies.FOLLOWRIGHTWALL;
-			currentStrategy = new FollowRightWallStrategy(tilesToAvoid, tileFollowingSensitivity, distToSlowDown);
+			currentStrategy = new FollowRightObstacleStrategy(tileFollowingSensitivity, distToSlowDown);
 			return currentStrategy;
 		}
 
 		else if (currentStrategyName == MyAIController.Strategies.FOLLOWRIGHTWALL) {
 			currentStrategyName = MyAIController.Strategies.FOLLOWLEFTWALL;
-			currentStrategy = new FollowLeftWallStrategy(tilesToAvoid, tileFollowingSensitivity, distToSlowDown);
+			currentStrategy = new FollowLeftObstacleStrategy(tileFollowingSensitivity, distToSlowDown);
 			return currentStrategy;
 		}
 
@@ -72,7 +69,8 @@ public class StrategyFactory {
 	public void registerTilesToFollow(HashMap<Coordinate, MapTile> currentView, WorldSpatial.Direction orientation,
 			Coordinate currentPosition) {
 
-		Coordinate tileCoordinate = currentStrategy.findTileOnOtherSide(currentView, orientation, currentPosition);
+		Coordinate tileCoordinate = ((PathFindingStrategy) currentStrategy).findTileOnOtherSide(currentView,
+				orientation, currentPosition);
 
 		if (tileCoordinate != null) {
 			if (!obstaclesToFollow.contains(tileCoordinate) && !followedObstacles.contains(tileCoordinate)) {
@@ -84,12 +82,12 @@ public class StrategyFactory {
 	public void deregisterFollowedObstacles(HashMap<Coordinate, MapTile> currentView,
 			WorldSpatial.Direction orientation, Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
 
-		LinkedHashMap<Coordinate, MapTile> viewInFollowingDirection = currentStrategy
+		LinkedHashMap<Coordinate, MapTile> viewInFollowingDirection = ((PathFindingStrategy) currentStrategy)
 				.getOrientationViewInFollowingDirection(currentView, orientation, currentPosition);
 
 		for (Map.Entry<Coordinate, MapTile> tileInView : viewInFollowingDirection.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if (TilesChecker.checkTileTypeSame(tileInView.getValue(), tile)) {
+				if (TilesChecker.checkTileSameType(tileInView.getValue(), tile)) {
 					obstaclesToFollow.remove(tileInView.getKey());
 
 					// TODO: Use HashSet if possible
@@ -104,37 +102,36 @@ public class StrategyFactory {
 	}
 
 	public CarControllerActions monitorStrategyChange(MyAIController carController,
-			HashMap<Coordinate, MapTile> currentView, WorldSpatial.Direction orientation, Coordinate currentPosition) {
-		Coordinate currentFollowingObstacle = currentStrategy.getFollowingObstacle(currentView, orientation,
-				currentPosition);
+			CarControllerActions actionAtTurningPoint, HashMap<Coordinate, MapTile> currentView,
+			WorldSpatial.Direction orientation, Coordinate currentPosition) {
+		Coordinate currentFollowingObstacle = ((PathFindingStrategy) currentStrategy).getFollowingObstacle(currentView,
+				orientation, currentPosition);
 
 		if (currentFollowingObstacle != null && switchingPoint == null) {
 			switchingPoint = currentFollowingObstacle;
 			justFoundSwitchingPoint = true;
 		}
 
-		if (justFoundSwitchingPoint && currentFollowingObstacle != null && switchingPoint != currentFollowingObstacle) {
+		if (justFoundSwitchingPoint && currentFollowingObstacle != null
+				&& !switchingPoint.equals(currentFollowingObstacle)) {
 			justFoundSwitchingPoint = false;
 		}
 
 		if (!justFoundSwitchingPoint && actionAtTurningPoint == null && currentFollowingObstacle != null
-				&& currentFollowingObstacle.equals(switchingPoint)) {
+				&& switchingPoint.equals(currentFollowingObstacle)) {
 			searchForTurningPoint = true;
 		}
 
 		if (searchForTurningPoint) {
-			actionAtTurningPoint = currentStrategy.findTurningPointForNewStrategy(carController, getObstaclesToFollow(),
-					orientation, currentView, currentPosition);
-			if (actionAtTurningPoint != null) {
-				if (actionAtTurningPoint == CarControllerActions.ISTURNINGRIGHT
-						|| actionAtTurningPoint == CarControllerActions.ISTURNINGLEFT) {
-					searchForTurningPoint = false;
-				}
-				return actionAtTurningPoint;
+			actionAtTurningPoint = ((PathFindingStrategy) currentStrategy).findTurningPointForNewStrategy(carController,
+					getObstaclesToFollow(), orientation, currentView, currentPosition);
+			if (actionAtTurningPoint == CarControllerActions.ISTURNINGRIGHT
+					|| actionAtTurningPoint == CarControllerActions.ISTURNINGLEFT) {
+				searchForTurningPoint = false;
 			}
 		}
 
-		return null;
+		return actionAtTurningPoint;
 	}
 
 	public Coordinate getSwitchingPoint() {

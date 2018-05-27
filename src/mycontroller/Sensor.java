@@ -94,7 +94,7 @@ public class Sensor {
 		int i = 1;
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()))
+				if (TilesChecker.checkTileSameType(tile, tileInView.getValue()))
 					return i;
 			}
 			i++;
@@ -114,7 +114,7 @@ public class Sensor {
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
 				// if (areTilesSameType(tileInView.getValue(), tile)) {
-				if (TilesChecker.checkTileTypeSame(tileInView.getValue(), tile)) {
+				if (TilesChecker.checkTileSameType(tileInView.getValue(), tile)) {
 					Coordinate roadBeforeObstacle = null;
 					int obstacleX = tileInView.getKey().x;
 					int obstacleY = tileInView.getKey().y;
@@ -172,11 +172,11 @@ public class Sensor {
 			boolean istile2Obstacle = false;
 
 			for (MapTile tile : tilesToCheck) {
-				if (TilesChecker.checkTileTypeSame(currentView.get(adjacentTile1), tile)) {
+				if (TilesChecker.checkTileSameType(currentView.get(adjacentTile1), tile)) {
 					istile1Obstacle = true;
 				}
 
-				if (TilesChecker.checkTileTypeSame(currentView.get(adjacentTile2), tile)) {
+				if (TilesChecker.checkTileSameType(currentView.get(adjacentTile2), tile)) {
 					istile2Obstacle = true;
 				}
 			}
@@ -277,7 +277,7 @@ public class Sensor {
 		int i = 1;
 		for (Map.Entry<Coordinate, MapTile> tileInView : view.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue()) && i <= getTileFollowingSensitivity())
+				if (TilesChecker.checkTileSameType(tile, tileInView.getValue()) && i <= getTileFollowingSensitivity())
 					return true;
 			}
 			i++;
@@ -296,7 +296,7 @@ public class Sensor {
 
 		for (Map.Entry<Coordinate, MapTile> tileInView : viewInOrientation.entrySet()) {
 			for (MapTile tile : tilesToCheck) {
-				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue())) {
+				if (TilesChecker.checkTileSameType(tile, tileInView.getValue())) {
 					return tileInView.getKey();
 				}
 			}

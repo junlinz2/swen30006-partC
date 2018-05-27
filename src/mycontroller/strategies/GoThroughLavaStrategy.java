@@ -6,9 +6,11 @@ import tiles.LavaTrap;
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
+import world.WorldSpatial.Direction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Group 39
@@ -22,8 +24,8 @@ public class GoThroughLavaStrategy extends PathFindingStrategy {
     private PathFindingStrategy followRightWallStrategy;
 
     public GoThroughLavaStrategy(StrategyFactory s, MyAIController c) {
-        followLeftWallStrategy = (PathFindingStrategy) s.createCarStrategy(c, MyAIController.strategies.FOLLOWLEFTWALL);
-        followRightWallStrategy = (PathFindingStrategy) s.createCarStrategy(c, MyAIController.strategies.FOLLOWRIGHTWALL);
+        followLeftWallStrategy = (PathFindingStrategy) s.createCarStrategy(c.TILE_FOLLOWING_SENSITIVITY, c.DISTANCE_TO_SLOW_DOWN, MyAIController.Strategies.FOLLOWLEFTWALL);
+        followRightWallStrategy = (PathFindingStrategy) s.createCarStrategy(c.TILE_FOLLOWING_SENSITIVITY, c.DISTANCE_TO_SLOW_DOWN, MyAIController.Strategies.FOLLOWRIGHTWALL);
 
         tilesToAvoid = new ArrayList<>();
         tilesToAvoid.add(new LavaTrap());
@@ -31,7 +33,7 @@ public class GoThroughLavaStrategy extends PathFindingStrategy {
 
     public void decideAction(MyAIController carController) {
 
-        CarControllerStrategy.carControllerActions nextState = null;
+        CarControllerStrategy.CarControllerActions nextState = null;
 
         // New action is relayed by the StrategyControllerRelay singleton to MyAIController
         StrategyControllerRelay.getInstance().changeState(carController, nextState);
@@ -42,4 +44,40 @@ public class GoThroughLavaStrategy extends PathFindingStrategy {
                              Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
         return false;
     }
+
+	@Override
+	public boolean checkFollowingObstacle(Direction orientation, HashMap<Coordinate, MapTile> currentView,
+			Coordinate currentPosition, ArrayList<MapTile> tilesToAvoid) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean peekCorner(Direction orientation, HashMap<Coordinate, MapTile> currentView,
+			Coordinate currentPosition, ArrayList<MapTile> tilesToCheck) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public LinkedHashMap<Coordinate, MapTile> getOrientationViewInFollowingDirection(
+			HashMap<Coordinate, MapTile> currentView, Direction orientation, Coordinate currentPosition) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CarControllerActions findTurningPointForNewStrategy(MyAIController carController,
+			ArrayList<Coordinate> obstaclesToFollow, Direction orientation, HashMap<Coordinate, MapTile> currentView,
+			Coordinate currentPosition) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Coordinate findTileOnOtherSide(HashMap<Coordinate, MapTile> currentView, Direction orientation,
+			Coordinate currentPosition) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
  */
 public interface CarControllerStrategy {
 
-    enum carControllerActions { ACCELERATE, SLOWDOWN, ISTURNINGLEFT, ISTURNINGRIGHT, REVERSE }
-
+    enum CarControllerActions { ACCELERATE, SLOWDOWN, ISTURNINGLEFT, ISTURNINGRIGHT, REVERSE }
+    
     void decideAction(MyAIController carController);
 }

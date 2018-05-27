@@ -108,8 +108,8 @@ public abstract class GoalCompletionStrategy implements CarControllerStrategy {
         return tilesToAvoid;
     }
 
-    public carControllerActions determineState(MyAIController carController) {
-        carControllerActions nextState;
+    public CarControllerActions determineState(MyAIController carController) {
+        CarControllerActions nextState;
         int distUntilTurn = getDistUntilNextTurn(carController.DISTANCE_TO_SLOW_DOWN);
 
         // If the car is to immediately turn, decide which way to turn
@@ -117,22 +117,22 @@ public abstract class GoalCompletionStrategy implements CarControllerStrategy {
             Movement nextMovement = movement.remove(0);
             switch (nextMovement) {
                 case LEFT:
-                    nextState = carControllerActions.ISTURNINGLEFT;
+                    nextState = CarControllerActions.ISTURNINGLEFT;
                     break;
                 case RIGHT:
-                    nextState = carControllerActions.ISTURNINGRIGHT;
+                    nextState = CarControllerActions.ISTURNINGRIGHT;
                     break;
                 default:
-                    nextState = carControllerActions.ACCELERATE;
+                    nextState = CarControllerActions.ACCELERATE;
             }
         }
         //Prepare the car to turn
         else if (distUntilTurn <= carController.DISTANCE_TO_SLOW_DOWN) {
-            nextState = carControllerActions.SLOWDOWN;
+            nextState = CarControllerActions.SLOWDOWN;
         }
 
         else {
-            nextState = carControllerActions.ACCELERATE;
+            nextState = CarControllerActions.ACCELERATE;
         }
         return nextState;
     }

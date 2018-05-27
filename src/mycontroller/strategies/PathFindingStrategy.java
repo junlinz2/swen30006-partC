@@ -26,10 +26,6 @@ public abstract class PathFindingStrategy implements CarControllerStrategy {
 	
 	public abstract void decideAction(MyAIController carController);
 
-	public enum CarControllerActions {
-		ACCELERATE, SLOWDOWN, ISTURNINGLEFT, ISTURNINGRIGHT, REVERSE, DONOTHING
-	}
-
 	public static CarControllerActions decideTurning(int distToObstacle,
 			WorldSpatial.RelativeDirection turningDirection, int maxDistToTurn, int maxDistToSlowDown,
 			boolean followedTilesEndAhead) {
@@ -112,7 +108,7 @@ public abstract class PathFindingStrategy implements CarControllerStrategy {
 		int i = 1;
 		for (Map.Entry<Coordinate, MapTile> tileInView : viewInFollowingDirection.entrySet()) {
 			for (MapTile tile : tilesToAvoid) {
-				if (TilesChecker.checkTileTypeSame(tile, tileInView.getValue())
+				if (TilesChecker.checkTileSameType(tile, tileInView.getValue())
 						&& i <= sensor.getTileFollowingSensitivity())
 					return tileInView.getKey();
 			}
@@ -136,4 +132,8 @@ public abstract class PathFindingStrategy implements CarControllerStrategy {
 
 	public abstract Coordinate findTileOnOtherSide(HashMap<Coordinate, MapTile> currentView, Direction orientation,
 			Coordinate currentPosition);
+	
+	public ArrayList<MapTile> getTilesToAvoid() {
+		return tilesToAvoid;
+	}
 }

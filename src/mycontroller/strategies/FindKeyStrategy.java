@@ -29,7 +29,7 @@ public class FindKeyStrategy extends GoalCompletionStrategy {
             routeInterpretor(path, currentOrientation);
         }
         else {
-            carControllerActions nextState = determineState(carController);
+            CarControllerActions nextState = determineState(carController);
             StrategyControllerRelay.getInstance().changeState(carController, nextState);
         }
     }

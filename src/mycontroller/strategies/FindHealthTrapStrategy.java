@@ -31,7 +31,7 @@ public class FindHealthTrapStrategy extends GoalCompletionStrategy {
         MapTile carCurrentPositionTile = carController.getLatestGameMap().getUpdatedMap().get(currentPosition).getTile();
         carCurrentNode = new Node(currentPosition.x, currentPosition.y, carCurrentPositionTile);
 
-        carControllerActions nextState = determineState(carController);
+        CarControllerActions nextState = determineState(carController);
         StrategyControllerRelay.getInstance().changeState(carController, nextState);
     }
 }
